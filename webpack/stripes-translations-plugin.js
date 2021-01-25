@@ -25,8 +25,6 @@ module.exports = class StripesTranslationPlugin {
     Object.assign(this.modules, options.modules);
     this.languageFilter = options.config.languages || [];
     logger.log('language filter', this.languageFilter);
-
-    console.log(this.modules);
   }
 
   apply(compiler) {
@@ -84,8 +82,6 @@ module.exports = class StripesTranslationPlugin {
       // translations from module dependencies may need to be located relative to their dependent (eg. in yarn workspaces)
       const locateContext = this.modules[mod].resolvedPath || this.context;
       const modPackageJsonPath = modulePaths.locateStripesModule(locateContext, mod, this.aliases, 'package.json');
-
-      console.log('modulePaths', modulePaths, modPackageJsonPath);
 
       if (modPackageJsonPath) {
         const moduleName = StripesTranslationPlugin.getModuleName(mod);
