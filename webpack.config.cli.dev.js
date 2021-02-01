@@ -11,10 +11,21 @@ const postCssNesting = require('postcss-nesting');
 const postCssCustomMedia = require('postcss-custom-media');
 const postCssMediaMinMax = require('postcss-media-minmax');
 const postCssColorFunction = require('postcss-color-function');
-const { generateStripesAlias } = require('./webpack/module-paths');
+const { generateStripesAlias, tryResolve } = require('./webpack/module-paths');
 
 const base = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
+
+const locateCssVariables = () => {
+  const variables = 'lib/variables.css';
+  const localPath = path.join(path.resolve(), variables);
+
+  // check if variables are present locally (in cases when stripes-components is
+  // being built directly) if not look for them via stripes aliases
+  return tryResolve(localPath) ?
+    localPath :
+    path.join(generateStripesAlias('@folio/stripes-components'), variables);
+};
 
 const devConfig = Object.assign({}, base, cli, {
   devtool: 'inline-source-map',
@@ -56,7 +67,7 @@ devConfig.module.rules.push({
           autoprefixer(),
           postCssCustomProperties({
             preserve: false,
-            importFrom: [path.join(generateStripesAlias('@folio/stripes-components'), 'lib/variables.css')]
+            importFrom: [locateCssVariables()]
           }),
           postCssCalc(),
           postCssNesting(),
