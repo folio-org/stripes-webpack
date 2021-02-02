@@ -4,6 +4,7 @@ const VirtualModulesPlugin = require('webpack-virtual-modules');
 const StripesConfigPlugin = require('../../webpack/stripes-config-plugin');
 const StripesTranslationsPlugin = require('../../webpack/stripes-translations-plugin');
 const StripesBrandingPlugin = require('../../webpack/stripes-branding-plugin');
+const StripesErrorLoggingPlugin = require('../../webpack/stripes-error-logging-plugin');
 const stripesModuleParser = require('../../webpack/stripes-module-parser');
 const stripesSerialize = require('../../webpack/stripes-serialize');
 
@@ -112,6 +113,10 @@ describe('The stripes-config-plugin', function () {
       brandingPlugin.serializedBranding = JSON.stringify({ logo: { alt: 'Future Of Libraries Is Open' } });
       compilerStub.options.plugins.push(brandingPlugin);
 
+      const loggingPlugin = new StripesErrorLoggingPlugin({});
+      loggingPlugin.errorLogging = JSON.stringify({ loggingService: { apiKey: 'top-secret' } });
+      compilerStub.options.plugins.push(loggingPlugin);
+
       this.sut.apply(compilerStub);
     });
 
@@ -130,7 +135,7 @@ describe('The stripes-config-plugin', function () {
       expect(writeModuleArgs[0]).to.be.a('string').that.equals('node_modules/stripes-config.js');
 
       // TODO: More thorough analysis of the generated virtual module
-      expect(writeModuleArgs[1]).to.be.a('string').with.match(/export { okapi, config, modules, branding, translations, metadata, icons }/);
+      expect(writeModuleArgs[1]).to.be.a('string').with.match(/export { okapi, config, modules, branding, errorLogging, translations, metadata, icons }/);
     });
   });
 
