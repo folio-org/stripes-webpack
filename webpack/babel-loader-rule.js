@@ -30,7 +30,9 @@ module.exports = {
     presets: [
       ['@babel/preset-env', { targets: '> 0.25%, not dead' }],
       ['@babel/preset-flow', { all: true }],
-      ['@babel/preset-react'],
+      ['@babel/preset-react', {
+        "runtime": "automatic"
+      }],
       ['@babel/preset-typescript'],
     ],
     plugins: [
