@@ -71,7 +71,20 @@ describe('The stripes-translations-plugin', function () {
     beforeEach(function () {
       this.sandbox.stub(modulePaths, 'locateStripesModule').callsFake((context, mod) => `path/to/${mod}/package.json`);
       this.sandbox.stub(fs, 'existsSync').returns(true);
-      this.sandbox.stub(fs, 'readdirSync').returns(['en.json', 'es.json', 'fr.json']);
+      this.sandbox.stub(fs, 'readdirSync').returns([
+        {
+          isFile: () => true,
+          name: 'en.json',
+        },
+        {
+          isFile: () => true,
+          name: 'es.json',
+        },
+        {
+          isFile: () => true,
+          name: 'fr.json',
+        },
+      ]);
       this.sandbox.spy(webpack.ContextReplacementPlugin.prototype, 'apply');
       this.sandbox.spy(compilerStub.hooks.emit, 'tapAsync');
       this.sandbox.stub(StripesTranslationsPlugin, 'loadFile').returns({ key1: 'Value 1', key2: 'Value 2' });
@@ -145,7 +158,20 @@ describe('The stripes-translations-plugin', function () {
 
   describe('loadTranslationsDirectory method', function () {
     beforeEach(function () {
-      this.sandbox.stub(fs, 'readdirSync').returns(['en.json', 'es.json', 'fr.json']);
+      this.sandbox.stub(fs, 'readdirSync').returns([
+        {
+          isFile: () => true,
+          name: 'en.json',
+        },
+        {
+          isFile: () => true,
+          name: 'es.json',
+        },
+        {
+          isFile: () => true,
+          name: 'fr.json',
+        },
+      ]);
       this.sandbox.stub(StripesTranslationsPlugin, 'loadFile').returns({ key1: 'Value 1', key2: 'Value 2' });
       this.sut = new StripesTranslationsPlugin(this.stripesConfig);
     });
