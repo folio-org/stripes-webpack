@@ -99,7 +99,7 @@ module.exports = class StripesTranslationPlugin {
           }
         }
       } else {
-        console.log(`Unable to locate ${mod} while looking for translations.`);
+        logger.log(`Unable to locate ${mod} while looking for translations.`);
       }
     }
     return allTranslations;
@@ -122,12 +122,16 @@ module.exports = class StripesTranslationPlugin {
       enTranslations = StripesTranslationPlugin.prefixModuleKeys(moduleName, rawEnTranslations);
     }
 
-    for (const translationFile of fs.readdirSync(dir)) {
-      const language = translationFile.replace('.json', '');
+    for (const translationFile of fs.readdirSync(dir, { withFileTypes: true })) {
+      const language = translationFile.name.replace('.json', '');
       // When filter is set, skip other languages. Otherwise loads all
       if (!this.languageFilter.length || this.languageFilter.includes(language)) {
-        const translations = StripesTranslationPlugin.loadFile(path.join(dir, translationFile));
-        moduleTranslations[language] = Object.assign({}, enTranslations, StripesTranslationPlugin.prefixModuleKeys(moduleName, translations));
+        if (translationFile.isFile()) {
+          const translations = StripesTranslationPlugin.loadFile(path.join(dir, translationFile.name));
+          moduleTranslations[language] = Object.assign({}, enTranslations, StripesTranslationPlugin.prefixModuleKeys(moduleName, translations));
+        } else {
+          logger.log(`Could not read translations from ${path.join(dir, translationFile.name)}; it is not a file.`)
+        }
       }
     }
     return moduleTranslations;
