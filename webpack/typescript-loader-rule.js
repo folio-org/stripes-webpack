@@ -8,7 +8,7 @@ function babelLoaderTest(fileName) {
   const nodeModIdx = fileName.lastIndexOf('node_modules');
   const folioIdx = fileName.lastIndexOf('@folio');
 
-  if (fileName.endsWith('.tsx') && (nodeModIdx === -1 || folioIdx > nodeModIdx)) {
+  if ((fileName.endsWith('.tsx') || fileName.endsWith('.ts')) && (nodeModIdx === -1 || folioIdx > nodeModIdx)) {
     return true;
   }
 
@@ -17,7 +17,7 @@ function babelLoaderTest(fileName) {
 
 module.exports = {
   test: babelLoaderTest,
-  loader: 'awesome-typescript-loader',
+  loader: 'ts-loader',
   query: {
     configFileName: path.join(__dirname, 'tsconfig.json'),
   },

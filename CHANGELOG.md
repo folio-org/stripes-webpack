@@ -3,6 +3,7 @@
 ## 1.3.0 (IN PROGRESS)
 
 * Correctly specify peer-dependencies. Refs STRWEB-11.
+* Replace unmaintained `awesome-typescript-loader` with `ts-loader`. Refs STRWEB-10.
 * Some babel plugins must be configured consistently. Refs STRWEB-12.
 
 ## [1.2.0](https://github.com/folio-org/stripes-webpack/tree/v1.2.0) (2021-04-12)

@@ -5,8 +5,5 @@
     "lib": [
       "esnext"
     ]
-  },
-  "awesomeTypescriptLoaderOptions": {
-    "useCache": true
   }
 }
