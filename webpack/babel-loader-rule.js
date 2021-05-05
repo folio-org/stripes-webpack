@@ -16,7 +16,7 @@ const folioScopeBlacklist = [
 function babelLoaderTest(fileName) {
   const nodeModIdx = fileName.lastIndexOf('node_modules');
   if (fileName.endsWith('.js')
-    && (nodeModIdx === -1 || ['@folio', ...extraTranspile].reduce((acc, cur) => (fileName.lastIndexOf(cur) > nodeModIdx) || acc))
+    && (nodeModIdx === -1 || ['@folio', ...extraTranspile].reduce((acc, cur) => (fileName.lastIndexOf(cur) > nodeModIdx) || acc, false))
     && (folioScopeBlacklist.findIndex(ignore => fileName.includes(ignore)) === -1)) {
     return true;
   }
