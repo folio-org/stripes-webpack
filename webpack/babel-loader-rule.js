@@ -1,4 +1,5 @@
 const path = require('path');
+const extraTranspile = process.env.STRIPES_TRANSPILE_TOKENS ? process.env.STRIPES_TRANSPILE_TOKENS.split(' ') : [];
 
 // These modules are already transpiled and should be excluded
 const folioScopeBlacklist = [
@@ -15,7 +16,7 @@ const folioScopeBlacklist = [
 function babelLoaderTest(fileName) {
   const nodeModIdx = fileName.lastIndexOf('node_modules');
   if (fileName.endsWith('.js')
-    && (nodeModIdx === -1 || fileName.lastIndexOf('@folio') > nodeModIdx)
+    && (nodeModIdx === -1 || ['@folio', ...extraTranspile].reduce((acc, cur) => (fileName.lastIndexOf(cur) > nodeModIdx) || acc))
     && (folioScopeBlacklist.findIndex(ignore => fileName.includes(ignore)) === -1)) {
     return true;
   }
