@@ -5,6 +5,7 @@
 * Correctly specify peer-dependencies. Refs STRWEB-11.
 * Replace unmaintained `awesome-typescript-loader` with `ts-loader`. Refs STRWEB-10.
 * Some babel plugins must be configured consistently. Refs STRWEB-12.
+* Introduce the STRIPES_TRANSPILE_TOKENS environment variable which includes a space delimited list of strings (typically namespaces) to use in addition to "@folio" to determine if something needs Stripes-flavoured transpilation. Fixes STRWEB-13.
 
 ## [1.2.0](https://github.com/folio-org/stripes-webpack/tree/v1.2.0) (2021-04-12)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v1.1.0...v1.2.0)
@@ -13,7 +14,6 @@
 * If translations exist in a `/compiled` subdirectory, then they will be preferred as the translations to use in the final bundle. Refs STCLI-158.
 * Ignore non-file entries when reading the `translations/...` directory. Refs STRWEB-7.
 * Add support for loading CSV files. Fixes STRWEB-8.
-* Introduce the STRIPES_TRANSPILE_TOKENS environment variable which includes a space delimited list of strings (typically namespaces) to use in addition to "@folio" to determine if something needs Stripes-flavoured transpilation. Fixes STRWEB-13.
 
 ## [1.1.0](https://github.com/folio-org/stripes-webpack/tree/v1.1.0) (2021-02-03)
 
