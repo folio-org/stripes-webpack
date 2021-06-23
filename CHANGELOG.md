@@ -1,5 +1,9 @@
 # Change history for stripes-webpack
 
+## 1.3.0 IN PROGRESS
+
+* Lock onto `optimize-css-assets-webpack-plugin` `5.0.6` to avoid `postcss` `v8`. Fixes STRWEB-19.
+
 ## [1.3.0](https://github.com/folio-org/stripes-webpack/tree/v1.3.0) (2021-06-08)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v1.2.0...v1.3.0)
 
