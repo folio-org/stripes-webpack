@@ -38,7 +38,7 @@ function babelLoaderTest(fileName) {
 module.exports = {
   test: babelLoaderTest,
   loader: 'babel-loader',
-  options = {
+  options: {
     cacheDirectory: true,
     ...babelOptions,
   },
