@@ -4,7 +4,7 @@
 
 * Lock onto `optimize-css-assets-webpack-plugin` `5.0.6` to avoid `postcss` `v8`. Fixes STRWEB-19.
 * Add `loose` to `plugin-proposal-private-property-in-object`. Fixes STRWEB-21.
-* Export babel config options for consumption by other modules. Refs STRWEB-22, STRIPES-742.
+* Export babel config options for consumption by other modules. Refs STRWEB-22, STRIPES-742, STRIPES-757.
 
 ## [1.3.0](https://github.com/folio-org/stripes-webpack/tree/v1.3.0) (2021-06-08)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v1.2.0...v1.3.0)
