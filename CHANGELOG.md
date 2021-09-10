@@ -5,6 +5,7 @@
 * Lock onto `optimize-css-assets-webpack-plugin` `5.0.6` to avoid `postcss` `v8`. Fixes STRWEB-19.
 * Add `loose` to `plugin-proposal-private-property-in-object`. Fixes STRWEB-21.
 * Export babel config options for consumption by other modules. Refs STRWEB-22, STRIPES-742, STRIPES-757.
+* Setup babel-plugin-lodash correctly. Fixes STRWEB-20.
 * Upgrade PostCSS depenency stack. Refs STRWEB-23
 * Conditionally inject shared style aliases based on development context. Refs STRWEB-23, STCLI-183
 

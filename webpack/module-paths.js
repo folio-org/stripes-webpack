@@ -81,13 +81,8 @@ function locateStripesModule(context, moduleName, alias, ...segments) {
   return foundPath;
 }
 
-function getSharedStyles(filename) {
-  return path.resolve(generateStripesAlias('@folio/stripes-components'), filename + ".css");
-}
-
 module.exports = {
   tryResolve,
   generateStripesAlias,
-  getSharedStyles,
   locateStripesModule,
 };

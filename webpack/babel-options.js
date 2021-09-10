@@ -8,6 +8,7 @@ module.exports = {
     ['@babel/preset-typescript'],
   ],
   plugins: [
+    ['lodash'],
     ['@babel/plugin-proposal-decorators', { 'legacy': true }],
     // when building a platform directly, i.e. outside a workspace,
     // babel complains loudly and repeatedly that when these modules are enabled:

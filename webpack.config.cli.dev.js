@@ -11,11 +11,10 @@ const postCssNesting = require('postcss-nesting');
 const postCssCustomMedia = require('postcss-custom-media');
 const postCssMediaMinMax = require('postcss-media-minmax');
 const postCssColorFunction = require('postcss-color-function');
-const { generateStripesAlias, tryResolve, getSharedStyles } = require('./webpack/module-paths');
+const { generateStripesAlias, tryResolve } = require('./webpack/module-paths');
 
 const base = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
-
 
 const locateCssVariables = () => {
   const variables = 'lib/variables.css';
@@ -54,9 +53,8 @@ devConfig.module.rules.push({
     {
       loader: 'css-loader',
       options: {
-        modules: {
-          localIdentName: '[local]---[hash:base64:5]',
-        },
+        localIdentName: '[local]---[hash:base64:5]',
+        modules: true,
         sourceMap: true,
         importLoaders: 1,
       },
@@ -64,21 +62,19 @@ devConfig.module.rules.push({
     {
       loader: 'postcss-loader',
       options: {
-        postcssOptions: {
-          plugins: [
-            postCssImport(),
-            autoprefixer(),
-            postCssCustomProperties({
-              preserve: false,
-              importFrom: [locateCssVariables()]
-            }),
-            postCssCalc(),
-            postCssNesting(),
-            postCssCustomMedia(),
-            postCssMediaMinMax(),
-            postCssColorFunction(),
-          ],
-        },
+        plugins: () => [
+          postCssImport(),
+          autoprefixer(),
+          postCssCustomProperties({
+            preserve: false,
+            importFrom: [locateCssVariables()]
+          }),
+          postCssCalc(),
+          postCssNesting(),
+          postCssCustomMedia(),
+          postCssMediaMinMax(),
+          postCssColorFunction(),
+        ],
         sourceMap: true,
       },
     },
