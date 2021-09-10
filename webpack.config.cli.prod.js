@@ -12,7 +12,7 @@ const postCssNesting = require('postcss-nesting');
 const postCssCustomMedia = require('postcss-custom-media');
 const postCssMediaMinMax = require('postcss-media-minmax');
 const postCssColorFunction = require('postcss-color-function');
-const { generateStripesAlias } = require('./webpack/module-paths');
+const { generateStripesAlias, getSharedStyles } = require('./webpack/module-paths');
 
 const base = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
@@ -22,9 +22,15 @@ const prodConfig = Object.assign({}, base, cli, {
 });
 
 prodConfig.plugins = prodConfig.plugins.concat([
-  new MiniCssExtractPlugin({ filename: 'style.[contenthash].css', allChunks: true }),
+  new MiniCssExtractPlugin({ filename: 'style.[contenthash].css' }),
   new OptimizeCssAssetsPlugin(),
 ]);
+
+prodConfig.resolve.alias = {
+  ...prodConfig.resolve.alias,
+  "stcom-interactionStyles": getSharedStyles("lib/sharedStyles/interactionStyles"),
+  "stcom-variables": getSharedStyles("lib/variables"),
+};
 
 prodConfig.module.rules.push({
   test: /\.css$/,
@@ -35,28 +41,30 @@ prodConfig.module.rules.push({
     {
       loader: 'css-loader',
       options: {
-        localIdentName: '[local]---[hash:base64:5]',
-        modules: true,
+        modules: {
+          localIdentName: '[local]---[hash:base64:5]',
+        },
         importLoaders: 1,
       },
     },
     {
       loader: 'postcss-loader',
       options: {
-        ident: 'postcss',
-        plugins: () => [
-          postCssImport(),
-          autoprefixer(),
-          postCssCustomProperties({
-            preserve: false,
-            importFrom: [path.join(generateStripesAlias('@folio/stripes-components'), 'lib/variables.css')]
-          }),
-          postCssCalc(),
-          postCssNesting(),
-          postCssCustomMedia(),
-          postCssMediaMinMax(),
-          postCssColorFunction(),
-        ],
+        postcssOptions: {
+          plugins: [
+            postCssImport(),
+            autoprefixer(),
+            postCssCustomProperties({
+              preserve: false,
+              importFrom: [path.join(generateStripesAlias('@folio/stripes-components'), 'lib/variables.css')]
+            }),
+            postCssCalc(),
+            postCssNesting(),
+            postCssCustomMedia(),
+            postCssMediaMinMax(),
+            postCssColorFunction(),
+          ],
+        },
       },
     },
   ],
