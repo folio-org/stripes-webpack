@@ -1,13 +1,14 @@
 # Change history for stripes-webpack
 
-## 2.0.0 IN PROGRESS
+## [2.0.0](https://github.com/folio-org/stripes-webpack/tree/v2.0.0) (2021-09-24)
+[Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v1.3.0...v2.0.0)
 
 * Lock onto `optimize-css-assets-webpack-plugin` `5.0.6` to avoid `postcss` `v8`. Fixes STRWEB-19.
 * Add `loose` to `plugin-proposal-private-property-in-object`. Fixes STRWEB-21.
 * Export babel config options for consumption by other modules. Refs STRWEB-22, STRIPES-742, STRIPES-757.
 * Setup babel-plugin-lodash correctly. Fixes STRWEB-20.
-* Upgrade PostCSS depenency stack. Refs STRWEB-23
-* Conditionally inject shared style aliases based on development context. Refs STRWEB-23, STCLI-183
+* Upgrade PostCSS depenency stack. Refs STRWEB-23.
+* Conditionally inject shared style aliases based on development context. Refs STRWEB-23, STCLI-183.
 * Include `react` `v17` in the peer-deps. Refs STRWEB-25.
 
 ## [1.3.0](https://github.com/folio-org/stripes-webpack/tree/v1.3.0) (2021-06-08)
