@@ -7,8 +7,6 @@ module.exports = (config, context) => {
     // aliasing the interactionStyles.css and variables.css as resolving those can be problematic in a workspace.
     config.resolve.alias = {
       ...config.resolve.alias,
-      // ".@folio/stripes-components/lib/Selection/Selection.css": getSharedStyles("lib/Selection/Selection.css"),
-      // ".@folio/stripes-components/lib/MultiSelection/MultiSelect.css": getSharedStyles("lib/MultiSelection/MultiSelect.css"),
       "./@folio/stripes-components/lib/sharedStyles/interactionStyles.css" : getSharedStyles("lib/sharedStyles/interactionStyles"),
       "./@folio/stripes-components/lib/variables.css": getSharedStyles("lib/variables"),
       "stcom-interactionStyles": getSharedStyles("lib/sharedStyles/interactionStyles"),
