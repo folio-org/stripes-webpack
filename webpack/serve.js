@@ -22,6 +22,11 @@ module.exports = function serve(stripesConfig, options) {
     logger.log('starting serve...');
     const app = express();
     let config = require('../webpack.config.cli.dev'); // eslint-disable-line global-require
+    let developmentConfig = require('../webpack.config.cli.dev.shared.styles');
+
+    if (process.env.NODE_ENV === 'development') {
+      config = developmentConfig(config, {});
+    }
 
     config.plugins.push(new StripesWebpackPlugin({ stripesConfig }));
 
