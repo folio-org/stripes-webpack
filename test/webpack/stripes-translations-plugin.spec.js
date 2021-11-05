@@ -2,8 +2,6 @@ const expect = require('chai').expect;
 const fs = require('fs');
 const webpack = require('webpack');
 
-const StripesConfigPlugin = require('../../webpack/stripes-config-plugin');
-
 const modulePaths = require('../../webpack/module-paths');
 const StripesTranslationsPlugin = require('../../webpack/stripes-translations-plugin');
 
@@ -20,17 +18,18 @@ const compilerStub = {
     },
   },
   hooks: {
-    beforeWrite: {
-      tap: () => {},
-    },
     emit: {
       tapAsync: () => {},
     },
-    processAssets: {
-      tap: () => {},
-    },
-    thisCompilation: {
-      tap: () => {},
+    stripesConfigPluginBeforeWrite: {
+      tap: (str, cb) => cb({
+        stripesDeps: {
+          'stripes-dependency': [{
+            name: 'stripes-dependency',
+            resolvedPath: '.'
+          }]
+        }
+      }, {}),
     },
     contextModuleFactory: {
       tap: () => {},
@@ -88,66 +87,34 @@ describe('The stripes-translations-plugin', function () {
       ]);
       this.sandbox.spy(webpack.ContextReplacementPlugin.prototype, 'apply');
       this.sandbox.spy(compilerStub.hooks.emit, 'tapAsync');
-      this.sandbox.spy(compilerStub.hooks.thisCompilation, 'tap');
       this.sandbox.stub(StripesTranslationsPlugin, 'loadFile').returns({ key1: 'Value 1', key2: 'Value 2' });
       this.compilationStub = {
         assets: {},
-        hooks: {
-          processAssets: {
-            tap: () => {}
-          },
-        },
       };
-      this.sandbox.spy(this.compilationStub.hooks.processAssets, 'tap');
-
-      StripesConfigPlugin.getPluginHooks(compilerStub).beforeWrite.tap(
-        { name: 'StripesConfigPlugin', context: true },
-        context => Object.assign(context, {
-          stripesDeps: {
-            'stripes-dependency': [{
-              name: 'stripes-dependency',
-              resolvedPath: '.'
-            }]
-          }
-        })
-      );
-
-      StripesConfigPlugin.getPluginHooks(compilerStub).beforeWrite.call({});
     });
 
     it('registers the "emit" hook', function () {
       this.sut = new StripesTranslationsPlugin(this.stripesConfig);
       this.sut.apply(compilerStub);
-      StripesConfigPlugin.getPluginHooks(compilerStub).beforeWrite.call({});
-
-      expect(compilerStub.hooks.thisCompilation.tap).to.be.calledWith('StripesTranslationsPlugin');
+      expect(compilerStub.hooks.emit.tapAsync).to.be.calledWith('StripesTranslationsPlugin');
     });
 
     it('includes modules from nominated dependencies', function () {
       this.sut = new StripesTranslationsPlugin(this.stripesConfig);
       this.sut.apply(compilerStub);
-      StripesConfigPlugin.getPluginHooks(compilerStub).beforeWrite.call({});
-
       expect(this.sut.modules).to.be.an('object').with.property('stripes-dependency');
     });
 
     it('generates an emit function with all translations', function () {
       this.sut = new StripesTranslationsPlugin(this.stripesConfig);
       this.sut.apply(compilerStub);
-      StripesConfigPlugin.getPluginHooks(compilerStub).beforeWrite.call({});
 
-      // Get the callback passed to 'thisCompilation' hook
-      const pluginArgs = compilerStub.hooks.thisCompilation.tap.getCall(0).args;
-      const compilerCallback = pluginArgs[1];
+      // Get the function passed to 'emit' hook
+      const pluginArgs = compilerStub.hooks.emit.tapAsync.getCall(0).args;
+      const emitFunction = pluginArgs[1];
 
-      compilerCallback(this.compilationStub);
-
-      const compilationArgs = this.compilationStub.hooks.processAssets.tap.getCall(0).args;
-      const compilationCallback = compilationArgs[1];
-
-      // Call it and observe the modification to compilation.asset
-      compilationCallback();
-
+      // Call it and observe the modification to compilation.assets
+      emitFunction(this.compilationStub, () => {});
       const emitFiles = Object.keys(this.compilationStub.assets);
 
       expect(emitFiles).to.have.length(3);

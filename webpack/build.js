@@ -32,7 +32,7 @@ module.exports = function build(stripesConfig, options) {
       config.entry = {};
       config.entry[options.dllName] = options.createDll.split(',');
       config.output.library = '[name]';
-      config.output.filename = '[name].[fullhash].js';
+      config.output.filename = '[name].[hash].js';
       config.plugins.push(new webpack.DllPlugin({
         name: '[name]',
         path: path.join(options.outputPath, '[name].json'),

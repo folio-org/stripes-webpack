@@ -63,7 +63,8 @@ module.exports = function serve(stripesConfig, options) {
     app.use(staticFileMiddleware);
 
     app.use(webpackDevMiddleware(compiler, {
-      stats: 'errors-only',
+      logLevel: 'warn',
+      stats: 'minimal',
       publicPath: config.output.publicPath,
     }));
 

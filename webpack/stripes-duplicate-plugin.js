@@ -2,7 +2,7 @@
 //   Error on specific packages that we never want duplicates of, notably react
 //   Warn on any duplicates that are not yet explicitly ignored
 
-const DuplicatePackageCheckerPlugin = require('@cerner/duplicate-package-checker-webpack-plugin');
+const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin');
 
 // Module names that must not have duplicates
 const duplicatesNotAllowed = [

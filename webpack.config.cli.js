@@ -6,7 +6,7 @@ const path = require('path');
 module.exports = {
   output: {
     path: path.join(__dirname, 'dist'),
-    filename: 'bundle.[contenthash].js',
+    filename: 'bundle.[hash].js',
     chunkFilename: 'chunk.[chunkhash].js',
     publicPath: '/',
   },

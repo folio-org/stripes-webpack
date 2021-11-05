@@ -17,10 +17,8 @@ function babelLoaderTest(fileName) {
 
 module.exports = {
   test: babelLoaderTest,
-  use: [{
-    loader: 'ts-loader',
-    options: {
-      configFileName: path.join(__dirname, 'tsconfig.json'),
-    }
-  }],
+  loader: 'ts-loader',
+  query: {
+    configFileName: path.join(__dirname, 'tsconfig.json'),
+  },
 };

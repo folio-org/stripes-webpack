@@ -5,7 +5,6 @@ const path = require('path');
 const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 const defaultBranding = require('../default-assets/branding');
 const logger = require('./logger')('stripesBrandingPlugin');
-const StripesConfigPlugin = require('./stripes-config-plugin');
 
 // Minimal favicon settings for favicons-webpack-plugin
 const standardFaviconsOnly = {
@@ -46,7 +45,7 @@ module.exports = class StripesBrandingPlugin {
     new FaviconsWebpackPlugin(faviconOptions).apply(compiler);
 
     // Hook into stripesConfigPlugin to supply branding config
-    StripesConfigPlugin.getPluginHooks(compiler).beforeWrite.tap('StripesTranslationsPlugin', (config) => {
+    compiler.hooks.stripesConfigPluginBeforeWrite.tap('StripesBrandingPlugin', (config) => {
       config.branding = this.branding;
       logger.log('stripesConfigPluginBeforeWrite', config.branding);
     });

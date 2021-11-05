@@ -2,7 +2,6 @@
 // error-logging configuration.
 
 const logger = require('./logger')('stripesErrorLoggingPlugin');
-const StripesConfigPlugin = require('./stripes-config-plugin');
 
 module.exports = class StripesErrorLoggingPlugin {
   constructor(options) {
@@ -16,7 +15,7 @@ module.exports = class StripesErrorLoggingPlugin {
 
   apply(compiler) {
     // Hook into stripesConfigPlugin to supply errorLogging config
-    StripesConfigPlugin.getPluginHooks(compiler).beforeWrite.tap('StripesTranslationsPlugin', (config) => {
+    compiler.hooks.stripesConfigPluginBeforeWrite.tap('StripesErrorLoggingPlugin', (config) => {
       config.errorLogging = this.errorLogging;
       logger.log('stripesConfigPluginBeforeWrite', config.errorLogging);
     });

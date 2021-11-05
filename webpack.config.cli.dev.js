@@ -29,17 +29,8 @@ const locateCssVariables = () => {
 };
 
 const devConfig = Object.assign({}, base, cli, {
-  devtool: 'eval-cheap-source-map',
+  devtool: 'inline-source-map',
   mode: 'development',
-  cache: {
-    type: 'filesystem',
-  },
-  mode: 'development',
-  target: 'web',
-  infrastructureLogging: {
-    appendOnly: true,
-    level: 'warn',
-  },
 });
 
 // Override filename to remove the hash in development due to memory issues (STCOR-296)
@@ -49,14 +40,10 @@ devConfig.entry.unshift('webpack-hot-middleware/client');
 
 devConfig.plugins = devConfig.plugins.concat([
   new webpack.HotModuleReplacementPlugin(),
-  new webpack.ProvidePlugin({
-    process: 'process/browser.js',
-  }),
 ]);
 
 // This alias avoids a console warning for react-dom patch
 devConfig.resolve.alias['react-dom'] = '@hot-loader/react-dom';
-devConfig.resolve.alias.process = 'process/browser.js';
 
 devConfig.module.rules.push({
   test: /\.css$/,
@@ -98,28 +85,10 @@ devConfig.module.rules.push({
   ],
 });
 
-// add 'Buffer' global required for tests/reporting tools.
-devConfig.plugins.push(
-  new webpack.ProvidePlugin({
-    Buffer: ['buffer', 'Buffer']
-  })
-);
-
-// add resolutions for node utilities required for test suites.
-devConfig.resolve.fallback = {
-  "stream": require.resolve('stream-browserify'),
-  "util": require.resolve('util-ex'),
-};
-
 devConfig.module.rules.push(
   {
     test: /\.svg$/,
-    use: [{
-      loader: 'file-loader?name=img/[path][name].[contenthash].[ext]',
-      options: {
-        esModule: false,
-      },
-    }]
+    use: [{ loader: 'file-loader?name=img/[path][name].[hash].[ext]' }]
   },
 );
 
