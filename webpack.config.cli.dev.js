@@ -107,6 +107,7 @@ devConfig.plugins.push(
 
 // add resolutions for node utilities required for test suites.
 devConfig.resolve.fallback = {
+  "crypto": require.resolve('crypto-browserify'),
   "stream": require.resolve('stream-browserify'),
   "util": require.resolve('util-ex'),
 };
