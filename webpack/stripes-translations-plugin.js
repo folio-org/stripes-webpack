@@ -31,7 +31,9 @@ module.exports = class StripesTranslationPlugin {
   apply(compiler) {
     // Used to help locate modules
     this.context = compiler.context;
-    this.publicPath = compiler.options.output.publicPath;
+      // 'publicPath' is not present when running tests via karma-webpack
+    // so when running in test mode use absolute 'path'.
+    this.publicPath = process.env.NODE_ENV !== 'test' ? output.publicPath : `/absolute${output.path}`;
     this.aliases = compiler.options.resolve.alias;
 
     // Limit the number of languages loaded by third-party libraries with the ContextReplacementPlugin
