@@ -24,9 +24,6 @@ const compilerStub = {
     plugins: ['something', {}, new HtmlWebpackPlugin()], // sample plugin data
   },
   hooks: {
-    stripesConfigPluginBeforeWrite: {
-      tap: () => {},
-    },
     make: {
       tapAsync: () => {},
       tapPromise: () => {},
@@ -39,6 +36,9 @@ const compilerStub = {
     },
     emit: {
       tapAsync: () => {},
+    },
+    initialize: {
+      tap: () => {},
     }
   },
   context: ''

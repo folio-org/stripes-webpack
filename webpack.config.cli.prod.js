@@ -2,8 +2,10 @@
 // production deployment from the command line
 
 const path = require('path');
+const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin")
+
 const postCssImport = require('postcss-import');
 const autoprefixer = require('autoprefixer');
 const postCssCustomProperties = require('postcss-custom-properties');
@@ -19,11 +21,17 @@ const cli = require('./webpack.config.cli');
 
 const prodConfig = Object.assign({}, base, cli, {
   mode: 'production',
+  infrastructureLogging: {
+    appendOnly: true,
+    level: 'warn',
+  }
 });
 
 prodConfig.plugins = prodConfig.plugins.concat([
   new MiniCssExtractPlugin({ filename: 'style.[contenthash].css' }),
-  new OptimizeCssAssetsPlugin(),
+  new webpack.ProvidePlugin({
+    process: 'process/browser.js',
+  }),
 ]);
 
 prodConfig.resolve.alias = {
@@ -31,6 +39,15 @@ prodConfig.resolve.alias = {
   "stcom-interactionStyles": getSharedStyles("lib/sharedStyles/interactionStyles"),
   "stcom-variables": getSharedStyles("lib/variables"),
 };
+
+prodConfig.optimization = {
+  mangleWasmImports: true,
+  minimizer: [
+   '...', // in webpack@5 we can use the '...' syntax to extend existing minimizers
+    new CssMinimizerPlugin(),
+  ],
+  minimize: true,
+}
 
 prodConfig.module.rules.push({
   test: /\.css$/,
@@ -74,7 +91,12 @@ prodConfig.module.rules.push(
   {
     test: /\.svg$/,
     use: [
-      { loader: 'file-loader?name=img/[path][name].[hash].[ext]' },
+      {
+        loader: 'file-loader?name=img/[path][name].[contenthash].[ext]',
+        options: {
+          esModule: false,
+        },
+      },
       {
         loader: 'svgo-loader',
         options: {

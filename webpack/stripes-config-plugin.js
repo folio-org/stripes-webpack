@@ -15,6 +15,8 @@ const StripesBuildError = require('./stripes-build-error');
 const stripesSerialize = require('./stripes-serialize');
 const logger = require('./logger')('stripesConfigPlugin');
 
+const stripesConfigPluginHooksMap = new WeakMap();
+
 module.exports = class StripesConfigPlugin {
   constructor(options) {
     logger.log('initializing...');
@@ -22,6 +24,21 @@ module.exports = class StripesConfigPlugin {
       throw new StripesBuildError('stripes-config-plugin was not provided a "modules" object for enabling stripes modules');
     }
     this.options = _.omit(options, 'branding', 'errorLogging');
+  }
+
+  // Establish hooks for other plugins to update the config, providing existing config as context
+  static getPluginHooks = (compiler) => {
+    let hooks = stripesConfigPluginHooksMap.get(compiler);
+
+    if (!hooks) {
+      hooks = {
+        beforeWrite: new SyncHook(['config']),
+      };
+
+      stripesConfigPluginHooksMap.set(compiler, hooks);
+    }
+
+    return hooks;
   }
 
   apply(compiler) {
@@ -36,15 +53,9 @@ module.exports = class StripesConfigPlugin {
     this.virtualModule = new VirtualModulesPlugin();
     this.virtualModule.apply(compiler);
 
-    // Establish hook for other plugins to update the config, providing existing config as context
-    if (compiler.hooks.stripesConfigPluginBeforeWrite) {
-      throw new StripesBuildError('StripesConfigPlugin hook already in use');
-    }
-    compiler.hooks.stripesConfigPluginBeforeWrite = new SyncHook(['config']);
-    compiler.hooks.stripesConfigPluginBeforeWrite.tap(
+    StripesConfigPlugin.getPluginHooks(compiler).beforeWrite.tap(
       { name: 'StripesConfigPlugin', context: true },
-      context => Object.assign(context, { config, metadata, icons, stripesDeps, warnings })
-    );
+      context => Object.assign(context, { config, metadata, icons, stripesDeps, warnings }));
 
     // Wait until after other plugins to generate virtual stripes-config
     compiler.hooks.afterPlugins.tap('StripesConfigPlugin', (theCompiler) => this.afterPlugins(theCompiler));
@@ -58,7 +69,8 @@ module.exports = class StripesConfigPlugin {
       errorLogging: {},
       translations: {},
     };
-    compiler.hooks.stripesConfigPluginBeforeWrite.call(pluginData);
+
+    StripesConfigPlugin.getPluginHooks(compiler).beforeWrite.call(pluginData);
 
     // Create a virtual module for Webpack to include in the build
     const stripesVirtualModule = `
