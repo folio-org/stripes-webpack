@@ -28,6 +28,10 @@ const locateCssVariables = () => {
     path.join(generateStripesAlias('@folio/stripes-components'), variables);
 };
 
+const useBrowserMocha = () => {
+  return tryResolve('mocha/mocha-es2018.js') ? 'mocha/mocha-es2018.js' : 'mocha';
+};
+
 const devConfig = Object.assign({}, base, cli, {
   devtool: 'eval-cheap-source-map',
   mode: 'development',
@@ -57,7 +61,7 @@ devConfig.plugins = devConfig.plugins.concat([
 // This alias avoids a console warning for react-dom patch
 devConfig.resolve.alias['react-dom'] = '@hot-loader/react-dom';
 devConfig.resolve.alias.process = 'process/browser.js';
-devConfig.resolve.alias['mocha'] = 'mocha/mocha-es2018.js';
+devConfig.resolve.alias['mocha'] = useBrowserMocha();
 devConfig.module.rules.push({
   test: /\.css$/,
   use: [
