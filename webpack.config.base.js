@@ -21,7 +21,7 @@ const specificReact = generateStripesAlias('react');
 // (like any other real module under node_modules) but in reality that file doesn't really exist.
 // Stripes config is "saved" under node_modules/stripes-config.js and it happens here:
 
-// https://github.com/folio-org/stripes-webpack/blob/master/webpack/stripes-config-plugin.js#L87
+// https://github.com/folio-org/stripes-webpack/blob/730ef33ee5a7799521408453b6e75653a21c3bfd/webpack/stripes-config-plugin.js#L87
 
 // Since webpack treats it as a real module we can use it as an entry path and extract it into a separate
 // chunk with (when we bundle for production env):
