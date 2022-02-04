@@ -33,12 +33,12 @@ const useBrowserMocha = () => {
 };
 
 const devConfig = Object.assign({}, base, cli, {
-  devtool: 'eval-cheap-source-map',
+  devtool: 'inline-source-map',
   mode: 'development',
   cache: {
     type: 'filesystem',
+    name: 'FOLIOCache',
   },
-  mode: 'development',
   target: 'web',
   infrastructureLogging: {
     appendOnly: true,
