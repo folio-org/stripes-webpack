@@ -1,6 +1,7 @@
 # Change history for stripes-webpack
 
-## [3.0.0] (IN PROGRESS)
+## [3.0.2](https://github.com/folio-org/stripes-webpack/tree/v3.0.2) (2022-02-08)
+[Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v2.0.0...v3.0.2)
 
 * Update webpack to v5. Refs STRWEB-4.
 * Dependency cleanup. Refs STRWEB-31.
