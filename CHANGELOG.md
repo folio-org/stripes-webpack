@@ -1,5 +1,9 @@
 # Change history for stripes-webpack
 
+## 3.0.3 IN PROGRESS
+
+* Avoid broken `@cerner/duplicate-package-checker-webpack-plugin` `v2.2.0` which introduces new node version restrictions. Refs STRWEB-35.
+
 ## [3.0.2](https://github.com/folio-org/stripes-webpack/tree/v3.0.2) (2022-02-08)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v2.0.0...v3.0.2)
 
