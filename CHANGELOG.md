@@ -1,5 +1,7 @@
 # Change history for stripes-webpack
 
+## 3.1.0 IN PROGRESS
+
 ## [3.0.3](https://github.com/folio-org/stripes-webpack/tree/v3.0.3) (2022-02-10)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v3.0.2...v3.0.3)
 
