@@ -22,6 +22,8 @@ module.exports = {
   resolve: {
     alias: {
       'react': specificReact,
+      // TODO: remove this after all UI modules remove reference to react-hot-loader
+      'react-hot-loader': path.resolve(__dirname, 'reactHotLoader.js'),
     },
     extensions: ['.js', '.json', '.tsx'],
   },

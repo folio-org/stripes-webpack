@@ -11,7 +11,9 @@ const postCssNesting = require('postcss-nesting');
 const postCssCustomMedia = require('postcss-custom-media');
 const postCssMediaMinMax = require('postcss-media-minmax');
 const postCssColorFunction = require('postcss-color-function');
-const { generateStripesAlias, tryResolve, getSharedStyles } = require('./webpack/module-paths');
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+
+const { generateStripesAlias, tryResolve } = require('./webpack/module-paths');
 
 const base = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
@@ -53,13 +55,13 @@ devConfig.entry.unshift('webpack-hot-middleware/client');
 
 devConfig.plugins = devConfig.plugins.concat([
   new webpack.HotModuleReplacementPlugin(),
+  new ReactRefreshWebpackPlugin(),
   new webpack.ProvidePlugin({
     process: 'process/browser.js',
   }),
 ]);
 
 // This alias avoids a console warning for react-dom patch
-devConfig.resolve.alias['react-dom'] = '@hot-loader/react-dom';
 devConfig.resolve.alias.process = 'process/browser.js';
 devConfig.resolve.alias['mocha'] = useBrowserMocha();
 devConfig.module.rules.push({
