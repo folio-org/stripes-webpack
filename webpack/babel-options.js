@@ -1,3 +1,6 @@
+
+const isDevelopment = process.env.NODE_ENV !== 'production';
+
 module.exports = {
   presets: [
     ['@babel/preset-env', { targets: '> 0.25%, not dead' }],
@@ -26,6 +29,6 @@ module.exports = {
     '@babel/plugin-proposal-numeric-separator',
     '@babel/plugin-proposal-throw-expressions',
     '@babel/plugin-syntax-import-meta',
-    [require.resolve('react-refresh/babel')],
+    [isDevelopment && require.resolve('react-refresh/babel')].filter(Boolean),
   ],
 };
