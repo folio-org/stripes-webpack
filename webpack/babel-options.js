@@ -29,6 +29,6 @@ module.exports = {
     '@babel/plugin-proposal-numeric-separator',
     '@babel/plugin-proposal-throw-expressions',
     '@babel/plugin-syntax-import-meta',
-    [isDevelopment && require.resolve('react-refresh/babel')].filter(Boolean),
-  ],
+    isDevelopment && require.resolve('react-refresh/babel'),
+  ].filter(Boolean),
 };
