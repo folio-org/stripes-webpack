@@ -14,10 +14,10 @@ const postCssColorFunction = require('postcss-color-function');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 const { generateStripesAlias, tryResolve } = require('./webpack/module-paths');
+const utils = require('./webpack/utils');
 
 const base = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
-
 
 const locateCssVariables = () => {
   const variables = 'lib/variables.css';
@@ -54,12 +54,18 @@ devConfig.output.filename = 'bundle.js';
 devConfig.entry.unshift('webpack-hot-middleware/client');
 
 devConfig.plugins = devConfig.plugins.concat([
-  new webpack.HotModuleReplacementPlugin(),
-  new ReactRefreshWebpackPlugin(),
   new webpack.ProvidePlugin({
     process: 'process/browser.js',
   }),
 ]);
+
+// include HMR plugins only when in development
+if (utils.isDevelopment) {
+  devConfig.plugins = devConfig.plugins.concat([
+    new webpack.HotModuleReplacementPlugin(),
+    new ReactRefreshWebpackPlugin()
+  ]);
+}
 
 // This alias avoids a console warning for react-dom patch
 devConfig.resolve.alias.process = 'process/browser.js';
