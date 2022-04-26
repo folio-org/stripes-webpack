@@ -51,7 +51,7 @@ module.exports = function build(stripesConfig, options) {
 
         const dllPath = path.dirname(dependencyPath);
 
-        dllPaths.push({ filepath: `${dllPath}/*.js` });
+        dllPaths.push({ glob: `${dllPath}/*.js` });
       }
 
       config.plugins.push(new AddAssetHtmlPlugin(dllPaths));
