@@ -7,7 +7,6 @@ const extraTranspile = process.env.STRIPES_TRANSPILE_TOKENS ? process.env.STRIPE
 
 // These modules are already transpiled and should be excluded
 const folioScopeBlacklist = [
-  'react-githubish-mentions',
 ].map(segment => path.join('@folio', segment));
 
 // Packages on NPM are typically distributed already transpiled. For historical
