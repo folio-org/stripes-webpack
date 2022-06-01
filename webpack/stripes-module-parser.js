@@ -101,13 +101,13 @@ class StripesModuleParser {
     return {
       name: this.nameOnly,
       actsAs,
-      config: this.config || this.parseStripesConfig(this.moduleName, actsAs, this.packageJson),
+      config: this.config || this.parseStripesConfig(this.moduleName, this.packageJson, actsAs),
       metadata: this.metadata || this.parseStripesMetadata(this.packageJson),
     };
   }
 
   // Validates and parses a module's stripes data
-  parseStripesConfig(moduleName, actsAs, packageJson) {
+  parseStripesConfig(moduleName, packageJson, actsAs = []) {
     const { stripes, description, version } = packageJson;
     const isHandler = actsAs.includes('handler');
 
