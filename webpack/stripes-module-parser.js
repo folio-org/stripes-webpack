@@ -101,15 +101,15 @@ class StripesModuleParser {
     return {
       name: this.nameOnly,
       actsAs,
-      config: this.config || this.parseStripesConfig(this.moduleName, this.packageJson),
+      config: this.config || this.parseStripesConfig(this.moduleName, actsAs, this.packageJson),
       metadata: this.metadata || this.parseStripesMetadata(this.packageJson),
     };
   }
 
   // Validates and parses a module's stripes data
-  parseStripesConfig(moduleName, packageJson) {
+  parseStripesConfig(moduleName, actsAs, packageJson) {
     const { stripes, description, version } = packageJson;
-    const isHandler = stripes?.actsAs?.includes('handler');
+    const isHandler = actsAs.includes('handler');
 
     // Do not lazy load handlers
     // more details in https://issues.folio.org/browse/STRWEB-52
