@@ -101,27 +101,15 @@ class StripesModuleParser {
     return {
       name: this.nameOnly,
       actsAs,
-      config: this.config || this.parseStripesConfig(this.moduleName, this.packageJson, actsAs),
+      config: this.config || this.parseStripesConfig(this.moduleName, this.packageJson),
       metadata: this.metadata || this.parseStripesMetadata(this.packageJson),
     };
   }
 
   // Validates and parses a module's stripes data
-  parseStripesConfig(moduleName, packageJson, actsAs = []) {
+  parseStripesConfig(moduleName, packageJson) {
     const { stripes, description, version } = packageJson;
-    const isHandler = actsAs.includes('handler');
-    const isPlugin = actsAs.includes('plugin');
-
-    // Do not lazy load handlers and plugins
-    // more details in https://issues.folio.org/browse/STRWEB-52
-    // and https://issues.folio.org/browse/STRWEB-53
-    const getModule = (isHandler || isPlugin) ?
-      new Function([], `return require('${moduleName}').default;`) :
-      new Function([], `
-        const { lazy } = require('react');
-        return lazy(() => import(/* webpackChunkName: "${moduleName}" */ '${moduleName}'));`
-      );
-
+    const getModule = new Function([], `return require('${moduleName}').default;`);
     const stripeConfig = _.omit(Object.assign({}, stripes, this.overrideConfig, {
       module: moduleName,
       getModule,
