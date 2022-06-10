@@ -8,6 +8,7 @@
 * Omit last traces of (unused) `react-githubish-mentions`. Refs STRWEB-41.
 * Do not lazy load handlers. Refs STRWEB-52.
 * Do not lazy load plugins. Refs STRWEB-53.
+* Fix TypeScript configuration. Refs STRWEB-54.
 
 ## [3.0.3](https://github.com/folio-org/stripes-webpack/tree/v3.0.3) (2022-02-10)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v3.0.2...v3.0.3)

@@ -54,7 +54,7 @@ module.exports = {
       // TODO: remove this after all UI modules remove reference to react-hot-loader
       'react-hot-loader': path.resolve(__dirname, 'reactHotLoader.js'),
     },
-    extensions: ['.js', '.json', '.tsx'],
+    extensions: ['.js', '.json', '.ts', '.tsx'],
   },
   plugins: [
     new HtmlWebpackPlugin({
