@@ -6,6 +6,7 @@
 * `autoprefixer` and `postcss` versions are now compatible. Refs STRWEB-46.
 * Migrate to current `add-asset-html-plugin` to avoid CVE-2020-28469. Refs STRWEB-28.
 * Omit last traces of (unused) `react-githubish-mentions`. Refs STRWEB-41.
+* Turn off lazy loading. Refs STRWEB-55.
 * Do not lazy load handlers. Refs STRWEB-52.
 * Do not lazy load plugins. Refs STRWEB-53.
 * Fix TypeScript configuration. Refs STRWEB-54.
