@@ -1,15 +1,14 @@
 # Change history for stripes-webpack
 
-## 3.1.0 IN PROGRESS
+## [4.0.0](https://github.com/folio-org/stripes-webpack/tree/v4.0.0) (2022-06-14)
+[Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v3.0.3...v4.0.0)
 
 * Migrate from react-hot-loader to react-refresh. Refs STRWEB-27.
 * `autoprefixer` and `postcss` versions are now compatible. Refs STRWEB-46.
 * Migrate to current `add-asset-html-plugin` to avoid CVE-2020-28469. Refs STRWEB-28.
 * Omit last traces of (unused) `react-githubish-mentions`. Refs STRWEB-41.
-* Turn off lazy loading. Refs STRWEB-55.
-* Do not lazy load handlers. Refs STRWEB-52.
-* Do not lazy load plugins. Refs STRWEB-53.
 * Fix TypeScript configuration. Refs STRWEB-54.
+* BREAKING: Actually, there are no breaking changes. Lazy loading went on in #42 and off in #69. Refs STRWEB-30, STRWEB-55.
 
 ## [3.0.3](https://github.com/folio-org/stripes-webpack/tree/v3.0.3) (2022-02-10)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v3.0.2...v3.0.3)
