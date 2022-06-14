@@ -20,7 +20,7 @@ module.exports = {
   use: [{
     loader: 'ts-loader',
     options: {
-      configFileName: path.join(__dirname, 'tsconfig.json'),
+      configFile: path.join(__dirname, 'tsconfig.json'),
     }
   }],
 };
