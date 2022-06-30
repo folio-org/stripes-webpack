@@ -5,16 +5,7 @@ const path = require('path');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin")
-
-const postCssImport = require('postcss-import');
-const autoprefixer = require('autoprefixer');
-const postCssCustomProperties = require('postcss-custom-properties');
-const postCssCalc = require('postcss-calc');
-const postCssNesting = require('postcss-nesting');
-const postCssCustomMedia = require('postcss-custom-media');
-const postCssMediaMinMax = require('postcss-media-minmax');
-const postCssColorFunction = require('postcss-color-function');
-const { generateStripesAlias, getSharedStyles } = require('./webpack/module-paths');
+const { getSharedStyles } = require('./webpack/module-paths');
 
 const base = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
@@ -68,20 +59,9 @@ prodConfig.module.rules.push({
       loader: 'postcss-loader',
       options: {
         postcssOptions: {
-          plugins: [
-            postCssImport(),
-            autoprefixer(),
-            postCssCustomProperties({
-              preserve: false,
-              importFrom: [path.join(generateStripesAlias('@folio/stripes-components'), 'lib/variables.css')]
-            }),
-            postCssCalc(),
-            postCssNesting(),
-            postCssCustomMedia(),
-            postCssMediaMinMax(),
-            postCssColorFunction(),
-          ],
+          config: path.resolve(__dirname, 'postcss.config.js'),
         },
+        sourceMap: true,
       },
     },
   ],
@@ -110,14 +90,5 @@ prodConfig.module.rules.push(
     ]
   },
 );
-
-// Remove all data-test or data-test-* attributes
-const babelLoaderConfig = prodConfig.module.rules.find(rule => rule.loader === 'babel-loader');
-
-babelLoaderConfig.options.plugins = (babelLoaderConfig.options.plugins || []).concat([
-  [require.resolve('babel-plugin-remove-jsx-attributes'), {
-    patterns: ['^data-test.*$']
-  }]
-]);
 
 module.exports = prodConfig;

@@ -3,14 +3,7 @@
 
 const path = require('path');
 const webpack = require('webpack');
-const postCssImport = require('postcss-import');
-const autoprefixer = require('autoprefixer');
-const postCssCustomProperties = require('postcss-custom-properties');
-const postCssCalc = require('postcss-calc');
-const postCssNesting = require('postcss-nesting');
-const postCssCustomMedia = require('postcss-custom-media');
-const postCssMediaMinMax = require('postcss-media-minmax');
-const postCssColorFunction = require('postcss-color-function');
+
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 const { generateStripesAlias, tryResolve } = require('./webpack/module-paths');
@@ -19,16 +12,7 @@ const utils = require('./webpack/utils');
 const base = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
 
-const locateCssVariables = () => {
-  const variables = 'lib/variables.css';
-  const localPath = path.join(path.resolve(), variables);
-
-  // check if variables are present locally (in cases when stripes-components is
-  // being built directly) if not look for them via stripes aliases
-  return tryResolve(localPath) ?
-    localPath :
-    path.join(generateStripesAlias('@folio/stripes-components'), variables);
-};
+const distStyles = tryResolve(path.join(generateStripesAlias('@folio/stripes-components'), 'dist/style.css'));
 
 const useBrowserMocha = () => {
   return tryResolve('mocha/mocha-es2018.js') ? 'mocha/mocha-es2018.js' : 'mocha';
@@ -56,6 +40,10 @@ devConfig.entry = [
   '@folio/stripes-core/src/index',
 ];
 
+if (distStyles) {
+  devConfig.entry.push('@folio/stripes-components/dist/style.css')
+}
+
 devConfig.plugins = devConfig.plugins.concat([
   new webpack.ProvidePlugin({
     process: 'process/browser.js',
@@ -73,8 +61,28 @@ if (utils.isDevelopment) {
 // This alias avoids a console warning for react-dom patch
 devConfig.resolve.alias.process = 'process/browser.js';
 devConfig.resolve.alias['mocha'] = useBrowserMocha();
+
+if (distStyles) {
+  devConfig.module.rules.push({
+    test: /\.css$/,
+    include: [/dist\/style.css/],
+    use: [
+      {
+        loader: 'style-loader'
+      },
+      {
+        loader: 'css-loader',
+        options: {
+          modules: false
+        },
+      },
+    ],
+  });
+}
+
 devConfig.module.rules.push({
   test: /\.css$/,
+  exclude: [/dist\/style.css/],
   use: [
     {
       loader: 'style-loader'
@@ -93,19 +101,7 @@ devConfig.module.rules.push({
       loader: 'postcss-loader',
       options: {
         postcssOptions: {
-          plugins: [
-            postCssImport(),
-            autoprefixer(),
-            postCssCustomProperties({
-              preserve: false,
-              importFrom: [locateCssVariables()]
-            }),
-            postCssCalc(),
-            postCssNesting(),
-            postCssCustomMedia(),
-            postCssMediaMinMax(),
-            postCssColorFunction(),
-          ],
+          config: path.resolve(__dirname, 'postcss.config.js'),
         },
         sourceMap: true,
       },
