@@ -64,9 +64,9 @@ config.optimization = {
 
 config.plugins = [
   new MiniCssExtractPlugin({ filename: 'style.css', ignoreOrder: false }),
-  new webpack.optimize.LimitChunkCountPlugin({
-    maxChunks: 1,
-  }),
+  // new webpack.optimize.LimitChunkCountPlugin({
+  //   maxChunks: 1,
+  // }),
 ];
 
 module.exports = config;
