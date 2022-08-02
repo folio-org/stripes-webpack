@@ -84,8 +84,8 @@ function locateStripesModule(context, moduleName, alias, ...segments) {
 /**
  * Returns a full path of package.json for a given module.
  */
-function locatePackageJsonPath(module) {
-  const packageJsonPath = locateStripesModule(process.cwd(), module, {}, 'package.json');
+function locatePackageJsonPath(moduleName) {
+  const packageJsonPath = locateStripesModule(process.cwd(), moduleName, {}, 'package.json');
 
   // Also check package.json in the current cwd dir.
   // This handles a case when `stripes serve` is executed for a single ui module (within the module).
@@ -95,7 +95,7 @@ function locatePackageJsonPath(module) {
     if (localPath) {
       const packageJson = require(localPath);
       // make sure it's the same package name as depName
-      if (packageJson.name === depName) {
+      if (packageJson.name === moduleName) {
         return localPath;
       }
     }
