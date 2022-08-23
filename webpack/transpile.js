@@ -1,5 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
+const applyWebpackOverrides = require('./apply-webpack-overrides');
 const logger = require('./logger')();
 const { tryResolve } = require('./module-paths');
 
@@ -14,6 +15,9 @@ module.exports = function transpile(options = {}) {
       const moduleTranspileConfig = require(moduleTranspileConfigPath);
       config = { ...config, ...moduleTranspileConfig }
     }
+
+    // Give the caller a chance to apply their own webpack overrides
+    config = applyWebpackOverrides(options.webpackOverrides, config);
 
     const compiler = webpack(config);
     compiler.run((err, stats) => {
