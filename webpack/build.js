@@ -68,6 +68,7 @@ module.exports = function build(stripesConfig, options) {
     config = applyWebpackOverrides(options.webpackOverrides, config);
 
     logger.log('assign final webpack config', config);
+
     const compiler = webpack(config);
     compiler.run((err, stats) => {
       if (err) {

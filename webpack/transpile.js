@@ -8,11 +8,13 @@ module.exports = function transpile(options = {}) {
   return new Promise((resolve, reject) => {
     logger.log('starting build...');
     let config = require('../webpack.config.cli.transpile');
+
     // TODO: allow for name customization
     const moduleTranspileConfigPath = path.join(process.cwd(), 'webpack.transpile.config.js');
 
     if (tryResolve(moduleTranspileConfigPath)) {
       const moduleTranspileConfig = require(moduleTranspileConfigPath);
+      config.externals = { ...config.externals, ...moduleTranspileConfig.externals };
       config = { ...config, ...moduleTranspileConfig }
     }
 
@@ -20,6 +22,7 @@ module.exports = function transpile(options = {}) {
     config = applyWebpackOverrides(options.webpackOverrides, config);
 
     const compiler = webpack(config);
+
     compiler.run((err, stats) => {
       if (err) {
         reject(err);

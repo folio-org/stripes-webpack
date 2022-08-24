@@ -1,4 +1,3 @@
-const path = require('path');
 const babelOptions = require('./babel-options');
 
 // a space delimited list of strings (typically namespaces) to use in addition
@@ -6,37 +5,58 @@ const babelOptions = require('./babel-options');
 const extraTranspile = process.env.STRIPES_TRANSPILE_TOKENS ? process.env.STRIPES_TRANSPILE_TOKENS.split(' ') : [];
 
 // These modules are already transpiled and should be excluded
-const folioScopeBlacklist = [
-].map(segment => path.join('@folio', segment));
+// const folioScopeBlacklist = [
+//   'stripes-components',
+//   'stripes/components',
+//   'stripes-smart-components',
+//   'stripes/smart-components',
+// ];
 
-// Packages on NPM are typically distributed already transpiled. For historical
-// reasons, Stripes modules are not and have their babel config centralised
-// here. This ought to have changed by now, but for now the following logic is
-// in effect and modules will be transpiled if:
-//
-// * they are in the @folio namespace
-// * their name contains a string from STRIPES_TRANSPILE_TOKENS
-//   (typically other namespaces)
-// * they aren't in node_modules (typically in a workspace)
-//
-// You'll see some chicanery here: we are only interested in these strings if
-// they occur after the last instance of "node_modules" since, in some
-// situations, our dependencies will get their own node_modules directories and
-// while we want to transpile "@folio/ui-users/somefile.js" we don't want to
-// transpile "@folio/ui-users/node_modules/nightmare/somefile.js"
-function babelLoaderTest(fileName) {
-  const nodeModIdx = fileName.lastIndexOf('node_modules');
-  if (fileName.endsWith('.js')
-    && (nodeModIdx === -1 || ['@folio', ...extraTranspile].reduce((acc, cur) => (fileName.lastIndexOf(cur) > nodeModIdx) || acc, false))
-    && (folioScopeBlacklist.findIndex(ignore => fileName.includes(ignore)) === -1)) {
-    return true;
-  }
-  return false;
-}
+// // Packages on NPM are typically distributed already transpiled. For historical
+// // reasons, Stripes modules are not and have their babel config centralised
+// // here. This ought to have changed by now, but for now the following logic is
+// // in effect and modules will be transpiled if:
+// //
+// // * they are in the @folio namespace
+// // * their name contains a string from STRIPES_TRANSPILE_TOKENS
+// //   (typically other namespaces)
+// // * they aren't in node_modules (typically in a workspace)
+// //
+// // You'll see some chicanery here: we are only interested in these strings if
+// // they occur after the last instance of "node_modules" since, in some
+// // situations, our dependencies will get their own node_modules directories and
+// // while we want to transpile "@folio/ui-users/somefile.js" we don't want to
+// // transpile "@folio/ui-users/node_modules/nightmare/somefile.js"
+// function babelLoaderTest(fileName) {
+//   const nodeModIdx = fileName.lastIndexOf('node_modules');
+
+
+//   if (fileName.endsWith('.js')
+//     && (nodeModIdx === -1 || ['@folio', ...extraTranspile].reduce((acc, cur) => (fileName.lastIndexOf(cur) > nodeModIdx) || acc, false))
+//     && (folioScopeBlacklist.findIndex(ignore => fileName.includes(ignore)) === -1)) {
+//       console.log('process', fileName);
+//     return true;
+//   }
+//   return false;
+// }
+
+const nodeModulesRegex = /node_modules|stripes-components/;
+const whileListRegex = /stripes-connect|stripes-config/;
 
 module.exports = {
-  test: babelLoaderTest,
   loader: 'babel-loader',
+  test: /\.js$/,
+  exclude: function(modulePath) {
+    if (!modulePath) {
+      return true;
+    }
+
+    const shouldBeExcluded = nodeModulesRegex.test(modulePath) &&
+      !whileListRegex.test(modulePath);
+
+    return shouldBeExcluded;
+
+  },
   options: {
     cacheDirectory: true,
     ...babelOptions,

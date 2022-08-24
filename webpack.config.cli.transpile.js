@@ -1,12 +1,34 @@
-// Top level Webpack configuration used for transpiling individual modules
+// Top level default Webpack configuration used for transpiling individual modules
 // before publishing
-const path = require('path')
+const path = require('path');
+const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CssMinimizerPlugin = require("css-minimizer-webpack-plugin")
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const babelOptions = require('./webpack/babel-options');
+
+const processExternals = (externals) => {
+  return externals.reduce((acc, name) => {
+    acc[name] = {
+      root: name,
+      commonjs2: name,
+      commonjs: name,
+      amd: name,
+      umd: name
+    };
+
+    return acc;
+  }, {});
+};
 
 const config = {
   mode: 'production',
+  output: {
+    library: {
+      type: 'umd',
+    },
+    path: path.resolve('./dist'),
+    filename: 'index.js',
+  },
   module: {
     rules: [
       {
@@ -49,8 +71,48 @@ const config = {
           filename: './img/[name].[contenthash].[ext]',
         },
       },
+      {
+        test: /\.svg$/,
+        use: [
+          {
+            loader: 'file-loader?name=img/[path][name].[contenthash].[ext]',
+            options: {
+              esModule: false,
+            },
+          },
+          {
+            loader: 'svgo-loader',
+            options: {
+              plugins: [
+                { removeTitle: true },
+                { convertColors: { shorthex: false } },
+                { convertPathData: false }
+              ]
+            }
+          }
+        ]
+      },
     ]
-  }
+  },
+  // Set default externals. These can be extended by individual modules.
+  externals: processExternals([
+    'react',
+    'react-dom',
+    'react-intl',
+    'react-router',
+    'moment',
+    'moment-timezone',
+    'stripes-config',
+    '@folio/stripes',
+    '@folio/stripes-connect',
+    '@folio/stripes-core',
+    '@folio/stripes-components',
+    '@folio/stripes-util',
+    '@folio/stripes-form',
+    '@folio/stripes-final-form',
+    '@folio/stripes-logger',
+    '@folio/stripes-smart-components',
+  ])
 };
 
 config.optimization = {
@@ -64,9 +126,9 @@ config.optimization = {
 
 config.plugins = [
   new MiniCssExtractPlugin({ filename: 'style.css', ignoreOrder: false }),
-  // new webpack.optimize.LimitChunkCountPlugin({
-  //   maxChunks: 1,
-  // }),
+  new webpack.optimize.LimitChunkCountPlugin({
+    maxChunks: 1,
+  }),
 ];
 
 module.exports = config;

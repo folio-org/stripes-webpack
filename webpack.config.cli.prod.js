@@ -4,8 +4,9 @@
 const path = require('path');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CssMinimizerPlugin = require("css-minimizer-webpack-plugin")
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
 const { getSharedStyles } = require('./webpack/module-paths');
+const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
 
 const base = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
@@ -18,8 +19,9 @@ const prodConfig = Object.assign({}, base, cli, {
   }
 });
 
+const smp = new SpeedMeasurePlugin();
+
 prodConfig.plugins = prodConfig.plugins.concat([
-  new MiniCssExtractPlugin({ filename: 'style.[contenthash].css' }),
   new webpack.ProvidePlugin({
     process: 'process/browser.js',
   }),
@@ -91,4 +93,11 @@ prodConfig.module.rules.push(
   },
 );
 
-module.exports = prodConfig;
+const webpackConfig = smp.wrap({ plugins: prodConfig.plugins });
+webpackConfig.plugins.push(
+  new MiniCssExtractPlugin({ filename: 'style.[contenthash].css' })
+);
+
+const config = {...prodConfig, ...webpackConfig };
+
+module.exports = config;
