@@ -22,12 +22,14 @@ const processExternals = (externals) => {
 
 const config = {
   mode: 'production',
+  entry: path.resolve('./index.js'),
   output: {
     library: {
       type: 'umd',
     },
     path: path.resolve('./dist'),
     filename: 'index.js',
+    umdNamedDefine: true,
   },
   module: {
     rules: [
