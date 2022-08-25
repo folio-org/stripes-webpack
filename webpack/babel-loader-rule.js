@@ -40,8 +40,8 @@ const extraTranspile = process.env.STRIPES_TRANSPILE_TOKENS ? process.env.STRIPE
 //   return false;
 // }
 
-const nodeModulesRegex = /node_modules|stripes-components/;
-const whileListRegex = /stripes-connect|stripes-config/;
+const nodeModulesRegex = /node_modules|stripes-components|stripes-smart-components|stripes-core|stripes-connect/;
+const whileListRegex = /stripes-config|stripes-web/;
 
 module.exports = {
   loader: 'babel-loader',

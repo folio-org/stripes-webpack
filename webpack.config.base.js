@@ -39,13 +39,13 @@ const specificReact = generateStripesAlias('react');
 
 module.exports = {
   entry: {
-    css: '@folio/stripes-components/lib/global.css',
+    css: ['@folio/stripes-components/lib/global.css'],
     stripesConfig: {
       import: 'stripes-config.js'
     },
     index: {
       dependOn: 'stripesConfig',
-      import: '@folio/stripes-core'
+      import: '@folio/stripes-web'
     },
   },
   resolve: {
@@ -81,7 +81,7 @@ module.exports = {
       'flattening': true,
       'paths': true,
       'placeholders': true // (requires currying)
-    })
+    }),
   ],
   module: {
     rules: [

@@ -75,24 +75,8 @@ const config = {
       },
       {
         test: /\.svg$/,
-        use: [
-          {
-            loader: 'file-loader?name=img/[path][name].[contenthash].[ext]',
-            options: {
-              esModule: false,
-            },
-          },
-          {
-            loader: 'svgo-loader',
-            options: {
-              plugins: [
-                { removeTitle: true },
-                { convertColors: { shorthex: false } },
-                { convertPathData: false }
-              ]
-            }
-          }
-        ]
+        type: 'asset/inline',
+        use: 'svgo-loader'
       },
     ]
   },

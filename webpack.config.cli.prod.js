@@ -4,12 +4,17 @@
 const path = require('path');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const TerserPlugin = require("terser-webpack-plugin");
+
 const { getSharedStyles } = require('./webpack/module-paths');
 const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
-
+const { generateStripesAlias, tryResolve } = require('./webpack/module-paths');
 const base = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
+
+const stripesComponentsStyles = tryResolve(path.join(generateStripesAlias('@folio/stripes-components'), 'dist/style.css'));
+const stripesCoreStyles = tryResolve(path.join(generateStripesAlias('@folio/stripes-core'), 'dist/style.css'));
 
 const prodConfig = Object.assign({}, base, cli, {
   mode: 'production',
@@ -18,6 +23,14 @@ const prodConfig = Object.assign({}, base, cli, {
     level: 'warn',
   }
 });
+
+if (stripesComponentsStyles) {
+  prodConfig.entry.css.push('@folio/stripes-components/dist/style.css');
+}
+
+if (stripesCoreStyles) {
+  prodConfig.entry.css.push('@folio/stripes-core/dist/style.css');
+}
 
 const smp = new SpeedMeasurePlugin();
 
@@ -34,16 +47,50 @@ prodConfig.resolve.alias = {
 };
 
 prodConfig.optimization = {
-  mangleWasmImports: true,
+  mangleWasmImports: false,
   minimizer: [
-   '...', // in webpack@5 we can use the '...' syntax to extend existing minimizers
+    new TerserPlugin({
+      exclude: /stripes/
+    }),
     new CssMinimizerPlugin(),
   ],
+  splitChunks: {
+    chunks: (chunk) => {
+      return chunk.name !== 'stripes';
+    },
+    cacheGroups: {
+      stripes: {
+        test: /stripes-core|stripes-components|stripes-smart-components|stripes-connect/,
+        name: 'stripes',
+        chunks: 'all'
+      },
+    },
+  },
   minimize: true,
 }
 
+if (stripesComponentsStyles) {
+  prodConfig.module.rules.push({
+    test: /\.css$/,
+    include: [/dist\/style.css/],
+    use: [
+      {
+        loader: 'style-loader'
+      },
+      {
+        loader: 'css-loader',
+        options: {
+          modules: false
+        },
+      },
+    ],
+  });
+}
+
+
 prodConfig.module.rules.push({
   test: /\.css$/,
+  exclude: [/dist\/style.css/],
   use: [
     {
       loader: MiniCssExtractPlugin.loader,
@@ -72,24 +119,12 @@ prodConfig.module.rules.push({
 prodConfig.module.rules.push(
   {
     test: /\.svg$/,
-    use: [
-      {
-        loader: 'file-loader?name=img/[path][name].[contenthash].[ext]',
-        options: {
-          esModule: false,
-        },
+    use: [{
+      loader: 'url-loader',
+      options: {
+        esModule: false,
       },
-      {
-        loader: 'svgo-loader',
-        options: {
-          plugins: [
-            { removeTitle: true },
-            { convertColors: { shorthex: false } },
-            { convertPathData: false }
-          ]
-        }
-      }
-    ]
+    }]
   },
 );
 

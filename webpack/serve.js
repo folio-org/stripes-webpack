@@ -1,6 +1,5 @@
 const webpack = require('webpack');
 const path = require('path');
-const nodeObjectHash = require('node-object-hash');
 const express = require('express');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');

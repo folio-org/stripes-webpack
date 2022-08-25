@@ -87,6 +87,8 @@
     "sinon": "^7.3.2",
     "sinon-chai": "^3.3.0",
     "speed-measure-webpack-plugin": "^1.5.0",
+    "terser-webpack-plugin": "^5.3.5",
+    "url-loader": "^4.1.1",
     "webpack": "^5.58.1"
   },
   "peerDependencies": {

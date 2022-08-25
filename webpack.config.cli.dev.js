@@ -12,7 +12,8 @@ const utils = require('./webpack/utils');
 const base = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
 
-const distStyles = tryResolve(path.join(generateStripesAlias('@folio/stripes-components'), 'dist/style.css'));
+const stripesComponentsStyles = tryResolve(path.join(generateStripesAlias('@folio/stripes-components'), 'dist/style.css'));
+const stripesCoreStyles = tryResolve(path.join(generateStripesAlias('@folio/stripes-core'), 'dist/style.css'));
 
 const useBrowserMocha = () => {
   return tryResolve('mocha/mocha-es2018.js') ? 'mocha/mocha-es2018.js' : 'mocha';
@@ -37,12 +38,17 @@ devConfig.output.filename = 'bundle.js';
 devConfig.entry = [
   'webpack-hot-middleware/client',
   '@folio/stripes-components/lib/global.css',
-  '@folio/stripes-core/src/index',
+  '@folio/stripes-web',
 ];
 
-if (distStyles) {
+if (stripesComponentsStyles) {
   devConfig.entry.push('@folio/stripes-components/dist/style.css')
 }
+
+if (stripesCoreStyles) {
+  devConfig.entry.push('@folio/stripes-core/dist/style.css')
+}
+
 
 devConfig.plugins = devConfig.plugins.concat([
   new webpack.ProvidePlugin({
@@ -62,7 +68,7 @@ if (utils.isDevelopment) {
 devConfig.resolve.alias.process = 'process/browser.js';
 devConfig.resolve.alias['mocha'] = useBrowserMocha();
 
-if (distStyles) {
+if (stripesComponentsStyles) {
   devConfig.module.rules.push({
     test: /\.css$/,
     include: [/dist\/style.css/],
@@ -127,7 +133,7 @@ devConfig.module.rules.push(
   {
     test: /\.svg$/,
     use: [{
-      loader: 'file-loader?name=img/[path][name].[contenthash].[ext]',
+      loader: 'url-loader',
       options: {
         esModule: false,
       },
