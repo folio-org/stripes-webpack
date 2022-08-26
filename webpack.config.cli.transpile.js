@@ -98,6 +98,8 @@ const config = {
     'react-router',
     'moment',
     'moment-timezone',
+    'redux',
+    'react-redux',
     'stripes-config',
     '@folio/stripes',
     '@folio/stripes-connect',

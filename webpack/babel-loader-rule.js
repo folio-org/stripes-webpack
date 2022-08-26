@@ -4,7 +4,7 @@ const babelOptions = require('./babel-options');
 // to "@folio" to determine if something needs Stripes-flavoured transpilation
 const extraTranspile = process.env.STRIPES_TRANSPILE_TOKENS ? new RegExp(process.env.STRIPES_TRANSPILE_TOKENS.replaceAll(' ', '|')) : '';
 // TODO: check if dist is present before excluding
-const excludeRegex = /node_modules|stripes|stripes-connect/;
+const excludeRegex = /node_modules|stripes/;
 const includeRegex = /stripes-config|stripes-web/;
 
 module.exports = {
@@ -26,7 +26,6 @@ module.exports = {
     }
 
     if (excludeRegex.test(modulePath)) {
-      console.log('exclude', modulePath);
       return false;
     }
 

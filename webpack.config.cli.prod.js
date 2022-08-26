@@ -65,7 +65,7 @@ prodConfig.optimization = {
     cacheGroups: {
       stripes: {
         // TODO: only include already transpiled modules
-        test: /stripes-core|stripes-components|stripes-smart-components|stripes-connect/,
+        test: /stripes/,
         name: 'stripes',
         chunks: 'all'
       },

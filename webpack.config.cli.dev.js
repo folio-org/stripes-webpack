@@ -23,10 +23,11 @@ const useBrowserMocha = () => {
 const devConfig = Object.assign({}, base, cli, {
   devtool: 'inline-source-map',
   mode: 'development',
-  cache: {
-    type: 'filesystem',
-    name: 'FOLIOCache',
-  },
+  cache: false,
+  // cache: {
+  //   type: 'filesystem',
+  //   name: 'FOLIOCache',
+  // },
   target: 'web',
   infrastructureLogging: {
     appendOnly: true,
