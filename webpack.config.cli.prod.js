@@ -40,7 +40,7 @@ const buildConfig = (stripesConfig) => {
     mangleWasmImports: false,
     minimizer: [
       new TerserPlugin({
-        // exclude stripes junk from minimizer
+        // exclude stripes cache group from the minimizer
         exclude: /stripes/
       }),
       new CssMinimizerPlugin(),
@@ -51,6 +51,7 @@ const buildConfig = (stripesConfig) => {
         return chunk.name !== 'stripes';
       },
       cacheGroups: {
+        // this cache group will be omitted by minimizer
         stripes: {
           // TODO: only include already transpiled modules
           test: /stripes/,
