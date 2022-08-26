@@ -7,32 +7,34 @@ const extraTranspile = process.env.STRIPES_TRANSPILE_TOKENS ? new RegExp(process
 const excludeRegex = /node_modules|stripes/;
 const includeRegex = /stripes-config|stripes-web/;
 
-module.exports = {
-  loader: 'babel-loader',
-  test: /\.js$/,
-  include: function(modulePath) {
-    // exclude empty modules
-    if (!modulePath) {
-      return false;
-    }
+module.exports = (stripesConfig) => {
 
-    if (includeRegex.test(modulePath)) {
-      console.log('include', modulePath);
+  return {
+    loader: 'babel-loader',
+    test: /\.js$/,
+    include: function(modulePath) {
+      // exclude empty modules
+      if (!modulePath) {
+        return false;
+      }
+
+      if (includeRegex.test(modulePath)) {
+        return true;
+      }
+
+      if (extraTranspile && extraTranspile.test(modulePath)) {
+        return true;
+      }
+
+      if (excludeRegex.test(modulePath)) {
+        return false;
+      }
+
       return true;
-    }
-
-    if (extraTranspile && extraTranspile.test(modulePath)) {
-      return true;
-    }
-
-    if (excludeRegex.test(modulePath)) {
-      return false;
-    }
-
-    return true;
-  },
-  options: {
-    cacheDirectory: true,
-    ...babelOptions,
-  },
+    },
+    options: {
+      cacheDirectory: true,
+      ...babelOptions,
+    },
+  };
 };

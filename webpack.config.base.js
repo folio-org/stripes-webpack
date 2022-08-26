@@ -4,9 +4,14 @@ const webpack = require('webpack');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
-const { generateStripesAlias } = require('./webpack/module-paths');
-const babelLoaderRule = require('./webpack/babel-loader-rule');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+const { generateStripesAlias, tryResolve } = require('./webpack/module-paths');
 const typescriptLoaderRule = require('./webpack/typescript-loader-rule');
+const { isProduction } = require('./webpack/utils');
+
+const stripesComponentsStyles = tryResolve(path.join(generateStripesAlias('@folio/stripes-components'), 'dist/style.css'));
+const stripesCoreStyles = tryResolve(path.join(generateStripesAlias('@folio/stripes-core'), 'dist/style.css'));
 
 // React doesn't like being included multiple times as can happen when using
 // yarn link. Here we find a more specific path to it by first looking in
@@ -37,7 +42,7 @@ const specificReact = generateStripesAlias('react');
 // Since we are now on the webpack 5 we can make use of dependOn (https://webpack.js.org/configuration/entry-context/#dependencies)
 // in order to create a dependency between stripes config and other chunks:
 
-module.exports = {
+const baseConfig = {
   entry: {
     css: ['@folio/stripes-components/lib/global.css'],
     stripesConfig: {
@@ -45,7 +50,7 @@ module.exports = {
     },
     index: {
       dependOn: 'stripesConfig',
-      import: '@folio/stripes-web'
+      import: ['@folio/stripes-web']
     },
   },
   resolve: {
@@ -85,7 +90,6 @@ module.exports = {
   ],
   module: {
     rules: [
-      babelLoaderRule,
       typescriptLoaderRule,
       {
         test: /\.(jpg|jpeg|gif|png|ico)$/,
@@ -124,7 +128,73 @@ module.exports = {
         test: /\.js.map$/,
         enforce: 'pre',
         use: ['source-map-loader'],
-      }
+      },
+      {
+        test: /\.svg$/,
+        use: [{
+          loader: 'url-loader',
+          options: {
+            esModule: false,
+          },
+        }]
+      },
     ],
   },
 };
+
+if (stripesComponentsStyles) {
+  baseConfig.entry.css.push('@folio/stripes-components/dist/style.css')
+}
+
+// TODO: the same will have to happen for every UI module
+if (stripesCoreStyles) {
+  baseConfig.entry.css.push('@folio/stripes-core/dist/style.css')
+}
+
+if (stripesComponentsStyles) {
+  baseConfig.module.rules.push({
+    test: /\.css$/,
+    include: [/dist\/style.css/],
+    use: [
+      {
+        loader: 'style-loader'
+      },
+      {
+        loader: 'css-loader',
+        options: {
+          modules: false
+        },
+      },
+    ],
+  });
+}
+
+baseConfig.module.rules.push({
+  test: /\.css$/,
+  exclude: [/dist\/style.css/],
+  use: [
+    isProduction ?
+      { loader: MiniCssExtractPlugin.loader } :
+      { loader: 'style-loader' },
+    {
+      loader: 'css-loader',
+      options: {
+        modules: {
+          localIdentName: '[local]---[hash:base64:5]',
+        },
+        importLoaders: 1,
+      },
+    },
+    {
+      loader: 'postcss-loader',
+      options: {
+        postcssOptions: {
+          config: path.resolve(__dirname, 'postcss.config.js'),
+        },
+        sourceMap: true,
+      },
+    },
+  ]
+});
+
+module.exports = baseConfig;

@@ -5,20 +5,8 @@ const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const babelOptions = require('./webpack/babel-options');
-
-const processExternals = (externals) => {
-  return externals.reduce((acc, name) => {
-    acc[name] = {
-      root: name,
-      commonjs2: name,
-      commonjs: name,
-      amd: name,
-      umd: name
-    };
-
-    return acc;
-  }, {});
-};
+const { processExternals } = require('./webpack/utils');
+const { defaultExternals } = require('./consts');
 
 const config = {
   mode: 'production',
@@ -91,26 +79,7 @@ const config = {
     ]
   },
   // Set default externals. These can be extended by individual modules.
-  externals: processExternals([
-    'react',
-    'react-dom',
-    'react-intl',
-    'react-router',
-    'moment',
-    'moment-timezone',
-    'redux',
-    'react-redux',
-    'stripes-config',
-    '@folio/stripes',
-    '@folio/stripes-connect',
-    '@folio/stripes-core',
-    '@folio/stripes-components',
-    '@folio/stripes-util',
-    '@folio/stripes-form',
-    '@folio/stripes-final-form',
-    '@folio/stripes-logger',
-    '@folio/stripes-smart-components',
-  ])
+  externals: processExternals(defaultExternals),
 };
 
 config.optimization = {

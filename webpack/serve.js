@@ -12,15 +12,17 @@ const cwd = path.resolve();
 const platformModulePath = path.join(cwd, 'node_modules');
 const coreModulePath = path.join(__dirname, '..', 'node_modules');
 const serverRoot = path.join(__dirname, '..');
+const buildConfig = require('../webpack.config.cli.dev');
 
 module.exports = function serve(stripesConfig, options) {
   if (typeof stripesConfig.okapi !== 'object') throw new Error('Missing Okapi config');
   if (typeof stripesConfig.okapi.url !== 'string') throw new Error('Missing Okapi URL');
   if (stripesConfig.okapi.url.endsWith('/')) throw new Error('Trailing slash in Okapi URL will prevent Stripes from functioning');
+
   return new Promise((resolve) => {
     logger.log('starting serve...');
     const app = express();
-    let config = require('../webpack.config.cli.dev'); // eslint-disable-line global-require
+    let config = buildConfig(stripesConfig);
     let developmentConfig = require('../webpack.config.cli.dev.shared.styles');
 
     if (process.env.NODE_ENV === 'development') {
