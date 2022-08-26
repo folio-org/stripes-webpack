@@ -8,6 +8,10 @@ const excludeRegex = /node_modules|stripes/;
 const includeRegex = /stripes-config|stripes-web/;
 
 module.exports = (stripesConfig) => {
+  // TODO:
+  // check which folio modules were pre-transpiled and exclude them
+  // from transpilation.
+  // This includes all stripes modules and ui modules
 
   return {
     loader: 'babel-loader',
