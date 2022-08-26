@@ -120,6 +120,11 @@ module.exports = {
           loader: 'csv-loader',
         }],
       },
+      {
+        test: /\.js.map$/,
+        enforce: 'pre',
+        use: ['source-map-loader'],
+      }
     ],
   },
 };

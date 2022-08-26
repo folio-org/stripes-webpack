@@ -15,7 +15,7 @@ module.exports = function transpile(options = {}) {
 
     if (tryResolve(moduleTranspileConfigPath)) {
       const moduleTranspileConfig = require(moduleTranspileConfigPath);
-      config.externals = { ...config.externals, ...moduleTranspileConfig.externals };
+      moduleTranspileConfig.externals = { ...config.externals, ...moduleTranspileConfig.externals };
       config = { ...config, ...moduleTranspileConfig }
     }
 

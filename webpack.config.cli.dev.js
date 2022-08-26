@@ -15,6 +15,7 @@ const cli = require('./webpack.config.cli');
 const stripesComponentsStyles = tryResolve(path.join(generateStripesAlias('@folio/stripes-components'), 'dist/style.css'));
 const stripesCoreStyles = tryResolve(path.join(generateStripesAlias('@folio/stripes-core'), 'dist/style.css'));
 
+
 const useBrowserMocha = () => {
   return tryResolve('mocha/mocha-es2018.js') ? 'mocha/mocha-es2018.js' : 'mocha';
 };

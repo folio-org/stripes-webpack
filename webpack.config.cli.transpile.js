@@ -22,6 +22,7 @@ const processExternals = (externals) => {
 
 const config = {
   mode: 'production',
+  devtool: 'source-map',
   entry: path.resolve('./index.js'),
   output: {
     library: {
@@ -75,9 +76,18 @@ const config = {
       },
       {
         test: /\.svg$/,
-        type: 'asset/inline',
-        use: 'svgo-loader'
+        use: [{
+          loader: 'url-loader',
+          options: {
+            esModule: false,
+          },
+        }]
       },
+      {
+        test: /\.js.map$/,
+        enforce: "pre",
+        use: ['source-map-loader'],
+      }
     ]
   },
   // Set default externals. These can be extended by individual modules.
@@ -115,6 +125,7 @@ config.plugins = [
   new webpack.optimize.LimitChunkCountPlugin({
     maxChunks: 1,
   }),
+  new webpack.EnvironmentPlugin(['NODE_ENV']),
 ];
 
 module.exports = config;

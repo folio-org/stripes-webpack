@@ -18,12 +18,14 @@ const stripesCoreStyles = tryResolve(path.join(generateStripesAlias('@folio/stri
 
 const prodConfig = Object.assign({}, base, cli, {
   mode: 'production',
+  devtool: 'source-map',
   infrastructureLogging: {
     appendOnly: true,
     level: 'warn',
   }
 });
 
+// TODO: the same will have to happen for every UI module
 if (stripesComponentsStyles) {
   prodConfig.entry.css.push('@folio/stripes-components/dist/style.css');
 }
@@ -50,16 +52,19 @@ prodConfig.optimization = {
   mangleWasmImports: false,
   minimizer: [
     new TerserPlugin({
+      // exclude stripes junk from minimizer
       exclude: /stripes/
     }),
     new CssMinimizerPlugin(),
   ],
   splitChunks: {
+    // Do not process stripes chunk
     chunks: (chunk) => {
       return chunk.name !== 'stripes';
     },
     cacheGroups: {
       stripes: {
+        // TODO: only include already transpiled modules
         test: /stripes-core|stripes-components|stripes-smart-components|stripes-connect/,
         name: 'stripes',
         chunks: 'all'
