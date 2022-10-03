@@ -3,6 +3,7 @@
 ## 4.1.0 IN PROGRESS
 
 * Fix TypeScript configuration a little more. Refs STRWEB-54.
+* Bump `favicons` and `favicons-webpack-plugin` to avoid security vulnerabilities. Refs STRWEB-50.
 
 ## [4.0.0](https://github.com/folio-org/stripes-webpack/tree/v4.0.0) (2022-06-14)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v3.0.3...v4.0.0)
