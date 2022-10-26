@@ -119,6 +119,12 @@ module.exports = {
           loader: 'csv-loader',
         }],
       },
+      {
+        test: /\.html$/,
+        use: [{
+          loader: 'html-loader',
+        }],
+      },
     ],
   },
 };
