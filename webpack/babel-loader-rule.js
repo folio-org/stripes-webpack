@@ -1,4 +1,6 @@
+const path = require('path');
 const babelOptions = require('./babel-options');
+const { getModulesPaths } = require('./module-paths');
 
 // a space delimited list of strings (typically namespaces) to use in addition
 // to "@folio" to determine if something needs Stripes-flavoured transpilation
@@ -12,7 +14,9 @@ module.exports = (stripesConfig) => {
   // check which folio modules were pre-transpiled and exclude them
   // from transpilation.
   // This includes all stripes modules and ui modules
-
+  const stripesDepsPaths = getModulesPaths(stripesConfig.modules);
+    
+    
   return {
     loader: 'babel-loader',
     test: /\.js$/,

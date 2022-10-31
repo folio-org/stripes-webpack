@@ -1,8 +1,15 @@
 # Change history for stripes-webpack
 
-## 4.1.0 IN PROGRESS
+## 4.1.1 IN PROGRESS
 
-* Fix TypeScript configuration a little more. Refs STRWEB-54.
+* Filter out test files from TS repos when building. Refs STRWEB-60.
+
+## [4.1.0](https://github.com/folio-org/stripes-webpack/tree/v4.1.0) (2022-10-11)
+[Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v4.0.0...v4.1.0)
+
+* Fix TypeScript configuration a little more. Replace ES6 with ESNext. Refs STRWEB-54.
+* Support transpilation without relying on `STRIPES_TRANSPILE_TOKENS`. Refs STRWEB-49.
+* Bump `favicons` and `favicons-webpack-plugin` to avoid security vulnerabilities. Refs STRWEB-50.
 
 ## [4.0.0](https://github.com/folio-org/stripes-webpack/tree/v4.0.0) (2022-06-14)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v3.0.3...v4.0.0)

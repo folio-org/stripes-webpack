@@ -11,7 +11,8 @@ const platformModulePath = path.join(path.resolve(), 'node_modules');
 module.exports = function build(stripesConfig, options) {
   return new Promise((resolve, reject) => {
     logger.log('starting build...');
-    let config = buildConfig(stripesConfig)
+
+    let config = buildConfig(stripesConfig);
 
     if (!options.skipStripesBuild) {
       config.plugins.push(new StripesWebpackPlugin({ stripesConfig, createDll: options.createDll }));

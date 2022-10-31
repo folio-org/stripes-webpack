@@ -8,5 +8,20 @@
     "moduleResolution": "node",
     "resolveJsonModule": true
   },
-  "include": ["../../**/*.ts", "../../**/*.tsx"]
+  "include": [
+    "../../**/*.ts",
+    "../../**/*.tsx",
+    "node_modules/@folio/**/*.ts",
+    "node_modules/@folio/**/*.tsx"
+  ],
+  "exclude": [
+    "../../**/*.test.ts",
+    "../../**/*.test.tsx",
+    "../../**/test/**/*.ts",
+    "../../**/test/**/*.tsx",
+    "node_modules/@folio/**/*.test.ts",
+    "node_modules/@folio/**/*.test.tsx",
+    "node_modules/@folio/**/test/**/*.ts",
+    "node_modules/@folio/**/test/**/*.tsx"
+  ]
 }

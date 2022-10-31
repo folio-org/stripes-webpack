@@ -7,6 +7,7 @@ const connectHistoryApiFallback = require('connect-history-api-fallback');
 const StripesWebpackPlugin = require('./stripes-webpack-plugin');
 const applyWebpackOverrides = require('./apply-webpack-overrides');
 const logger = require('./logger')();
+const buildConfig = require('../webpack.config.cli.dev');
 
 const cwd = path.resolve();
 const platformModulePath = path.join(cwd, 'node_modules');

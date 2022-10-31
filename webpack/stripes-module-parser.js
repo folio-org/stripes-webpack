@@ -110,14 +110,15 @@ class StripesModuleParser {
   parseStripesConfig(moduleName, packageJson) {
     const { stripes, description, version } = packageJson;
     const getModule = new Function([], `return require('${moduleName}').default;`);
-    const stripeConfig = _.omit(Object.assign({}, stripes, this.overrideConfig, {
+    const stripesConfig = _.omit(Object.assign({}, stripes, this.overrideConfig, {
       module: moduleName,
       getModule,
       description,
       version,
     }), TOP_LEVEL_ONLY);
-    logger.log('config:', stripeConfig);
-    return stripeConfig;
+    logger.log('config:', stripesConfig);
+
+    return stripesConfig;
   }
 
   // Extract metadata defined here:

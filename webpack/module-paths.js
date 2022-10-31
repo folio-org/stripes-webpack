@@ -81,6 +81,100 @@ function locateStripesModule(context, moduleName, alias, ...segments) {
   return foundPath;
 }
 
+/**
+ * Returns a full path of package.json for a given module.
+ */
+function locatePackageJsonPath(moduleName) {
+  const packageJsonPath = locateStripesModule(process.cwd(), moduleName, {}, 'package.json');
+
+  // Also check package.json in the current cwd dir.
+  // This handles a case when `stripes serve` is executed for a single ui module (within the module).
+  if (!packageJsonPath) {
+    const localPath = tryResolve(path.join(process.cwd(), 'package.json'));
+
+    if (localPath) {
+      const packageJson = require(localPath);
+      // make sure it's the same package name as depName
+      if (packageJson.name === moduleName) {
+        return localPath;
+      }
+    }
+  }
+
+  return packageJsonPath;
+}
+
+/**
+ * Convert dependencies defined in "stripes.stripesDeps" in package.json
+ * into their full path representation.
+ *
+ * For example dependencies defined as:
+ *
+ * "stripesDeps": [
+    "@reshare/stripes-reshare",
+  ],
+ *
+ * will be converted to:
+ *
+ * [
+ *  './node_modules/@reshare/stripes-reshare'
+ * ]
+ *
+*/
+function getStripesDepsPaths(packageJsonPath) {
+  const packageJson = require(packageJsonPath);
+  const stripes = packageJson.stripes || {};
+
+  if (!stripes.stripesDeps) {
+    return null;
+  }
+
+  const stripesDeps = stripes.stripesDeps;
+
+  return stripesDeps.map(dep => {
+    const path = locatePackageJsonPath(dep);
+    return path ? path.replace('/package.json', '') : null;
+  });
+}
+
+/**
+ * Convert modules defined in stripes config into their full path representation.
+ * The conversion will happen for all modules found in stripes config.
+ *
+ * For example modules defined in stripes config:
+ *
+ * modules: { '@folio/users': {}, '@reshare/directory': {} }
+ *
+ * will be converted to:
+ *
+ * [
+ *  './node_modules/@folio/users',
+ *  './node_modules/@reshare/directory'
+ * ]
+ *
+*/
+function getModulesPaths(modules) {
+  return Object
+    .keys(modules)
+    .flatMap(module => {
+      const packageJsonPath = locatePackageJsonPath(module);
+
+      if (packageJsonPath) {
+        const modulePaths = [packageJsonPath.replace('/package.json', '')];
+        const stripesDepPaths = getStripesDepsPaths(packageJsonPath);
+
+        if (stripesDepPaths) {
+          modulePaths.push(...stripesDepPaths);
+        }
+
+        return modulePaths
+      }
+
+      return null;
+    })
+    .filter(module => !!module);
+}
+
 function getSharedStyles(filename) {
   return path.resolve(generateStripesAlias('@folio/stripes-components'), filename + ".css");
 }
@@ -90,4 +184,5 @@ module.exports = {
   generateStripesAlias,
   getSharedStyles,
   locateStripesModule,
+  getModulesPaths,
 };
