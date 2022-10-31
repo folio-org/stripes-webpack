@@ -13,7 +13,6 @@ const cwd = path.resolve();
 const platformModulePath = path.join(cwd, 'node_modules');
 const coreModulePath = path.join(__dirname, '..', 'node_modules');
 const serverRoot = path.join(__dirname, '..');
-const buildConfig = require('../webpack.config.cli.dev');
 
 module.exports = function serve(stripesConfig, options) {
   if (typeof stripesConfig.okapi !== 'object') throw new Error('Missing Okapi config');
