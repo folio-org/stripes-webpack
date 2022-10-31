@@ -11,6 +11,7 @@ const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
 const base = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
 const babelLoaderRule = require('./webpack/babel-loader-rule');
+const { getModulesPaths, getStripesModulesPaths, getNonTranspiledModules } = require('./webpack/module-paths');
 
 const buildConfig = (stripesConfig) => {
   const prodConfig = Object.assign({}, base, cli, {
@@ -22,6 +23,10 @@ const buildConfig = (stripesConfig) => {
     }
   });
 
+  const modulePaths = getModulesPaths(stripesConfig.modules);
+  const stripesModulePaths = getStripesModulesPaths();
+  const modulesToTranspile = getNonTranspiledModules([...stripesModulePaths, ...modulePaths]);
+  const modulesToTranspileRegex = new RegExp(modulesToTranspile.join('|'));
   const smp = new SpeedMeasurePlugin();
 
   prodConfig.plugins = prodConfig.plugins.concat([
@@ -53,8 +58,8 @@ const buildConfig = (stripesConfig) => {
       cacheGroups: {
         // this cache group will be omitted by minimizer
         stripes: {
-          // TODO: only include already transpiled modules
-          test: /stripes/,
+          // only include already transpiled modules
+          test: (module) => !modulesToTranspileRegex.test(module.resource),
           name: 'stripes',
           chunks: 'all'
         },
@@ -70,7 +75,7 @@ const buildConfig = (stripesConfig) => {
     new MiniCssExtractPlugin({ filename: 'style.[contenthash].css' })
   );
 
-  return {...prodConfig, ...webpackConfig };
+  return { ...prodConfig, ...webpackConfig };
 };
 
 module.exports = buildConfig;

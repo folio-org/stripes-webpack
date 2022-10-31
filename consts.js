@@ -5,6 +5,7 @@ const defaultExternals = [
   'react-dom',
   'react-intl',
   'react-router',
+  'react-query',
   'moment',
   'moment-timezone',
   'redux',

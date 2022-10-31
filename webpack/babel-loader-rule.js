@@ -1,22 +1,19 @@
-const path = require('path');
 const babelOptions = require('./babel-options');
-const { getModulesPaths } = require('./module-paths');
+const { getModulesPaths, getStripesModulesPaths, getNonTranspiledModules } = require('./module-paths');
 
 // a space delimited list of strings (typically namespaces) to use in addition
 // to "@folio" to determine if something needs Stripes-flavoured transpilation
 const extraTranspile = process.env.STRIPES_TRANSPILE_TOKENS ? new RegExp(process.env.STRIPES_TRANSPILE_TOKENS.replaceAll(' ', '|')) : '';
-// TODO: check if dist is present before excluding
-const excludeRegex = /node_modules|stripes/;
-const includeRegex = /stripes-config|stripes-web/;
+const excludeRegex = /node_modules/;
 
 module.exports = (stripesConfig) => {
-  // TODO:
-  // check which folio modules were pre-transpiled and exclude them
-  // from transpilation.
-  // This includes all stripes modules and ui modules
-  const stripesDepsPaths = getModulesPaths(stripesConfig.modules);
-    
-    
+  const modulePaths = getModulesPaths(stripesConfig.modules);
+  const stripesModulePaths = getStripesModulesPaths();
+  const modulesToTranspile = getNonTranspiledModules([...stripesModulePaths, ...modulePaths]);
+  const includeRegex = new RegExp(modulesToTranspile.join('|'));
+
+  console.info('modules to transpile:', modulesToTranspile);
+
   return {
     loader: 'babel-loader',
     test: /\.js$/,
@@ -26,14 +23,19 @@ module.exports = (stripesConfig) => {
         return false;
       }
 
+      // regex which represents modules which should be included for transpilation
       if (includeRegex.test(modulePath)) {
         return true;
       }
 
+      // include STRIPES_TRANSPILE_TOKENS in transpilation
+      // TODO: Should we check if the modules listed in STRIPES_TRANSPILE_TOKENS are
+      // already transpiled (the dist folder exists).
       if (extraTranspile && extraTranspile.test(modulePath)) {
         return true;
       }
 
+      // regex which represents modules which should be excluded from transpilation
       if (excludeRegex.test(modulePath)) {
         return false;
       }

@@ -175,6 +175,41 @@ function getModulesPaths(modules) {
     .filter(module => !!module);
 }
 
+function getStripesModulesPaths() {
+  const packageJsonPath = locatePackageJsonPath('@folio/stripes');
+  const packageJson = require(packageJsonPath);
+  const paths = [];
+
+  if (!packageJson) {
+    return paths;
+  }
+
+  Object.keys(packageJson.dependencies).forEach(moduleName => {
+    if (moduleName.match('@folio')) {
+      const stripesModulePath = locatePackageJsonPath(moduleName);
+
+      if (stripesModulePath) {
+        paths.push(stripesModulePath.replace('/package.json', ''));
+      }
+    }
+  });
+
+  return paths;
+}
+
+function getNonTranspiledModules(modules) {
+  const nonTranspiledModules = ['stripes-config', 'stripes-web'];
+
+  modules.forEach(module => {
+    const distPath = tryResolve(path.join(module, 'dist'));
+    if (!distPath) {
+      nonTranspiledModules.push(module.split('/').pop());
+    }
+  });
+
+  return nonTranspiledModules;
+}
+
 function getSharedStyles(filename) {
   return path.resolve(generateStripesAlias('@folio/stripes-components'), filename + ".css");
 }
@@ -185,4 +220,6 @@ module.exports = {
   getSharedStyles,
   locateStripesModule,
   getModulesPaths,
+  getStripesModulesPaths,
+  getNonTranspiledModules
 };

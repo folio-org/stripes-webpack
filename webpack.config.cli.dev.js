@@ -29,10 +29,6 @@ const buildConfig = (stripesConfig) => {
       level: 'warn',
     },
   });
-    
-  const useBrowserMocha = () => {
-    return tryResolve('mocha/mocha-es2018.js') ? 'mocha/mocha-es2018.js' : 'mocha';
-  };
 
   // Override filename to remove the hash in development due to memory issues (STCOR-296)
   devConfig.output.filename = 'bundle.js';
@@ -75,18 +71,6 @@ const buildConfig = (stripesConfig) => {
     "stream": require.resolve('stream-browserify'),
     "util": require.resolve('util-ex'),
   };
-
-  devConfig.module.rules.push(
-    {
-      test: /\.svg$/,
-      use: [{
-        loader: 'url-loader',
-        options: {
-          esModule: false,
-        },
-      }]
-    },
-  );
 
   return devConfig;
 }
