@@ -21,9 +21,6 @@ const buildConfig = (stripesConfig) => {
       appendOnly: true,
       level: 'warn',
     },
-    externalsPresets: {
-      node: true // in order to ignore built-in modules like path, fs, etc.
-  },
   });
 
   const modulePaths = getModulesPaths(stripesConfig.modules);
@@ -77,7 +74,6 @@ const buildConfig = (stripesConfig) => {
   webpackConfig.plugins.push(
     new MiniCssExtractPlugin({ filename: 'style.[contenthash].css' })
   );
-
 
   return { ...prodConfig, ...webpackConfig };
 };
