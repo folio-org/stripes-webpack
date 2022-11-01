@@ -210,6 +210,20 @@ function getNonTranspiledModules(modules) {
   return nonTranspiledModules;
 }
 
+function getTranspiledModules(modules) {
+  const transpiledModules = [];
+
+  modules.forEach(module => {
+    const distPath = tryResolve(path.join(module, 'dist'));
+
+    if (distPath) {
+      transpiledModules.push(distPath);
+    }
+  });
+
+  return transpiledModules;
+}
+
 function getSharedStyles(filename) {
   return path.resolve(generateStripesAlias('@folio/stripes-components'), filename + ".css");
 }
@@ -221,5 +235,6 @@ module.exports = {
   locateStripesModule,
   getModulesPaths,
   getStripesModulesPaths,
-  getNonTranspiledModules
+  getNonTranspiledModules,
+  getTranspiledModules
 };

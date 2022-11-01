@@ -11,7 +11,7 @@ const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
 const base = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
 const babelLoaderRule = require('./webpack/babel-loader-rule');
-const { getModulesPaths, getStripesModulesPaths, getNonTranspiledModules } = require('./webpack/module-paths');
+const { getModulesPaths, getStripesModulesPaths, getTranspiledModules } = require('./webpack/module-paths');
 
 const buildConfig = (stripesConfig) => {
   const prodConfig = Object.assign({}, base, cli, {
@@ -20,13 +20,16 @@ const buildConfig = (stripesConfig) => {
     infrastructureLogging: {
       appendOnly: true,
       level: 'warn',
-    }
+    },
+    externalsPresets: {
+      node: true // in order to ignore built-in modules like path, fs, etc.
+  },
   });
 
   const modulePaths = getModulesPaths(stripesConfig.modules);
   const stripesModulePaths = getStripesModulesPaths();
-  const modulesToTranspile = getNonTranspiledModules([...stripesModulePaths, ...modulePaths]);
-  const modulesToTranspileRegex = new RegExp(modulesToTranspile.join('|'));
+  const transpiledModules = getTranspiledModules([...stripesModulePaths, ...modulePaths]);
+  const transpiledModulesRegex = new RegExp(transpiledModules.join('|'));
   const smp = new SpeedMeasurePlugin();
 
   prodConfig.plugins = prodConfig.plugins.concat([
@@ -46,7 +49,7 @@ const buildConfig = (stripesConfig) => {
     minimizer: [
       new TerserPlugin({
         // exclude stripes cache group from the minimizer
-        exclude: /stripes/
+        exclude: /stripes/,
       }),
       new CssMinimizerPlugin(),
     ],
@@ -59,7 +62,7 @@ const buildConfig = (stripesConfig) => {
         // this cache group will be omitted by minimizer
         stripes: {
           // only include already transpiled modules
-          test: (module) => !modulesToTranspileRegex.test(module.resource),
+          test: (module) => transpiledModulesRegex.test(module.resource),
           name: 'stripes',
           chunks: 'all'
         },
@@ -74,6 +77,7 @@ const buildConfig = (stripesConfig) => {
   webpackConfig.plugins.push(
     new MiniCssExtractPlugin({ filename: 'style.[contenthash].css' })
   );
+
 
   return { ...prodConfig, ...webpackConfig };
 };

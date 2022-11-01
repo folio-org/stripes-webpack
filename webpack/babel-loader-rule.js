@@ -1,18 +1,21 @@
 const babelOptions = require('./babel-options');
-const { getModulesPaths, getStripesModulesPaths, getNonTranspiledModules } = require('./module-paths');
+const { getModulesPaths, getStripesModulesPaths, getNonTranspiledModules, getTranspiledModules } = require('./module-paths');
 
 // a space delimited list of strings (typically namespaces) to use in addition
 // to "@folio" to determine if something needs Stripes-flavoured transpilation
 const extraTranspile = process.env.STRIPES_TRANSPILE_TOKENS ? new RegExp(process.env.STRIPES_TRANSPILE_TOKENS.replaceAll(' ', '|')) : '';
-const excludeRegex = /node_modules/;
 
 module.exports = (stripesConfig) => {
   const modulePaths = getModulesPaths(stripesConfig.modules);
   const stripesModulePaths = getStripesModulesPaths();
-  const modulesToTranspile = getNonTranspiledModules([...stripesModulePaths, ...modulePaths]);
+  const allModules = [...stripesModulePaths, ...modulePaths];
+  const modulesToTranspile = getNonTranspiledModules(allModules);
+  const transpiledModules = getTranspiledModules(allModules);
   const includeRegex = new RegExp(modulesToTranspile.join('|'));
+  const excludeRegex = new RegExp(transpiledModules.join('|'));
 
   console.info('modules to transpile:', modulesToTranspile);
+  console.info('transpiled modules:', transpiledModules);
 
   return {
     loader: 'babel-loader',
@@ -37,6 +40,10 @@ module.exports = (stripesConfig) => {
 
       // regex which represents modules which should be excluded from transpilation
       if (excludeRegex.test(modulePath)) {
+        return false;
+      }
+
+      if (/node_modules/.test(modulePath)) {
         return false;
       }
 
