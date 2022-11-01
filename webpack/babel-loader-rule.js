@@ -1,5 +1,10 @@
 const babelOptions = require('./babel-options');
-const { getModulesPaths, getStripesModulesPaths, getNonTranspiledModules, getTranspiledModules } = require('./module-paths');
+const {
+  getModulesPaths,
+  getStripesModulesPaths,
+  getNonTranspiledModules,
+  getTranspiledModules,
+} = require('./module-paths');
 
 // a space delimited list of strings (typically namespaces) to use in addition
 // to "@folio" to determine if something needs Stripes-flavoured transpilation
