@@ -1,6 +1,7 @@
 # Change history for stripes-webpack
 
-## 4.1.1 IN PROGRESS
+## [4.1.1](https://github.com/folio-org/stripes-webpack/tree/v4.1.1) (2022-11-02)
+[Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v4.1.0...v4.1.1)
 
 * Filter out test files from TS repos when building. Refs STRWEB-60.
 
