@@ -27,7 +27,7 @@ const buildConfig = (stripesConfig) => {
     },
   });
 
-  const transpiledModules = getTranspiledModules(allModules);
+  const transpiledModules = getTranspiledModules(allModulePaths);
   const transpiledModulesRegex = new RegExp(transpiledModules.join('|'));
   const smp = new SpeedMeasurePlugin();
 
