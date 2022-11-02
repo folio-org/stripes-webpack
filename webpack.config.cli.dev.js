@@ -4,17 +4,24 @@
 const webpack = require('webpack');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
+const { getModulesPaths, getStripesModulesPaths } = require('./webpack/module-paths');
 const { tryResolve } = require('./webpack/module-paths');
 const babelLoaderRule = require('./webpack/babel-loader-rule');
 const utils = require('./webpack/utils');
-const base = require('./webpack.config.base');
+const buildBaseConfig = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
+
 
 const useBrowserMocha = () => {
   return tryResolve('mocha/mocha-es2018.js') ? 'mocha/mocha-es2018.js' : 'mocha';
 };
 
 const buildConfig = (stripesConfig) => {
+  const modulePaths = getModulesPaths(stripesConfig.modules);
+  const stripesModulePaths = getStripesModulesPaths();
+  const allModulePaths = [...stripesModulePaths, ...modulePaths];
+
+  const base = buildBaseConfig(allModulePaths);
   const devConfig = Object.assign({}, base, cli, {
     devtool: 'inline-source-map',
     mode: 'development',
@@ -55,7 +62,7 @@ const buildConfig = (stripesConfig) => {
   devConfig.resolve.alias.process = 'process/browser.js';
   devConfig.resolve.alias['mocha'] = useBrowserMocha();
 
-  devConfig.module.rules.push(babelLoaderRule(stripesConfig));
+  devConfig.module.rules.push(babelLoaderRule(allModulePaths));
 
   // add 'Buffer' global required for tests/reporting tools.
   devConfig.plugins.push(

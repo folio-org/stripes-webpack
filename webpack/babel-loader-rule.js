@@ -1,7 +1,5 @@
 const babelOptions = require('./babel-options');
 const {
-  getModulesPaths,
-  getStripesModulesPaths,
   getNonTranspiledModules,
   getTranspiledModules,
 } = require('./module-paths');
@@ -10,12 +8,9 @@ const {
 // to "@folio" to determine if something needs Stripes-flavoured transpilation
 const extraTranspile = process.env.STRIPES_TRANSPILE_TOKENS ? new RegExp(process.env.STRIPES_TRANSPILE_TOKENS.replaceAll(' ', '|')) : '';
 
-module.exports = (stripesConfig) => {
-  const modulePaths = getModulesPaths(stripesConfig.modules);
-  const stripesModulePaths = getStripesModulesPaths();
-  const allModules = [...stripesModulePaths, ...modulePaths];
-  const modulesToTranspile = getNonTranspiledModules(allModules);
-  const transpiledModules = getTranspiledModules(allModules);
+module.exports = (modulePaths) => {
+  const modulesToTranspile = getNonTranspiledModules(modulePaths);
+  const transpiledModules = getTranspiledModules(modulePaths);
   const includeRegex = new RegExp(modulesToTranspile.join('|'));
   const excludeRegex = new RegExp(transpiledModules.join('|'));
 
@@ -37,8 +32,6 @@ module.exports = (stripesConfig) => {
       }
 
       // include STRIPES_TRANSPILE_TOKENS in transpilation
-      // TODO: Should we check if the modules listed in STRIPES_TRANSPILE_TOKENS are
-      // already transpiled (the dist folder exists).
       if (extraTranspile && extraTranspile.test(modulePath)) {
         return true;
       }

@@ -152,6 +152,7 @@ function getStripesDepsPaths(packageJsonPath) {
  *  './node_modules/@reshare/directory'
  * ]
  *
+ *
 */
 function getModulesPaths(modules) {
   return Object
@@ -175,6 +176,12 @@ function getModulesPaths(modules) {
     .filter(module => !!module);
 }
 
+/**
+ * Return full paths for all stripes dependencies defined in:
+ *
+ * https://github.com/folio-org/stripes/blob/ab01ed9c8d60d020d76f5682406b3bf901c24e76/package.json#L20-L27
+ *
+*/
 function getStripesModulesPaths() {
   const packageJsonPath = locatePackageJsonPath('@folio/stripes');
   const packageJson = require(packageJsonPath);
@@ -224,6 +231,20 @@ function getTranspiledModules(modules) {
   return transpiledModules;
 }
 
+function getTranspiledCssPaths(modules) {
+  const cssPaths = [];
+
+  modules.forEach(module => {
+    const cssPath = tryResolve(path.join(module, 'dist', 'style.css'));
+
+    if (cssPath) {
+      cssPaths.push(cssPath);
+    }
+  });
+
+  return cssPaths;
+}
+
 function getSharedStyles(filename) {
   return path.resolve(generateStripesAlias('@folio/stripes-components'), filename + ".css");
 }
@@ -236,5 +257,6 @@ module.exports = {
   getModulesPaths,
   getStripesModulesPaths,
   getNonTranspiledModules,
-  getTranspiledModules
+  getTranspiledModules,
+  getTranspiledCssPaths,
 };

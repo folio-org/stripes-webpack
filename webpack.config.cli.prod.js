@@ -8,12 +8,16 @@ const TerserPlugin = require('terser-webpack-plugin');
 
 const { getSharedStyles } = require('./webpack/module-paths');
 const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
-const base = require('./webpack.config.base');
+const buildBaseConfig = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
 const babelLoaderRule = require('./webpack/babel-loader-rule');
 const { getModulesPaths, getStripesModulesPaths, getTranspiledModules } = require('./webpack/module-paths');
 
 const buildConfig = (stripesConfig) => {
+  const modulePaths = getModulesPaths(stripesConfig.modules);
+  const stripesModulePaths = getStripesModulesPaths();
+  const allModulePaths = [...stripesModulePaths, ...modulePaths];
+  const base = buildBaseConfig(allModulePaths);
   const prodConfig = Object.assign({}, base, cli, {
     mode: 'production',
     devtool: 'source-map',
@@ -23,9 +27,7 @@ const buildConfig = (stripesConfig) => {
     },
   });
 
-  const modulePaths = getModulesPaths(stripesConfig.modules);
-  const stripesModulePaths = getStripesModulesPaths();
-  const transpiledModules = getTranspiledModules([...stripesModulePaths, ...modulePaths]);
+  const transpiledModules = getTranspiledModules(allModules);
   const transpiledModulesRegex = new RegExp(transpiledModules.join('|'));
   const smp = new SpeedMeasurePlugin();
 
@@ -68,7 +70,7 @@ const buildConfig = (stripesConfig) => {
     minimize: true,
   }
 
-  prodConfig.module.rules.push(babelLoaderRule(stripesConfig));
+  prodConfig.module.rules.push(babelLoaderRule(allModulePaths));
 
   const webpackConfig = smp.wrap({ plugins: prodConfig.plugins });
   webpackConfig.plugins.push(
