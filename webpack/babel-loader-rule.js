@@ -11,8 +11,8 @@ const extraTranspile = process.env.STRIPES_TRANSPILE_TOKENS ? new RegExp(process
 module.exports = (modulePaths) => {
   const modulesToTranspile = getNonTranspiledModules(modulePaths);
   const transpiledModules = getTranspiledModules(modulePaths);
-  const includeRegex = new RegExp(modulesToTranspile.join('|'));
-  const excludeRegex = new RegExp(transpiledModules.join('|'));
+  const includeRegex = modulesToTranspile.length ? new RegExp(modulesToTranspile.join('|')) : null;
+  const excludeRegex = transpiledModules.length ? new RegExp(transpiledModules.join('|')) : null;
 
   console.info('modules to transpile:', modulesToTranspile);
   console.info('transpiled modules:', transpiledModules);
@@ -27,7 +27,7 @@ module.exports = (modulePaths) => {
       }
 
       // regex which represents modules which should be included for transpilation
-      if (includeRegex.test(modulePath)) {
+      if (includeRegex && includeRegex.test(modulePath)) {
         return true;
       }
 
@@ -37,7 +37,7 @@ module.exports = (modulePaths) => {
       }
 
       // regex which represents modules which should be excluded from transpilation
-      if (excludeRegex.test(modulePath)) {
+      if (excludeRegex && excludeRegex.test(modulePath)) {
         return false;
       }
 
