@@ -29,6 +29,13 @@ const config = {
         options: babelOptions,
       },
       {
+        test: /\.(woff2?)$/,
+        type: 'asset/resource',
+        generator: {
+          filename: './fonts/[name].[contenthash].[ext]',
+        },
+      },
+      {
         test: /\.css$/,
         use: [
           {
