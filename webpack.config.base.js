@@ -5,6 +5,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
 
 const { generateStripesAlias, tryResolve } = require('./webpack/module-paths');
 const typescriptLoaderRule = require('./webpack/typescript-loader-rule');
@@ -85,6 +86,7 @@ const baseConfig = {
       'paths': true,
       'placeholders': true // (requires currying)
     }),
+    new RemoveEmptyScriptsPlugin(),
   ],
   module: {
     rules: [
@@ -144,11 +146,11 @@ const baseConfig = {
 const buildConfig = (modulePaths) => {
   const transpiledCssPaths = getTranspiledCssPaths(modulePaths);
 
-  transpiledCssPaths.forEach(cssPath => {
-    baseConfig.entry.css.push(cssPath);
-  });
-
   if (transpiledCssPaths.length) {
+    transpiledCssPaths.forEach(cssPath => {
+      baseConfig.entry.css.push(cssPath);
+    });
+
     baseConfig.module.rules.push({
       test: /\.css$/,
       include: [/dist\/style.css/],

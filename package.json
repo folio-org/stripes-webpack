@@ -78,6 +78,7 @@
     "util-ex": "^0.3.15",
     "webpack-dev-middleware": "^5.2.1",
     "webpack-hot-middleware": "^2.25.1",
+    "webpack-remove-empty-scripts": "^1.0.1",
     "webpack-virtual-modules": "^0.4.3"
   },
   "devDependencies": {
