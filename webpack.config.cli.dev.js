@@ -57,7 +57,7 @@ const buildConfig = (stripesConfig) => {
   devConfig.entry = [
     'webpack-hot-middleware/client',
     '@folio/stripes-components/lib/global.css',
-    '@folio/stripes-core/src/index',
+    '@folio/stripes-ui',
   ];
 
   devConfig.plugins = devConfig.plugins.concat([

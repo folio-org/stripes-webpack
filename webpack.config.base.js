@@ -45,7 +45,7 @@ module.exports = {
     },
     index: {
       dependOn: 'stripesConfig',
-      import: '@folio/stripes-core/src/index'
+      import: '@folio/stripes-ui'
     },
   },
   resolve: {
