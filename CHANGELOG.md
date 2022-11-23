@@ -1,5 +1,10 @@
 # Change history for stripes-webpack
 
+## [4.1.2](https://github.com/folio-org/stripes-webpack/tree/v4.1.2) (2022-11-23)
+[Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v4.1.1...v4.1.2)
+
+* Avoid `enhanced-resolve` `~5.11.0` due to incompatibilities with `webpack-virtual-config`. Refs STRWEB-61.
+
 ## [4.1.1](https://github.com/folio-org/stripes-webpack/tree/v4.1.1) (2022-11-02)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v4.1.0...v4.1.1)
 
