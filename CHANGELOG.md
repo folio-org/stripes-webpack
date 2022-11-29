@@ -1,5 +1,9 @@
 # Change history for stripes-webpack
 
+## 4.2.0 IN PROGRESS
+
+* Register `@folio/stripes-ui` with `stripes-duplicate` and `stripes-translations` plugins. Refs STRWEB-65.
+
 ## [4.1.1](https://github.com/folio-org/stripes-webpack/tree/v4.1.1) (2022-11-02)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v4.1.0...v4.1.1)
 
