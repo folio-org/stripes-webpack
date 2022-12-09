@@ -22,6 +22,7 @@ module.exports = class StripesTranslationPlugin {
       '@folio/stripes-components': {},
       '@folio/stripes-smart-components': {},
       '@folio/stripes-form': {},
+      '@folio/stripes-ui': {},
     };
     Object.assign(this.modules, options.modules);
     this.languageFilter = options.config.languages || [];

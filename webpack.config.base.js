@@ -49,7 +49,7 @@ const baseConfig = {
     },
     index: {
       dependOn: 'stripesConfig',
-      import: ['@folio/stripes-web']
+      import: '@folio/stripes-ui'
     },
   },
   resolve: {

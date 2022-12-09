@@ -14,6 +14,7 @@ const duplicatesNotAllowed = [
   'rxjs',
   'stripes',
   'stripes-core',
+  'stripes-ui',
   'stripes-components',
   'stripes-connect',
   'stripes-final-form',
