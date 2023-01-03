@@ -77,7 +77,8 @@ const buildConfig = (stripesConfig) => {
               autoprefixer(),
               postCssCustomProperties({
                 preserve: false,
-                importFrom: [path.join(generateStripesAlias('@folio/stripes-components'), 'lib/variables.css')]
+                importFrom: [path.join(generateStripesAlias('@folio/stripes-components'), 'lib/variables.css')],
+                disableDeprecationNotice: true
               }),
               postCssCalc(),
               postCssNesting(),
