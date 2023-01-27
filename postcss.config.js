@@ -27,7 +27,8 @@ module.exports = {
     autoprefixer(),
     postCssCustomProperties({
       preserve: false,
-      importFrom: [locateCssVariables()]
+      importFrom: [locateCssVariables()],
+      disableDeprecationNotice: true
     }),
     postCssCalc(),
     postCssNesting(),
