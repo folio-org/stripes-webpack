@@ -205,7 +205,7 @@ function getStripesModulesPaths() {
 }
 
 function getNonTranspiledModules(modules) {
-  const nonTranspiledModules = ['stripes-config', 'stripes-web'];
+  const nonTranspiledModules = ['stripes-config', 'stripes-ui'];
 
   modules.forEach(module => {
     const distPath = tryResolve(path.join(module, 'dist'));
