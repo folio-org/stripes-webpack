@@ -40,7 +40,7 @@ const buildConfig = (stripesConfig) => {
   devConfig.output.filename = 'bundle.js';
   devConfig.entry = [
     'webpack-hot-middleware/client',
-    '@folio/stripes-components/lib/global.css',
+    ...devConfig.entry.css,
     '@folio/stripes-ui',
   ];
 
