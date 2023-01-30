@@ -132,8 +132,8 @@ function getStripesDepsPaths(packageJsonPath) {
   const stripesDeps = stripes.stripesDeps;
 
   return stripesDeps.map(dep => {
-    const path = locatePackageJsonPath(dep);
-    return path ? path.replace('/package.json', '') : null;
+    const packageJsonPath = locatePackageJsonPath(dep);
+    return packageJsonPath ? path.dirname(packageJsonPath) : null;
   });
 }
 
@@ -161,7 +161,7 @@ function getModulesPaths(modules) {
       const packageJsonPath = locatePackageJsonPath(module);
 
       if (packageJsonPath) {
-        const modulePaths = [packageJsonPath.replace('/package.json', '')];
+        const modulePaths = [path.dirname(packageJsonPath)];
         const stripesDepPaths = getStripesDepsPaths(packageJsonPath);
 
         if (stripesDepPaths) {
@@ -196,7 +196,7 @@ function getStripesModulesPaths() {
       const stripesModulePath = locatePackageJsonPath(moduleName);
 
       if (stripesModulePath) {
-        paths.push(stripesModulePath.replace('/package.json', ''));
+        paths.push(path.dirname(stripesModulePath));
       }
     }
   });
