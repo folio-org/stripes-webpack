@@ -246,7 +246,7 @@ function getTranspiledCssPaths(modules) {
 }
 
 function getSharedStyles(filename) {
-  return path.resolve(generateStripesAlias('@folio/stripes-components'), filename + '.css');
+  return path.resolve(generateStripesAlias('@folio/stripes-components'), `${filename}.css`);
 }
 
 module.exports = {
