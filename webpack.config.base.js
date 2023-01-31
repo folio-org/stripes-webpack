@@ -7,10 +7,10 @@ const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
 
-const { generateStripesAlias, tryResolve } = require('./webpack/module-paths');
+const { generateStripesAlias } = require('./webpack/module-paths');
 const typescriptLoaderRule = require('./webpack/typescript-loader-rule');
 const { isProduction } = require('./webpack/utils');
-const { getModulesPaths, getStripesModulesPaths, getTranspiledCssPaths } = require('./webpack/module-paths');
+const { getTranspiledCssPaths } = require('./webpack/module-paths');
 
 // React doesn't like being included multiple times as can happen when using
 // yarn link. Here we find a more specific path to it by first looking in
@@ -145,6 +145,7 @@ const baseConfig = {
 
 const buildConfig = (modulePaths) => {
   const transpiledCssPaths = getTranspiledCssPaths(modulePaths);
+  const cssDistPathRegex = new RegExp(`dist(\/|\\\\)style.css`);
 
   if (transpiledCssPaths.length) {
     transpiledCssPaths.forEach(cssPath => {
@@ -153,7 +154,7 @@ const buildConfig = (modulePaths) => {
 
     baseConfig.module.rules.push({
       test: /\.css$/,
-      include: [/dist\/style.css/],
+      include: [cssDistPathRegex],
       use: [
         {
           loader: 'style-loader'
@@ -170,7 +171,7 @@ const buildConfig = (modulePaths) => {
 
   baseConfig.module.rules.push({
     test: /\.css$/,
-    exclude: [/dist\/style.css/],
+    exclude: [cssDistPathRegex],
     use: [
       isProduction ?
         { loader: MiniCssExtractPlugin.loader } :
