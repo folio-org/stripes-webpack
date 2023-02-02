@@ -1,3 +1,5 @@
+const path = require('path');
+
 const babelOptions = require('./babel-options');
 const {
   getNonTranspiledModules,
@@ -8,14 +10,34 @@ const {
 // to "@folio" to determine if something needs Stripes-flavoured transpilation
 const extraTranspile = process.env.STRIPES_TRANSPILE_TOKENS ? new RegExp(process.env.STRIPES_TRANSPILE_TOKENS.replaceAll(' ', '|')) : '';
 
+// https://stackoverflow.com/questions/3446170/escape-string-for-use-in-javascript-regex/6969486#6969486
+const escapeRegExp = string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 module.exports = (modulePaths) => {
   const modulesToTranspile = getNonTranspiledModules(modulePaths);
   const transpiledModules = getTranspiledModules(modulePaths);
-  const includeRegex = modulesToTranspile.length ? new RegExp(modulesToTranspile.join('|')) : null;
-  const excludeRegex = transpiledModules.length ? new RegExp(transpiledModules.join('|')) : null;
+  let includeRegex;
+  let excludeRegex;
 
-  console.info('modules to transpile:', modulesToTranspile);
-  console.info('transpiled modules:', transpiledModules);
+  if (modulesToTranspile.length) {
+    includeRegex = new RegExp(modulesToTranspile.map(escapeRegExp).join('|'));
+    console.info('\nmodules to transpile:\n');
+    modulesToTranspile.forEach(m => console.log(m));
+  }
+
+  if (transpiledModules.length) {
+    excludeRegex = new RegExp(transpiledModules.map(escapeRegExp).join('|'))
+    console.info('\ntranspiled modules:\n');
+    transpiledModules.forEach(m => console.log(m));
+  }
+
+  const folioModulePath = path.join('node_modules', '@folio');
+  // A negative lookahead regex to find @folio modules present in node_modules
+  // which are still not transpiled ('dist' folder is not present).
+  // This currently happens when folio module is not listed in stripes config
+  // or under stripes.stripesDeps and another folio module includes it as a dependency.
+  // TODO: remove this after all modules are cleanuped and transpiled
+  const folioModulesRegex = new RegExp(`${escapeRegExp(folioModulePath)}(?!.*dist)`);
 
   return {
     loader: 'babel-loader',
@@ -41,6 +63,13 @@ module.exports = (modulePaths) => {
         return false;
       }
 
+      // if untranspiled @folio module is present in node_modules
+      // just transpile it
+      if (folioModulesRegex.test(modulePath)) {
+        return true;
+      }
+
+      // skip everything from node_modules
       if (/node_modules/.test(modulePath)) {
         return false;
       }
