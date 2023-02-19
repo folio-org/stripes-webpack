@@ -1,5 +1,9 @@
 # Change history for stripes-webpack
 
+## 4.3.0 IN PROGRESS
+
+* Upgrade `css-minimizer-webpack-plugin` to `v4`. Refs STRWEB-72.
+
 ## [4.2.0](https://github.com/folio-org/stripes-webpack/tree/v4.2.0) (2023-01-30)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v4.1.2...v4.2.0)
 
