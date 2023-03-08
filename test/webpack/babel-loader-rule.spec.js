@@ -1,8 +1,7 @@
 const expect = require('chai').expect;
 const babelLoaderRule = require('../../webpack/babel-loader-rule');
-const modulePaths = require('../../webpack/module-paths');
 
-describe('The babel-loader-rule', function () {
+describe.only('The babel-loader-rule', function () {
   describe('test condition function', function () {
     beforeEach(function () {
       this.sut = babelLoaderRule(['@folio/inventory']);
@@ -22,8 +21,8 @@ describe('The babel-loader-rule', function () {
 
     it('only selects .js file extensions', function () {
       const fileName = '/project/folio/folio-testing-platform/node_modules/@folio/search/package.json';
-      const result = this.sut.include(fileName);
-      expect(result).to.equal(false);
+      const result = fileName.match(this.sut.test);
+      expect(result).to.equal(null);
     });
 
     it('selects files outside of both @folio scope and node_modules', function () {

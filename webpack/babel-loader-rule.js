@@ -36,7 +36,7 @@ module.exports = (modulePaths) => {
   // which are still not transpiled ('dist' folder is not present).
   // This currently happens when folio module is not listed in stripes config
   // or under stripes.stripesDeps and another folio module includes it as a dependency.
-  // TODO: remove this after all modules are cleanuped and transpiled
+  // TODO: remove this after all modules are transpiled
   const folioModulesRegex = new RegExp(`${escapeRegExp(folioModulePath)}(?!.*dist)`);
 
   return {
