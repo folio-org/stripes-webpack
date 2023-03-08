@@ -3,7 +3,6 @@ const fs = require('fs');
 const webpack = require('webpack');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 const { generateStripesAlias } = require('./webpack/module-paths');
 const babelLoaderRule = require('./webpack/babel-loader-rule');
 const typescriptLoaderRule = require('./webpack/typescript-loader-rule');
@@ -61,27 +60,6 @@ module.exports = {
       template: fs.existsSync('index.html') ? 'index.html' : `${__dirname}/index.html`,
     }),
     new webpack.EnvironmentPlugin(['NODE_ENV']),
-    // https://github.com/lodash/lodash-webpack-plugin#feature-sets
-    // Replace lodash feature sets of modules with noop.
-    // Feature sets that are truly not needed can be disabled here (listed largest to smallest):
-    new LodashModuleReplacementPlugin({
-      'shorthands': true,
-      'cloning': true,
-      'currying': true,
-      'caching': true,
-      'collections': true,
-      'exotics': true,
-      'guards': true,
-      'metadata': true, // (requires currying)
-      'deburring': true,
-      'unicode': true,
-      'chaining': true,
-      'memoizing': true,
-      'coercions': true,
-      'flattening': true,
-      'paths': true,
-      'placeholders': true // (requires currying)
-    })
   ],
   module: {
     rules: [
