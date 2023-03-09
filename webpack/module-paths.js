@@ -214,7 +214,7 @@ function getNonTranspiledModules(modules) {
     }
   });
 
-  return nonTranspiledModules;
+  return [...new Set(nonTranspiledModules)];
 }
 
 function getTranspiledModules(modules) {

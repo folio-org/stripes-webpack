@@ -22,7 +22,7 @@ module.exports = (modulePaths) => {
   if (modulesToTranspile.length) {
     includeRegex = new RegExp(modulesToTranspile.map(escapeRegExp).join('|'));
     console.info('\nmodules to transpile:\n');
-    modulesToTranspile.forEach(m => console.log(m));
+    modulesToTranspile.sort().forEach(m => console.log(m));
   }
 
   if (transpiledModules.length) {
