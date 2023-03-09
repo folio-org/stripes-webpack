@@ -64,6 +64,7 @@ const baseConfig = {
       template: fs.existsSync('index.html') ? 'index.html' : `${__dirname}/index.html`,
     }),
     new webpack.EnvironmentPlugin(['NODE_ENV']),
+    new RemoveEmptyScriptsPlugin(),
   ],
   module: {
     rules: [
@@ -122,8 +123,9 @@ const baseConfig = {
 
 const buildConfig = (modulePaths) => {
   const transpiledCssPaths = getTranspiledCssPaths(modulePaths);
-  const cssDistPathRegex = new RegExp(`dist(\/|\\\\)style.css`);
+  const cssDistPathRegex = /dist[\/\\]style\.css/;
 
+  // already transpiled css files
   if (transpiledCssPaths.length) {
     transpiledCssPaths.forEach(cssPath => {
       baseConfig.entry.css.push(cssPath);
@@ -133,9 +135,7 @@ const buildConfig = (modulePaths) => {
       test: /\.css$/,
       include: [cssDistPathRegex],
       use: [
-        {
-          loader: 'style-loader'
-        },
+        { loader: isProduction ? MiniCssExtractPlugin.loader : 'style-loader' },
         {
           loader: 'css-loader',
           options: {
@@ -146,13 +146,12 @@ const buildConfig = (modulePaths) => {
     });
   }
 
+  // css files not transpiled yet
   baseConfig.module.rules.push({
     test: /\.css$/,
     exclude: [cssDistPathRegex],
     use: [
-      isProduction ?
-        { loader: MiniCssExtractPlugin.loader } :
-        { loader: 'style-loader' },
+      { loader: isProduction ? MiniCssExtractPlugin.loader : 'style-loader'  },
       {
         loader: 'css-loader',
         options: {
