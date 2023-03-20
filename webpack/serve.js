@@ -8,6 +8,7 @@ const StripesWebpackPlugin = require('./stripes-webpack-plugin');
 const applyWebpackOverrides = require('./apply-webpack-overrides');
 const logger = require('./logger')();
 const buildConfig = require('../webpack.config.cli.dev');
+const sharedStylesConfig = require('../webpack.config.cli.shared.styles');
 
 const cwd = path.resolve();
 const platformModulePath = path.join(cwd, 'node_modules');
@@ -23,11 +24,7 @@ module.exports = function serve(stripesConfig, options) {
     logger.log('starting serve...');
     const app = express();
     let config = buildConfig(stripesConfig);
-    let developmentConfig = require('../webpack.config.cli.dev.shared.styles');
-
-    if (process.env.NODE_ENV === 'development') {
-      config = developmentConfig(config, {});
-    }
+    config = sharedStylesConfig(config, {});
 
     config.plugins.push(new StripesWebpackPlugin({ stripesConfig }));
 

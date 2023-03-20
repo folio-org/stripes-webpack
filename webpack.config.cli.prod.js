@@ -37,12 +37,6 @@ const buildConfig = (stripesConfig) => {
     }),
   ]);
 
-  prodConfig.resolve.alias = {
-    ...prodConfig.resolve.alias,
-    'stcom-interactionStyles': getSharedStyles('lib/sharedStyles/interactionStyles'),
-    'stcom-variables': getSharedStyles('lib/variables'),
-  };
-
   prodConfig.optimization = {
     mangleWasmImports: false,
     minimizer: [

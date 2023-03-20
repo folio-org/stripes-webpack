@@ -5,6 +5,7 @@ const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
 const applyWebpackOverrides = require('./apply-webpack-overrides');
 const logger = require('./logger')();
 const buildConfig = require('../webpack.config.cli.prod');
+const sharedStylesConfig = require('../webpack.config.cli.shared.styles');
 
 const platformModulePath = path.join(path.resolve(), 'node_modules');
 
@@ -13,6 +14,8 @@ module.exports = function build(stripesConfig, options) {
     logger.log('starting build...');
 
     let config = buildConfig(stripesConfig);
+
+    config = sharedStylesConfig(config, {});
 
     if (!options.skipStripesBuild) {
       config.plugins.push(new StripesWebpackPlugin({ stripesConfig, createDll: options.createDll }));
