@@ -184,8 +184,13 @@ function getModulesPaths(modules) {
 */
 function getStripesModulesPaths() {
   const packageJsonPath = locatePackageJsonPath('@folio/stripes');
-  const packageJson = require(packageJsonPath);
   const paths = [];
+
+  if (!packageJsonPath) {
+    return paths;
+  }
+
+  const packageJson = require(packageJsonPath);
 
   if (!packageJson) {
     return paths;
