@@ -81,7 +81,8 @@
     "webpack-dev-middleware": "^5.2.1",
     "webpack-hot-middleware": "^2.25.1",
     "webpack-remove-empty-scripts": "^1.0.1",
-    "webpack-virtual-modules": "^0.4.3"
+    "webpack-virtual-modules": "^0.4.3",
+    "esbuild-loader": "^3.0.1"
   },
   "devDependencies": {
     "chai": "^4.1.2",
