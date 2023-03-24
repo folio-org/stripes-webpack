@@ -8,7 +8,7 @@ const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
 
 const buildBaseConfig = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
-const babelLoaderRule = require('./webpack/babel-loader-rule');
+const esbuildLoaderRule = require('./webpack/esbuild-loader-rule');
 const { getModulesPaths, getStripesModulesPaths, getTranspiledModules } = require('./webpack/module-paths');
 
 const buildConfig = (stripesConfig) => {
@@ -59,7 +59,7 @@ const buildConfig = (stripesConfig) => {
     },
   }
 
-  prodConfig.module.rules.push(babelLoaderRule(allModulePaths));
+  prodConfig.module.rules.push(esbuildLoaderRule(allModulePaths));
 
   const webpackConfig = smp.wrap({ plugins: prodConfig.plugins });
   webpackConfig.plugins.push(
