@@ -92,7 +92,7 @@ const config = {
 };
 
 config.optimization = {
-  mangleWasmImports: false,
+  mangleWasmImports: true,
   minimizer: [
     new EsbuildPlugin({
       css: true,
