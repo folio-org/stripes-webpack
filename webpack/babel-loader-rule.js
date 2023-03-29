@@ -1,4 +1,6 @@
 const path = require('path');
+
+const babelOptions = require('./babel-options');
 const {
   getNonTranspiledModules,
   getTranspiledModules,
@@ -38,7 +40,7 @@ module.exports = (modulePaths) => {
   const folioModulesRegex = new RegExp(`${escapeRegExp(folioModulePath)}(?!.*dist)`);
 
   return {
-    loader: 'esbuild-loader',
+    loader: 'babel-loader',
     test: /\.js$/,
     include: function(modulePath) {
       // exclude empty modules
@@ -75,8 +77,8 @@ module.exports = (modulePaths) => {
       return true;
     },
     options: {
-      loader: 'tsx',
-      jsx: 'automatic',
+      cacheDirectory: true,
+      ...babelOptions,
     },
   };
 };
