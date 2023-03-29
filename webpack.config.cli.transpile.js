@@ -3,7 +3,8 @@
 const path = require('path');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const { EsbuildPlugin } = require('esbuild-loader');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const babelOptions = require('./webpack/babel-options');
 const { processExternals } = require('./webpack/utils');
 const { defaultExternals } = require('./consts');
 
@@ -24,11 +25,8 @@ const config = {
       {
         test: /\.(js|jsx|ts|tsx)$/,
         exclude: /node_modules/,
-        loader: 'esbuild-loader',
-        options: {
-          loader: 'tsx',
-          jsx: 'automatic',
-        },
+        loader: 'babel-loader',
+        options: babelOptions,
       },
       {
         test: /\.(woff2?)$/,
@@ -94,10 +92,10 @@ const config = {
 config.optimization = {
   mangleWasmImports: true,
   minimizer: [
-    new EsbuildPlugin({
-      css: true,
-    }),
+   '...', // in webpack@5 we can use the '...' syntax to extend existing minimizers
+    new CssMinimizerPlugin(),
   ],
+  minimize: true,
 };
 
 config.plugins = [
