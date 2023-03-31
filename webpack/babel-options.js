@@ -28,7 +28,6 @@ module.exports = {
     '@babel/plugin-proposal-throw-expressions',
     '@babel/plugin-syntax-import-meta',
     utils.isDevelopment && require.resolve('react-refresh/babel'),
-    utils.isProduction && ['remove-jsx-attributes', { patterns: [ '^data-test.*$' ] }]
 
   ].filter(Boolean),
 };
