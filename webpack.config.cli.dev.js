@@ -43,7 +43,6 @@ const buildConfig = (stripesConfig) => {
     '@folio/stripes-ui',
   ];
 
-
   devConfig.plugins = devConfig.plugins.concat([
     new webpack.ProvidePlugin({
       process: 'process/browser.js',
