@@ -5,6 +5,7 @@
 * Upgrade `css-minimizer-webpack-plugin` to `v4`. Refs STRWEB-72.
 * Remove `babel-plugin-lodash`. Refs STRWEB-73.
 * Replace babel loader with esbuild loader. Refs STRWEB-76.
+* Do not strip `data-test` attributes from production builds. Refs STRWEB-75.
 
 ## [4.2.0](https://github.com/folio-org/stripes-webpack/tree/v4.2.0) (2023-01-30)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v4.1.2...v4.2.0)
