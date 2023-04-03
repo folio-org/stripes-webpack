@@ -74,15 +74,6 @@ const config = {
         },
       },
       {
-        test: /\.svg$/,
-        use: [{
-          loader: 'url-loader',
-          options: {
-            esModule: false,
-          },
-        }]
-      },
-      {
         test: /\.js.map$/,
         enforce: "pre",
         use: ['source-map-loader'],
