@@ -74,9 +74,6 @@ module.exports = (modulePaths) => {
 
     // skip everything from node_modules
     if (nodeModulesRegex.test(modulePath)) {
-      if (modulePath.match('stripes')) {
-        console.log('node_modules', modulePath);
-      }
       return false;
     }
 
