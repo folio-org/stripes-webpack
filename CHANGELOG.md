@@ -4,7 +4,6 @@
 
 * Upgrade `css-minimizer-webpack-plugin` to `v4`. Refs STRWEB-72.
 * Remove `babel-plugin-lodash`. Refs STRWEB-73.
-* Replace babel loader with esbuild loader. Refs STRWEB-76.
 * Do not strip `data-test` attributes from production builds. Refs STRWEB-75.
 * Switch to asset modules configuration in stripes webpack (removes file-loader, url-loader deps). Refs STRWEB-77.
 * Remove SVGO-dependencies. Replaced by SVGR for loading STCOM SVG's as react-components. Refs STRWEB-77.
