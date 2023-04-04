@@ -5,9 +5,7 @@
 * Upgrade `css-minimizer-webpack-plugin` to `v4`. Refs STRWEB-72.
 * Remove `babel-plugin-lodash`. Refs STRWEB-73.
 * Do not strip `data-test` attributes from production builds. Refs STRWEB-75.
-* Switch to asset modules configuration in stripes webpack (removes file-loader, url-loader deps). Refs STRWEB-77.
-* Remove SVGO-dependencies. Replaced by SVGR for loading STCOM SVG's as react-components. Refs STRWEB-77.
-* Avoid buggy `postcss-loader` `v7.2.0` release. Refs STRWEB-79, STRWEB-81.
+* Avoid buggy `postcss-loader` `v7.2.x` releases. Refs STRWEB-79.
 
 ## [4.2.0](https://github.com/folio-org/stripes-webpack/tree/v4.2.0) (2023-01-30)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v4.1.2...v4.2.0)
