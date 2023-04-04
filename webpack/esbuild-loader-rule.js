@@ -13,7 +13,7 @@ const extraTranspile = process.env.STRIPES_TRANSPILE_TOKENS ? new RegExp(process
 // https://stackoverflow.com/questions/3446170/escape-string-for-use-in-javascript-regex/6969486#6969486
 const escapeRegExp = string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-const bigTestRegex = /bigtest|interactor/;
+const bigTestRegex = /bigtest|interactor/i;
 const nodeModulesRegex = /node_modules/;
 
 module.exports = (modulePaths) => {
