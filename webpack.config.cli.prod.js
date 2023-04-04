@@ -3,14 +3,12 @@
 
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
-
-const { getSharedStyles } = require('./webpack/module-paths');
+const { EsbuildPlugin } = require('esbuild-loader');
 const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
 const buildBaseConfig = require('./webpack.config.base');
+
 const cli = require('./webpack.config.cli');
-const babelLoaderRule = require('./webpack/babel-loader-rule');
+const esbuildLoaderRule = require('./webpack/esbuild-loader-rule');
 const { getModulesPaths, getStripesModulesPaths, getTranspiledModules } = require('./webpack/module-paths');
 
 const buildConfig = (stripesConfig) => {
@@ -40,11 +38,9 @@ const buildConfig = (stripesConfig) => {
   prodConfig.optimization = {
     mangleWasmImports: false,
     minimizer: [
-      new TerserPlugin({
-        // exclude stripes cache group from the minimizer
-        exclude: /stripes/,
+      new EsbuildPlugin({
+        css: true,
       }),
-      new CssMinimizerPlugin(),
     ],
     splitChunks: {
       // Do not process stripes chunk
@@ -61,10 +57,9 @@ const buildConfig = (stripesConfig) => {
         },
       },
     },
-    minimize: true,
   }
 
-  prodConfig.module.rules.push(babelLoaderRule(allModulePaths));
+  prodConfig.module.rules.push(esbuildLoaderRule(allModulePaths));
 
   const webpackConfig = smp.wrap({ plugins: prodConfig.plugins });
   webpackConfig.plugins.push(

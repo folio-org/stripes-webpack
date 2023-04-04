@@ -4,6 +4,7 @@
 
 * Upgrade `css-minimizer-webpack-plugin` to `v4`. Refs STRWEB-72.
 * Remove `babel-plugin-lodash`. Refs STRWEB-73.
+* Replace babel loader with esbuild loader. Refs STRWEB-76.
 * Do not strip `data-test` attributes from production builds. Refs STRWEB-75.
 * Avoid buggy `postcss-loader` `v7.2.0` release. Refs STRWEB-79.
 

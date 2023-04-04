@@ -1,7 +1,7 @@
 const expect = require('chai').expect;
-const babelLoaderRule = require('../../webpack/babel-loader-rule');
+const babelLoaderRule = require('../../webpack/esbuild-loader-rule');
 
-describe('The babel-loader-rule', function () {
+describe('The esbuild-loader-rule', function () {
   describe('test condition function', function () {
     beforeEach(function () {
       this.sut = babelLoaderRule(['@folio/inventory']);
