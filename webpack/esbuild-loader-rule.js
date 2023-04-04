@@ -60,9 +60,6 @@ module.exports = (modulePaths) => {
 
     // regex which represents modules which should be excluded from transpilation
     if (excludeRegex && excludeRegex.test(modulePath)) {
-      if (modulePath.match('stripes')) {
-        console.log('node_modules', modulePath);
-      }
       return false;
     }
 
