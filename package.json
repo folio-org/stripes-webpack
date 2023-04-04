@@ -57,7 +57,7 @@
     "postcss-custom-media": "^9.0.1",
     "postcss-custom-properties": "12.1.11",
     "postcss-import": "^15.0.1",
-    "postcss-loader": "^7.2.3",
+    "postcss-loader": "^7.2.4",
     "postcss-media-minmax": "^5.0.0",
     "postcss-nesting": "^10.2.0",
     "postcss-url": "^10.1.3",
