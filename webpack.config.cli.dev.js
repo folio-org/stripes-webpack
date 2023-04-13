@@ -1,12 +1,11 @@
 // Top level Webpack configuration for running a development environment
 // from the command line via devServer.js
-
 const webpack = require('webpack');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 const { getModulesPaths, getStripesModulesPaths } = require('./webpack/module-paths');
 const { tryResolve } = require('./webpack/module-paths');
-const babelLoaderRule = require('./webpack/babel-loader-rule');
+const esbuildLoaderRule = require('./webpack/esbuild-loader-rule');
 const utils = require('./webpack/utils');
 const buildBaseConfig = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
@@ -47,6 +46,8 @@ const buildConfig = (stripesConfig) => {
   devConfig.plugins = devConfig.plugins.concat([
     new webpack.ProvidePlugin({
       process: 'process/browser.js',
+      // add 'Buffer' global required for tests/reporting tools.
+      Buffer: ['buffer', 'Buffer']
     }),
   ]);
 
@@ -62,14 +63,8 @@ const buildConfig = (stripesConfig) => {
   devConfig.resolve.alias.process = 'process/browser.js';
   devConfig.resolve.alias['mocha'] = useBrowserMocha();
 
-  devConfig.module.rules.push(babelLoaderRule(allModulePaths));
+  devConfig.module.rules.push(esbuildLoaderRule(allModulePaths));
 
-  // add 'Buffer' global required for tests/reporting tools.
-  devConfig.plugins.push(
-    new webpack.ProvidePlugin({
-      Buffer: ['buffer', 'Buffer']
-    })
-  );
 
   // add resolutions for node utilities required for test suites.
   devConfig.resolve.fallback = {
