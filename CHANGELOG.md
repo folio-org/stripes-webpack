@@ -6,8 +6,8 @@
 * Remove `babel-plugin-lodash`. Refs STRWEB-73.
 * Replace babel loader with esbuild loader. Refs STRWEB-76.
 * Do not strip `data-test` attributes from production builds. Refs STRWEB-75.
-* Avoid buggy `postcss-loader` `v7.2.0` release. Refs STRWEB-79.
 * Remove `css-minimizer-webpack-plugin`. Refs STRWEB-82.
+* Avoid buggy `postcss-loader` `v7.2.x` releases. Refs STRWEB-79.
 * Bump minimum `favicons` versions to avoid CVE-2023-0842. Refs STRWEB-83.
 
 ## [4.2.0](https://github.com/folio-org/stripes-webpack/tree/v4.2.0) (2023-01-30)
