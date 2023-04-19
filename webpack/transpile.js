@@ -37,8 +37,6 @@ module.exports = function transpile(options = {}) {
     // Give the caller a chance to apply their own webpack overrides
     config = applyWebpackOverrides(options.webpackOverrides, config);
 
-    console.log(config.externals);
-
     const compiler = webpack(config);
 
     compiler.run((err, stats) => {
