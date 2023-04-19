@@ -1,7 +1,7 @@
 const isDevelopment = process.env.NODE_ENV === 'development';
 const isProduction = process.env.NODE_ENV === 'production';
-const processExternals = (externals) => {
-  return externals.reduce((acc, name) => {
+const processExternals = (peerDeps) => {
+  return Object.keys(peerDeps).reduce((acc, name) => {
     acc[name] = {
       root: name,
       commonjs2: name,

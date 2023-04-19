@@ -3,6 +3,7 @@ const webpack = require('webpack');
 const applyWebpackOverrides = require('./apply-webpack-overrides');
 const logger = require('./logger')();
 const { tryResolve } = require('./module-paths');
+const { processExternals } = require('./utils');
 
 module.exports = function transpile(options = {}) {
   return new Promise((resolve, reject) => {
@@ -13,22 +14,30 @@ module.exports = function transpile(options = {}) {
     const moduleTranspileConfigPath = path.join(process.cwd(), 'webpack.transpile.config.js');
     const packagePath = path.join(process.cwd(), 'package.json');
 
+    if (tryResolve(packagePath)) {
+      const packageJson = require(packagePath);
+      const { name, peerDependencies } = packageJson;
+
+      config.output.library = {
+        type: 'umd',
+        name,
+      };
+
+      if (peerDependencies) {
+        config.externals = processExternals(peerDependencies);
+      }
+    }
+
     if (tryResolve(moduleTranspileConfigPath)) {
       const moduleTranspileConfig = require(moduleTranspileConfigPath);
       moduleTranspileConfig.externals = { ...config.externals, ...moduleTranspileConfig.externals };
-      config = { ...config, ...moduleTranspileConfig }
-    }
-
-    if (tryResolve(packagePath)) {
-      const packageJson = require(packagePath);
-      config.output.library = {
-        type: 'umd',
-        name: packageJson.name,
-      };
+      config = { ...config, ...moduleTranspileConfig };
     }
 
     // Give the caller a chance to apply their own webpack overrides
     config = applyWebpackOverrides(options.webpackOverrides, config);
+
+    console.log(config.externals);
 
     const compiler = webpack(config);
 

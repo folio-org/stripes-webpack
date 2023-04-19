@@ -5,9 +5,6 @@ const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { EsbuildPlugin } = require('esbuild-loader');
 
-const { processExternals } = require('./webpack/utils');
-const { defaultExternals } = require('./consts');
-
 const config = {
   mode: 'production',
   devtool: 'source-map',
@@ -88,8 +85,7 @@ const config = {
       }
     ]
   },
-  // Set default externals. These can be extended by individual modules.
-  externals: processExternals(defaultExternals),
+  externals: {},
 };
 
 config.optimization = {
