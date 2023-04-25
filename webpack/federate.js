@@ -57,8 +57,11 @@ module.exports = async function federate(options = {}) {
   console.log(`Starting remote server on port ${port}`);
   server.start();
 
-  process.on('SIGINT', async () => {
-    await axios.delete(registryUrl, { data: metadata });
-    process.exit(0);
+  compiler.hooks.shutdown.tapPromise('AsyncShutdownHook', async (stats) => {
+    try {
+      await axios.delete(registryUrl, { data: metadata });
+    } catch (error) {
+      console.error('AsyncShutdownHook error:', error);
+    }
   });
 };
