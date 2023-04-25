@@ -13,7 +13,6 @@ const buildConfig = (metadata) => {
   const stripesModulePaths = getStripesModulesPaths();
   const translationsPath = path.join(process.cwd(), 'translations', displayName.split('.').shift());
   const shared = processShared(singletons, { singleton: true });
-  console.log(shared);
 
   const config = {
     name,
