@@ -109,7 +109,8 @@ class StripesModuleParser {
   // Validates and parses a module's stripes data
   parseStripesConfig(moduleName, packageJson) {
     const { stripes, description, version } = packageJson;
-    const getModule = new Function([], `return require('${moduleName}').default;`);
+    //const getModule = new Function([], `return require('${moduleName}').default;`);
+    const getModule = new Function([], ``);
     const stripesConfig = _.omit(Object.assign({}, stripes, this.overrideConfig, {
       module: moduleName,
       getModule,
@@ -207,14 +208,17 @@ function parseAllModules(enabledModules, context, aliases) {
 
     // stripesDeps
     const config = parsedModule.config;
+
     if (Array.isArray(config.stripesDeps)) {
       config.stripesDeps.forEach(dep => {
         // locate dep relative to the module that depends on it
         const depContext = modulePaths.locateStripesModule(context, config.module, aliases, 'package.json');
         const packageJsonPath = modulePaths.locateStripesModule(depContext, dep, aliases, 'package.json');
+
         if (!packageJsonPath) {
           throw new StripesBuildError(`StripesModuleParser: Unable to locate ${dep}'s package.json (dependency of ${config.module})`);
         }
+
         const packageJson = require(packageJsonPath);
         const resolvedPath = packageJsonPath.replace('/package.json', '');
         unsortedStripesDeps[dep] = appendOrSingleton(unsortedStripesDeps[dep], {
@@ -255,6 +259,7 @@ function parseAllModules(enabledModules, context, aliases) {
     }
     return depIcons;
   }, {});
+
   for (const [key, value] of Object.entries(stripesDeps)) {
     if (anyHasIcon(value)) {
       icons[key] = mergeIcons(value);
