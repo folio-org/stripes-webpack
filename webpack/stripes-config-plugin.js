@@ -51,7 +51,6 @@ module.exports = class StripesConfigPlugin {
     const metadata = {};
     const icons = {};
     this.mergedConfig = config;
-    // Object.assign({}, this.options);
     this.metadata = metadata;
     this.icons = icons;
     this.warnings = warnings;
@@ -84,12 +83,10 @@ module.exports = class StripesConfigPlugin {
       const branding = ${stripesSerialize.serializeWithRequire(pluginData.branding)};
       const errorLogging = ${stripesSerialize.serializeWithRequire(pluginData.errorLogging)};
       const translations = ${serialize(pluginData.translations, { space: 2 })};
-      // const metadata = ${stripesSerialize.serializeWithRequire(this.metadata)};
-      // const icons = ${stripesSerialize.serializeWithRequire(this.icons)};
+      const metadata = ${stripesSerialize.serializeWithRequire(this.metadata)};
+      const icons = ${stripesSerialize.serializeWithRequire(this.icons)};
       export { okapi, config, modules, branding, errorLogging, translations, metadata, icons };
     `;
-
-    console.log(stripesVirtualModule);
 
     logger.log('writing virtual module...', stripesVirtualModule);
     this.virtualModule.writeModule('node_modules/stripes-config.js', stripesVirtualModule);
