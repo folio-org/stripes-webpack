@@ -10,7 +10,6 @@ const utils = require('./webpack/utils');
 const buildBaseConfig = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
 
-
 const useBrowserMocha = () => {
   return tryResolve('mocha/mocha-es2018.js') ? 'mocha/mocha-es2018.js' : 'mocha';
 };

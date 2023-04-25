@@ -10,6 +10,7 @@ const logger = require('./logger')();
 const buildConfig = require('../webpack.config.cli.dev');
 const sharedStylesConfig = require('../webpack.config.cli.shared.styles');
 const buildServiceWorkerConfig = require('../webpack.config.service.worker');
+const registryServer = require('./registryServer');
 
 const cwd = path.resolve();
 const platformModulePath = path.join(cwd, 'node_modules');
@@ -31,6 +32,9 @@ module.exports = function serve(stripesConfig, options) {
     const serviceWorkerConfig = buildServiceWorkerConfig(stripesConfig);
     serviceWorkerConfig.resolve = { modules: ['node_modules', platformModulePath, coreModulePath] };
     serviceWorkerConfig.resolveLoader = { modules: ['node_modules', platformModulePath, coreModulePath] };
+
+    // stripes module registry
+    registryServer.start();
 
     let config = buildConfig(stripesConfig);
 
