@@ -93,7 +93,8 @@ const buildConfig = (metadata) => {
         }
       ]
     },
-    externals: processExternals(['@folio/stripes', 'stripes-config']),
+    // TODO: remove this after stripes-config is gone.
+    externals: processExternals({ 'stripes-config': true }),
     plugins: [
       new MiniCssExtractPlugin({ filename: 'style.css', ignoreOrder: false }),
       new container.ModuleFederationPlugin({
