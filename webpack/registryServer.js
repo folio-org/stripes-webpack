@@ -26,6 +26,7 @@ const registryServer = {
     app.delete('/registry', (req, res) => {
       const metadata = req.body;
       const { name } = metadata;
+
       delete registry.remotes[name];
 
       res.status(200).send(`Remote ${name} removed`);
