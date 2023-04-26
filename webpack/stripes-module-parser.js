@@ -215,7 +215,6 @@ function parseAllModules(enabledModules, context, aliases) {
         if (!packageJsonPath) {
           throw new StripesBuildError(`StripesModuleParser: Unable to locate ${dep}'s package.json (dependency of ${config.module})`);
         }
-
         const packageJson = require(packageJsonPath);
         const resolvedPath = packageJsonPath.replace('/package.json', '');
         unsortedStripesDeps[dep] = appendOrSingleton(unsortedStripesDeps[dep], {
