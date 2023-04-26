@@ -61,7 +61,7 @@ module.exports = async function federate(options = {}) {
     try {
       await axios.delete(registryUrl, { data: metadata });
     } catch (error) {
-      console.error('AsyncShutdownHook error:', error);
+      console.error(`registry not found. Please check ${registryUrl}`);
     }
   });
 };
