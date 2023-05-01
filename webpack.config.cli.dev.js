@@ -9,6 +9,7 @@ const esbuildLoaderRule = require('./webpack/esbuild-loader-rule');
 const utils = require('./webpack/utils');
 const buildBaseConfig = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
+const StripesFederationPlugin = require('./webpack/stripes-federation-plugin');
 
 const useBrowserMocha = () => {
   return tryResolve('mocha/mocha-es2018.js') ? 'mocha/mocha-es2018.js' : 'mocha';
@@ -55,7 +56,8 @@ const buildConfig = (stripesConfig) => {
   if (utils.isDevelopment) {
     devConfig.plugins = devConfig.plugins.concat([
       new webpack.HotModuleReplacementPlugin(),
-      new ReactRefreshWebpackPlugin()
+      new ReactRefreshWebpackPlugin(),
+      new StripesFederationPlugin(stripesConfig)
     ]);
   }
 

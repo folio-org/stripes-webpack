@@ -5,7 +5,6 @@ const axios = require('axios');
 const { snakeCase } = require('lodash');
 const portfinder = require('portfinder');
 
-const applyWebpackOverrides = require('./apply-webpack-overrides');
 const buildConfig = require('../webpack.config.federate.remote');
 const { tryResolve } = require('./module-paths');
 const logger = require('./logger')();
@@ -23,7 +22,7 @@ module.exports = async function federate(options = {}) {
     process.exit();
   }
 
-  const port = await portfinder.getPortPromise();
+  const port = options.port ?? await portfinder.getPortPromise();
   const host = `http://localhost`;
   const url = `${host}:${port}/remoteEntry.js`;
 

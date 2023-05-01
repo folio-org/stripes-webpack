@@ -7,7 +7,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
 const { ModuleFederationPlugin } = require('webpack').container;
 
-const { generateStripesAlias, locatePackageJsonPath } = require('./webpack/module-paths');
+const { generateStripesAlias,  } = require('./webpack/module-paths');
 const { processShared } = require('./webpack/utils');
 const typescriptLoaderRule = require('./webpack/typescript-loader-rule');
 const { isProduction } = require('./webpack/utils');
