@@ -8,6 +8,8 @@ const postCssCustomMedia = require('postcss-custom-media');
 const postCssMediaMinMax = require('postcss-media-minmax');
 const postCssColorFunction = require('postcss-color-function');
 
+const postCssReporter = require('postcss-reporter');
+
 const { generateStripesAlias, tryResolve } = require('./webpack/module-paths');
 
 const locateCssVariables = () => {
@@ -35,5 +37,6 @@ module.exports = {
     postCssCustomMedia(),
     postCssMediaMinMax(),
     postCssColorFunction(),
+    postCssReporter(),
   ],
 };
