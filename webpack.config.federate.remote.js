@@ -12,6 +12,7 @@ const buildConfig = (metadata) => {
   const mainEntry = path.join(process.cwd(), 'src', 'index.js');
   const stripesModulePaths = getStripesModulesPaths();
   const translationsPath = path.join(process.cwd(), 'translations', displayName.split('.').shift());
+  const iconsPath = path.join(process.cwd(), 'icons');
   const shared = processShared(singletons, { singleton: true });
 
   const config = {
@@ -28,10 +29,16 @@ const buildConfig = (metadata) => {
       headers: {
         'Access-Control-Allow-Origin': '*',
       },
-      static: {
-        directory: translationsPath,
-        publicPath: '/translations'
-      }
+      static: [
+        {
+          directory: translationsPath,
+          publicPath: '/translations'
+        },
+        {
+          directory: iconsPath,
+          publicPath: '/icons'
+        },
+      ]
     },
     module: {
       rules: [
