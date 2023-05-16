@@ -5,6 +5,7 @@ const singletons = {
   'react': '^17.0.2',
   'react-dom': '^17.0.2',
   'react-intl': '^5.7.0',
+  'react-query': '^3.39.3',
   'react-redux': '^8.0.5',
   'react-router': '^5.2.0',
   'react-router-dom': '^5.2.0',
