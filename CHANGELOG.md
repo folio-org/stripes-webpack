@@ -10,6 +10,7 @@
 * Avoid buggy `postcss-loader` `v7.2.x` releases. Refs STRWEB-79.
 * Bump minimum `favicons` versions to avoid CVE-2023-0842. Refs STRWEB-83.
 * List `peerDependencies` as `externals` during transpilation process. Refs STRWEB-84.
+* Correctly set `.css` in `resolve.extensions` array. Refs STRWEB-85.
 
 ## [4.2.0](https://github.com/folio-org/stripes-webpack/tree/v4.2.0) (2023-01-30)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v4.1.2...v4.2.0)
