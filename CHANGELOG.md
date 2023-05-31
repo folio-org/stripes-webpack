@@ -1,6 +1,7 @@
 # Change history for stripes-webpack
 
-## 4.1.3 IN PROGRESS
+## [4.1.3](https://github.com/folio-org/stripes-webpack/tree/v4.1.3) (2023-05-31)
+[Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v4.1.2...v4.1.3)
 
 * Add missing `@babel/plugin-*` dependencies that are listed in `babel-options.js`. Refs STRWEB-86.
 
