@@ -13,7 +13,7 @@ module.exports = (config, context) => {
       "stcom-variables": getSharedStyles("lib/variables"),
     };
 
-    config.resolve.extensions.push('.css');
+    config.resolve.extensions.push('css');
   }
 
   return config;
