@@ -34,7 +34,12 @@ module.exports = function serve(stripesConfig, options) {
     serviceWorkerConfig.resolveLoader = { modules: ['node_modules', platformModulePath, coreModulePath] };
 
     // stripes module registry
-    registryServer.start();
+    try {
+      registryServer.start();
+    }
+    catch (e) {
+      console.error(e)
+    }
 
     let config = buildConfig(stripesConfig);
 
