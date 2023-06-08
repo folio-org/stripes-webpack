@@ -20,8 +20,11 @@ const registryServer = {
       res.status(200).send(`Remote ${name} metadata updated`);
     });
 
-    // return entire registry
+    // return entire registry for machines
     app.get('/registry', (_, res) => res.json(registry));
+
+    // return entire registry for humans
+    app.get('/code', (_, res) => res.send(`<pre>${JSON.stringify(registry, null, 2)}</pre>`));
 
     app.delete('/registry', (req, res) => {
       const metadata = req.body;

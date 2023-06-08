@@ -13,6 +13,10 @@ const buildConfig = (metadata) => {
   const stripesModulePaths = getStripesModulesPaths();
   const translationsPath = path.join(process.cwd(), 'translations', displayName.split('.').shift());
   const iconsPath = path.join(process.cwd(), 'icons');
+
+  // yeah, yeah, soundsPath vs sound. sorry. `sound` is a legacy name.
+  // other paths are plural and I'm sticking with that convention.
+  const soundsPath = path.join(process.cwd(), 'sound');
   const shared = processShared(singletons, { singleton: true });
 
   const config = {
@@ -37,6 +41,10 @@ const buildConfig = (metadata) => {
         {
           directory: iconsPath,
           publicPath: '/icons'
+        },
+        {
+          directory: soundsPath,
+          publicPath: '/sounds'
         },
       ]
     },

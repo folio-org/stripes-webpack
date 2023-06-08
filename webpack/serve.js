@@ -24,7 +24,12 @@ module.exports = function serve(stripesConfig, options) {
   return new Promise((resolve) => {
     logger.log('starting serve...');
     const app = express();
-    registryServer.start();
+    try {
+      registryServer.start();
+    }
+    catch (e) {
+      console.error(e)
+    }
 
     let config = buildConfig(stripesConfig);
     config = sharedStylesConfig(config, {});
