@@ -1,6 +1,6 @@
 {
   "name": "@folio/stripes-webpack",
-  "version": "4.2.0",
+  "version": "5.0.0",
   "description": "The webpack config for stripes",
   "license": "Apache-2.0",
   "publishConfig": {
@@ -93,8 +93,8 @@
     "webpack": "^5.58.1"
   },
   "peerDependencies": {
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "webpack": "^5.58.1"
   }
 }

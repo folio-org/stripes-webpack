@@ -1,6 +1,6 @@
 # Change history for stripes-webpack
 
-## 4.3.0 IN PROGRESS
+## 5.0.0 IN PROGRESS
 
 * Upgrade `css-minimizer-webpack-plugin` to `v4`. Refs STRWEB-72.
 * Remove `babel-plugin-lodash`. Refs STRWEB-73.
@@ -13,6 +13,7 @@
 * Add missing `@babel/plugin-*` dependencies that are listed in `babel-options.js`. Refs STRWEB-86.
 * Upgrade `postcss-calc` dependency from 8.2.4 to 9.0.1. Refs STRWEB-88.
 * replace `@babel` packages that have moved from "proposed" to "official". Refs STRWEB-87.
+* *BREAKING* Upgrade `react` to `v18.2.0`. Refs STRWEB-92.
 
 ## [4.2.0](https://github.com/folio-org/stripes-webpack/tree/v4.2.0) (2023-01-30)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v4.1.2...v4.2.0)
