@@ -17,6 +17,7 @@
 * Lock `esbuild-loader` to `~3.0.0` to avoid problematic `3.1` release. Refs STRWEB-94.
 * Switch to asset modules configuration in stripes webpack (removes file-loader, url-loader deps). Refs STRWEB-77.
 * Remove SVGO-dependencies. Replaced by SVGR for loading STCOM SVG's as react-components. Refs STRWEB-77.
+* Bump `babel-loader` from `^8.0.0` to `^9.1.3`.
 
 ## [4.2.0](https://github.com/folio-org/stripes-webpack/tree/v4.2.0) (2023-01-30)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v4.1.2...v4.2.0)
