@@ -61,9 +61,9 @@ const buildConfig = (stripesConfig) => {
   //
   // thanks SO: https://stackoverflow.com/questions/65640449/how-to-solve-chunkloaderror-loading-hot-update-chunk-second-app-failed-in-webpa
   // and sokra: https://github.com/pmmmwh/react-refresh-webpack-plugin/issues/88#issuecomment-627558799
-  devConfig.optimization = {
-    runtimeChunk: 'single'
-  };
+  // devConfig.optimization = {
+  //   runtimeChunk: 'single'
+  // };
 
   devConfig.plugins = devConfig.plugins.concat([
     new webpack.ProvidePlugin({
