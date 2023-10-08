@@ -36,12 +36,34 @@ const buildConfig = (stripesConfig) => {
   });
 
   // Override filename to remove the hash in development due to memory issues (STCOR-296)
-  devConfig.output.filename = 'bundle.js';
-  devConfig.entry = [
-    'webpack-hot-middleware/client',
-    ...devConfig.entry.css,
-    '@folio/stripes-ui',
-  ];
+  devConfig.output.filename = '[name].js';
+  devConfig.entry =
+  {
+    css: devConfig.entry.css,
+    main: [
+      'webpack-hot-middleware/client',
+      '@folio/stripes-ui',
+    ],
+    'service-worker': {
+      import: '@folio/stripes-core/src/service-worker.js',
+      filename: 'service-worker.js',
+    }
+  };
+
+  // in dev-mode when react-refresh-webpack-plugin (hot reload) is in play
+  // and there are multiple entry points on a single page (as there are now
+  // that we have a service-worker), we need to make sure there is only one
+  // runtime instance so that modules are only instantiated once.
+  //
+  // I don't entirely understand what that ^^^^ means, but it's the outcome
+  // of a conversation among the creators of react, pmmmwh, and webpack,
+  // so I ain't gonna argue.
+  //
+  // thanks SO: https://stackoverflow.com/questions/65640449/how-to-solve-chunkloaderror-loading-hot-update-chunk-second-app-failed-in-webpa
+  // and sokra: https://github.com/pmmmwh/react-refresh-webpack-plugin/issues/88#issuecomment-627558799
+  devConfig.optimization = {
+    runtimeChunk: 'single'
+  };
 
   devConfig.plugins = devConfig.plugins.concat([
     new webpack.ProvidePlugin({
