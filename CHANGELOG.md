@@ -19,6 +19,7 @@
 * Remove SVGO-dependencies. Replaced by SVGR for loading STCOM SVG's as react-components. Refs STRWEB-77.
 * Bump `@svgr/webpack` from `7.0.0` to `8.1.0`.
 * Bump `babel-loader` from `^8.0.0` to `^9.1.3`.
+* Omit CSS alias cruft, leaving `config.resolve.extenssions` alone. Refs STRWEB-90, STRWEB-85.
 
 ## [4.2.0](https://github.com/folio-org/stripes-webpack/tree/v4.2.0) (2023-01-30)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v4.1.2...v4.2.0)
