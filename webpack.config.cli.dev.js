@@ -22,6 +22,7 @@ const buildConfig = (stripesConfig) => {
 
   const base = buildBaseConfig(allModulePaths);
   const devConfig = Object.assign({}, base, cli, {
+    name: 'development',
     devtool: 'inline-source-map',
     mode: 'development',
     cache: {
@@ -36,19 +37,12 @@ const buildConfig = (stripesConfig) => {
   });
 
   // Override filename to remove the hash in development due to memory issues (STCOR-296)
-  devConfig.output.filename = '[name].js';
-  devConfig.entry =
-  {
-    css: devConfig.entry.css,
-    main: [
-      'webpack-hot-middleware/client',
-      '@folio/stripes-ui',
-    ],
-    'service-worker': {
-      import: '@folio/stripes-core/src/service-worker.js',
-      filename: 'service-worker.js',
-    }
-  };
+  devConfig.output.filename = 'bundle.js';
+  devConfig.entry = [
+    'webpack-hot-middleware/client',
+    ...devConfig.entry.css,
+    '@folio/stripes-ui',
+  ];
 
   // in dev-mode when react-refresh-webpack-plugin (hot reload) is in play
   // and there are multiple entry points on a single page (as there are now

@@ -9,6 +9,7 @@ const applyWebpackOverrides = require('./apply-webpack-overrides');
 const logger = require('./logger')();
 const buildConfig = require('../webpack.config.cli.dev');
 const sharedStylesConfig = require('../webpack.config.cli.shared.styles');
+const serviceWorkerConfig = require('../webpack.config.service.worker');
 
 const cwd = path.resolve();
 const platformModulePath = path.join(cwd, 'node_modules');
@@ -39,8 +40,10 @@ module.exports = function serve(stripesConfig, options) {
     config = applyWebpackOverrides(options.webpackOverrides, config);
 
     logger.log('assign final webpack config', config);
-    const compiler = webpack(config);
-    compiler.hooks.done.tap('StripesCoreServe', stats => resolve(stats));
+    const compiler = webpack([serviceWorkerConfig, config]);
+    const [swCompiler, stripesCompiler] = compiler.compilers;
+
+    stripesCompiler.hooks.done.tap('StripesCoreServe', stats => resolve(stats));
 
     const port = options.port || process.env.STRIPES_PORT || 3000;
     const host = options.host || process.env.STRIPES_HOST || 'localhost';
@@ -49,23 +52,28 @@ module.exports = function serve(stripesConfig, options) {
 
     app.use(staticFileMiddleware);
 
-    // Process index rewrite before webpack-dev-middleware
+    // To handle rewrites without the dot rule, we should include the static middleware twice
+    // https://github.com/bripkens/connect-history-api-fallback/blob/master/examples/static-files-and-index-rewrite
+    app.use(staticFileMiddleware);
+
+    app.use(webpackDevMiddleware(swCompiler, {
+      publicPath: serviceWorkerConfig.output.publicPath,
+    }));
+
+        // Process index rewrite before webpack-dev-middleware
     // to respond with webpack's dist copy of index.html
     app.use(connectHistoryApiFallback({
       disableDotRule: true,
       htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
     }));
 
-    // To handle rewrites without the dot rule, we should include the static middleware twice
-    // https://github.com/bripkens/connect-history-api-fallback/blob/master/examples/static-files-and-index-rewrite
-    app.use(staticFileMiddleware);
-
-    app.use(webpackDevMiddleware(compiler, {
-      stats: 'errors-only',
+    app.use(webpackDevMiddleware(stripesCompiler, {
       publicPath: config.output.publicPath,
     }));
 
-    app.use(webpackHotMiddleware(compiler));
+
+
+    app.use(webpackHotMiddleware(stripesCompiler));
 
     app.listen(port, host, (err) => {
       if (err) {
