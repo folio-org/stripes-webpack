@@ -18,11 +18,11 @@ const config = {
   module: {
     rules: [
       {
-          test: /\.js$/,
-          loader: 'esbuild-loader',
-          options: {
-              target: 'es2015'
-          }
+        test: /\.js$/,
+        loader: 'esbuild-loader',
+        options: {
+          target: 'es2015'
+        }
       },
     ]
   }
