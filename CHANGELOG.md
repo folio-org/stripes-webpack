@@ -1,6 +1,9 @@
 # Change history for stripes-webpack
 
-## 5.0.0 IN PROGRESS
+## 5.1.0 IN PROGRESS
+
+## [5.0.0](https://github.com/folio-org/stripes-webpack/tree/v5.0.0) (2023-10-11)
+[Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v4.2.0...v5.0.0)
 
 * Upgrade `css-minimizer-webpack-plugin` to `v4`. Refs STRWEB-72.
 * Remove `babel-plugin-lodash`. Refs STRWEB-73.
