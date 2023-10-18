@@ -6,7 +6,7 @@ const applyWebpackOverrides = require('./apply-webpack-overrides');
 const logger = require('./logger')();
 const buildConfig = require('../webpack.config.cli.prod');
 const sharedStylesConfig = require('../webpack.config.cli.shared.styles');
-
+const serviceWorkerConfig = require('../webpack.config.service.worker');
 const platformModulePath = path.join(path.resolve(), 'node_modules');
 
 module.exports = function build(stripesConfig, options) {
@@ -73,9 +73,21 @@ module.exports = function build(stripesConfig, options) {
     config = applyWebpackOverrides(options.webpackOverrides, config);
 
     logger.log('assign final webpack config', config);
-    const compiler = webpack(config);
-    compiler.run((err, stats) => {
+
+    // repoint the service-worker's output.path value so it emits
+    // into options.outputPath
+    if (options.outputPath) {
+      serviceWorkerConfig.output.path = path.resolve(options.outputPath);
+    }
+    // override the default mode; given we are building, assume production
+    serviceWorkerConfig.mode = 'production';
+
+    webpack([config,serviceWorkerConfig], (err, stats) => {
       if (err) {
+        console.error(err.stack || err);
+        if (err.details) {
+          console.error(err.details);
+        }
         reject(err);
       } else {
         resolve(stats);

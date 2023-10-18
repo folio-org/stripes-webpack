@@ -50,10 +50,6 @@ const baseConfig = {
       dependOn: 'stripesConfig',
       import: '@folio/stripes-ui'
     },
-    'service-worker': {
-      import: '@folio/stripes-core/src/service-worker.js',
-      filename: 'service-worker.js',
-    }
   },
   resolve: {
     alias: {
