@@ -1,5 +1,10 @@
 # Change history for stripes-webpack
 
+## [5.0.1](https://github.com/folio-org/stripes-webpack/tree/v5.0.1) (2023-11-06)
+[Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v5.0.0...v5.0.1)
+
+* bundle `@folio/stripes-core`'s `service-worker.js`. Refs STRWEB-99.
+
 ## [5.0.0](https://github.com/folio-org/stripes-webpack/tree/v5.0.0) (2023-10-11)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v4.2.0...v5.0.0)
 
