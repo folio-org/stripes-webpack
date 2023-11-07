@@ -24,7 +24,14 @@ module.exports = function serve(stripesConfig, options) {
   return new Promise((resolve) => {
     logger.log('starting serve...');
     const app = express();
+
+    // service worker config
+    // update resolve/resolveLoader in order to find the micro-stripes-config
+    // virtual module configured by buildServiceWorkerConfig()
     const serviceWorkerConfig = buildServiceWorkerConfig(stripesConfig);
+    serviceWorkerConfig.resolve = { modules: ['node_modules', platformModulePath, coreModulePath] };
+    serviceWorkerConfig.resolveLoader = { modules: ['node_modules', platformModulePath, coreModulePath] };
+
     let config = buildConfig(stripesConfig);
 
     config = sharedStylesConfig(config, {});
@@ -72,8 +79,6 @@ module.exports = function serve(stripesConfig, options) {
     app.use(webpackDevMiddleware(stripesCompiler, {
       publicPath: config.output.publicPath,
     }));
-
-
 
     app.use(webpackHotMiddleware(stripesCompiler));
 
