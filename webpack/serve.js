@@ -9,7 +9,7 @@ const applyWebpackOverrides = require('./apply-webpack-overrides');
 const logger = require('./logger')();
 const buildConfig = require('../webpack.config.cli.dev');
 const sharedStylesConfig = require('../webpack.config.cli.shared.styles');
-const serviceWorkerConfig = require('../webpack.config.service.worker');
+const buildServiceWorkerConfig = require('../webpack.config.service.worker');
 
 const cwd = path.resolve();
 const platformModulePath = path.join(cwd, 'node_modules');
@@ -24,7 +24,16 @@ module.exports = function serve(stripesConfig, options) {
   return new Promise((resolve) => {
     logger.log('starting serve...');
     const app = express();
+
+    // service worker config
+    // update resolve/resolveLoader in order to find the micro-stripes-config
+    // virtual module configured by buildServiceWorkerConfig()
+    const serviceWorkerConfig = buildServiceWorkerConfig(stripesConfig);
+    serviceWorkerConfig.resolve = { modules: ['node_modules', platformModulePath, coreModulePath] };
+    serviceWorkerConfig.resolveLoader = { modules: ['node_modules', platformModulePath, coreModulePath] };
+
     let config = buildConfig(stripesConfig);
+
     config = sharedStylesConfig(config, {});
 
     config.plugins.push(new StripesWebpackPlugin({ stripesConfig }));
@@ -70,8 +79,6 @@ module.exports = function serve(stripesConfig, options) {
     app.use(webpackDevMiddleware(stripesCompiler, {
       publicPath: config.output.publicPath,
     }));
-
-
 
     app.use(webpackHotMiddleware(stripesCompiler));
 

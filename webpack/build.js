@@ -6,12 +6,26 @@ const applyWebpackOverrides = require('./apply-webpack-overrides');
 const logger = require('./logger')();
 const buildConfig = require('../webpack.config.cli.prod');
 const sharedStylesConfig = require('../webpack.config.cli.shared.styles');
-const serviceWorkerConfig = require('../webpack.config.service.worker');
+const buildServiceWorkerConfig = require('../webpack.config.service.worker');
 const platformModulePath = path.join(path.resolve(), 'node_modules');
 
 module.exports = function build(stripesConfig, options) {
   return new Promise((resolve, reject) => {
     logger.log('starting build...');
+
+    // service worker config
+    const serviceWorkerConfig = buildServiceWorkerConfig(stripesConfig);
+    // repoint the service-worker's output.path value so it emits
+    // into options.outputPath
+    if (options.outputPath) {
+      serviceWorkerConfig.output.path = path.resolve(options.outputPath);
+    }
+    // override the default mode; given we are building, assume production
+    serviceWorkerConfig.mode = 'production';
+    // update resolve/resolveLoader in order to find the micro-stripes-config
+    // virtual module configured by buildServiceWorkerConfig()
+    serviceWorkerConfig.resolve = { modules: ['node_modules', platformModulePath] };
+    serviceWorkerConfig.resolveLoader = { modules: ['node_modules', platformModulePath] };
 
     let config = buildConfig(stripesConfig);
 
@@ -73,14 +87,6 @@ module.exports = function build(stripesConfig, options) {
     config = applyWebpackOverrides(options.webpackOverrides, config);
 
     logger.log('assign final webpack config', config);
-
-    // repoint the service-worker's output.path value so it emits
-    // into options.outputPath
-    if (options.outputPath) {
-      serviceWorkerConfig.output.path = path.resolve(options.outputPath);
-    }
-    // override the default mode; given we are building, assume production
-    serviceWorkerConfig.mode = 'production';
 
     webpack([config,serviceWorkerConfig], (err, stats) => {
       if (err) {
