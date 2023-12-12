@@ -12,8 +12,6 @@ module.exports = (config, context) => {
       "stcom-interactionStyles": getSharedStyles("lib/sharedStyles/interactionStyles"),
       "stcom-variables": getSharedStyles("lib/variables"),
     };
-
-    config.resolve.extensions.push('css');
   }
 
   return config;

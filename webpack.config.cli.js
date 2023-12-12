@@ -9,6 +9,5 @@ module.exports = {
     filename: 'bundle.[name][contenthash].js',
     chunkFilename: 'chunk.[name][chunkhash].js',
     publicPath: '/',
-    clean: true
   },
 };

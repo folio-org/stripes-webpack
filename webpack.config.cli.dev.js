@@ -22,6 +22,7 @@ const buildConfig = (stripesConfig) => {
 
   const base = buildBaseConfig(allModulePaths);
   const devConfig = Object.assign({}, base, cli, {
+    name: 'development',
     devtool: 'inline-source-map',
     mode: 'development',
     cache: {

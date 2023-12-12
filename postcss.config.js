@@ -7,7 +7,7 @@ const postCssNesting = require('postcss-nesting');
 const postCssCustomMedia = require('postcss-custom-media');
 const postCssMediaMinMax = require('postcss-media-minmax');
 const postCssColorFunction = require('postcss-color-function');
-
+const postCssRelativeColorSyntax = require('@csstools/postcss-relative-color-syntax');
 const { generateStripesAlias, tryResolve } = require('./webpack/module-paths');
 
 const locateCssVariables = () => {
@@ -34,6 +34,7 @@ module.exports = {
     postCssNesting(),
     postCssCustomMedia(),
     postCssMediaMinMax(),
+    postCssRelativeColorSyntax(),
     postCssColorFunction(),
   ],
 };
