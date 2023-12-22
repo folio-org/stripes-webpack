@@ -1,5 +1,9 @@
 # Change history for stripes-webpack
 
+## 5.0.2 IN PROGRESS
+
+* Lock `favicons` to `7.1.4` due to build failures. Refs STRWEB-105.
+
 ## [5.0.1](https://github.com/folio-org/stripes-webpack/tree/v5.0.1) (2023-11-06)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v5.0.0...v5.0.1)
 

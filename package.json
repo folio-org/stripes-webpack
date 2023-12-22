@@ -45,7 +45,7 @@
     "debug": "^4.0.1",
     "esbuild-loader": "~3.0.1",
     "express": "^4.14.0",
-    "favicons": "^7.1.2",
+    "favicons": "7.1.4",
     "favicons-webpack-plugin": "^6.0.0",
     "handlebars": "^4.7.7",
     "handlebars-loader": "^1.7.1",
