@@ -5,6 +5,7 @@
 * Add an entry point for stripes-core's service worker. Refs STRWEB-99.
 * Pass micro-stripes-config to service worker at build-time. Refs STRWEB-102.
 * Add postcss-plugin for relative color syntax support for Firefox. Refs STRWEB-103.
+* Lock `favicons` to `7.1.4` due to build failures. Refs STRWEB-105.
 
 ## [5.0.0](https://github.com/folio-org/stripes-webpack/tree/v5.0.0) (2023-10-11)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v4.2.0...v5.0.0)
