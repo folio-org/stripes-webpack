@@ -63,6 +63,7 @@ module.exports = function serve(stripesConfig, options) {
     app.use(webpackDevMiddleware(compiler, {
       stats: 'errors-only',
       publicPath: config.output.publicPath,
+      writeToDisk: true,
     }));
 
     app.use(webpackHotMiddleware(compiler));

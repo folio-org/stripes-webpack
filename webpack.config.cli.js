@@ -9,6 +9,7 @@ module.exports = {
     filename: 'bundle.[name][contenthash].js',
     chunkFilename: 'chunk.[name][chunkhash].js',
     publicPath: '/',
-    clean: true
+    clean: true,
+    devtoolModuleFilenameTemplate: 'file:///[absolute-resource-path]'  // map to source with absolute file path not webpack:// protocol
   },
 };
