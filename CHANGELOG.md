@@ -7,6 +7,7 @@
 * Add postcss-plugin for relative color syntax support for Firefox. Refs STRWEB-103.
 * Lock `favicons` to `7.1.4` due to build failures. Refs STRWEB-105.
 * Update `typescript` from `^4.2.4` to `^5.3.3`. Refs STRWEB-104.
+* Resolve issue with favicon referencing by removing `speed-measurer-webpack-plugin` and its wrapping of other webpack plugins. Refs STRWEB-108.
 
 ## [5.0.0](https://github.com/folio-org/stripes-webpack/tree/v5.0.0) (2023-10-11)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v4.2.0...v5.0.0)
