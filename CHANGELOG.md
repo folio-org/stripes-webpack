@@ -1,6 +1,7 @@
 # Change history for stripes-webpack
 
-## 5.0.3 IN PROGRESS
+## [5.0.3](https://github.com/folio-org/stripes-webpack/tree/v5.0.3) (2024-03-05)
+[Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v5.0.2...v5.0.3)
 
 * Resolve issue with favicon referencing by removing `speed-measurer-webpack-plugin` and its wrapping of other webpack plugins. Refs STRWEB-108.
 
