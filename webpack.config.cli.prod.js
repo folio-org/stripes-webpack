@@ -4,7 +4,6 @@
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { EsbuildPlugin } = require('esbuild-loader');
-const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
 const buildBaseConfig = require('./webpack.config.base');
 
 const cli = require('./webpack.config.cli');
@@ -27,7 +26,6 @@ const buildConfig = (stripesConfig) => {
 
   const transpiledModules = getTranspiledModules(allModulePaths);
   const transpiledModulesRegex = new RegExp(transpiledModules.join('|'));
-  const smp = new SpeedMeasurePlugin();
 
   prodConfig.plugins = prodConfig.plugins.concat([
     new webpack.ProvidePlugin({
@@ -61,12 +59,11 @@ const buildConfig = (stripesConfig) => {
 
   prodConfig.module.rules.push(esbuildLoaderRule(allModulePaths));
 
-  const webpackConfig = smp.wrap({ plugins: prodConfig.plugins });
-  webpackConfig.plugins.push(
+  prodConfig.plugins.push(
     new MiniCssExtractPlugin({ filename: 'style.[contenthash].css' })
   );
 
-  return { ...prodConfig, ...webpackConfig };
+  return prodConfig;
 };
 
 module.exports = buildConfig;
