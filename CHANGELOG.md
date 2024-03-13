@@ -1,6 +1,9 @@
 # Change history for stripes-webpack
 
-## 5.1.0 IN PROGRESS
+## 5.2.0 IN PROGRESS
+
+## [5.1.0](https://github.com/folio-org/stripes-webpack/tree/v5.1.0) (2024-03-12)
+[Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v5.0.0...v5.1.0)
 
 * Add an entry point for stripes-core's service worker. Refs STRWEB-99.
 * Pass micro-stripes-config to service worker at build-time. Refs STRWEB-102.
@@ -8,6 +11,21 @@
 * Lock `favicons` to `7.1.4` due to build failures. Refs STRWEB-105.
 * Update `typescript` from `^4.2.4` to `^5.3.3`. Refs STRWEB-104.
 * Resolve issue with favicon referencing by removing `speed-measurer-webpack-plugin` and its wrapping of other webpack plugins. Refs STRWEB-108.
+
+## [5.0.3](https://github.com/folio-org/stripes-webpack/tree/v5.0.3) (2024-03-05)
+[Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v5.0.2...v5.0.3)
+
+* Resolve issue with favicon referencing by removing `speed-measurer-webpack-plugin` and its wrapping of other webpack plugins. Refs STRWEB-108.
+
+## [5.0.2](https://github.com/folio-org/stripes-webpack/tree/v5.0.2) (2024-01-12)
+[Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v5.0.1...v5.0.2)
+
+* Lock `favicons` to `7.1.4` due to build failures. Refs STRWEB-105.
+
+## [5.0.1](https://github.com/folio-org/stripes-webpack/tree/v5.0.1) (2023-11-06)
+[Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v5.0.0...v5.0.1)
+
+* bundle `@folio/stripes-core`'s `service-worker.js`. Refs STRWEB-99.
 
 ## [5.0.0](https://github.com/folio-org/stripes-webpack/tree/v5.0.0) (2023-10-11)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v4.2.0...v5.0.0)
