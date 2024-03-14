@@ -1,5 +1,9 @@
 # Change history for stripes-webpack
 
+## 5.2.0
+
+* Don't worry about the order of CSS imports across modules. Refs STRWEB-110.
+
 ## 5.1.0 IN PROGRESS
 
 * Add an entry point for stripes-core's service worker. Refs STRWEB-99.

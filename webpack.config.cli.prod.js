@@ -60,7 +60,7 @@ const buildConfig = (stripesConfig) => {
   prodConfig.module.rules.push(esbuildLoaderRule(allModulePaths));
 
   prodConfig.plugins.push(
-    new MiniCssExtractPlugin({ filename: 'style.[contenthash].css' })
+    new MiniCssExtractPlugin({ filename: 'style.[contenthash].css', ignoreOrder: true })
   );
 
   return prodConfig;
