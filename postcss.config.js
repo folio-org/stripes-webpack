@@ -1,13 +1,13 @@
 const path = require('path');
 const postCssImport = require('postcss-import');
 const autoprefixer = require('autoprefixer');
-const postCssCustomProperties = require('postcss-custom-properties');
 const postCssCalc = require('postcss-calc');
 const postCssNesting = require('postcss-nesting');
 const postCssCustomMedia = require('postcss-custom-media');
+const postCssGlobalData = require('@csstools/postcss-global-data');
 const postCssMediaMinMax = require('postcss-media-minmax');
-const postCssColorFunction = require('postcss-color-function');
 const postCssRelativeColorSyntax = require('@csstools/postcss-relative-color-syntax');
+const postCssOmitImports = require('./webpack/postcss-omit-imports');
 const { generateStripesAlias, tryResolve } = require('./webpack/module-paths');
 
 const locateCssVariables = () => {
@@ -23,18 +23,18 @@ const locateCssVariables = () => {
 
 module.exports = {
   plugins: [
-    postCssImport(),
-    autoprefixer(),
-    postCssCustomProperties({
-      preserve: false,
-      importFrom: [locateCssVariables()],
-      disableDeprecationNotice: true
+    // postcssGlobalData to import custom media queries so that those can be successfully resolve
+    postCssGlobalData({
+      files: [
+        locateCssVariables()
+      ]
     }),
-    postCssCalc(),
-    postCssNesting(),
+    // ignore any imports of variables to keep those from being inlined...
+    postCssImport({filter: (path) => !/variables/.test(path)}),
+    // strip out imports of variables to prevent variable reset via a custom postcss plugin.
+    postCssOmitImports({ contains: /variables/ }),
+    autoprefixer(),
     postCssCustomMedia(),
-    postCssMediaMinMax(),
     postCssRelativeColorSyntax(),
-    postCssColorFunction(),
   ],
 };
