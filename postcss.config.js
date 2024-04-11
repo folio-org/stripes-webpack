@@ -1,11 +1,8 @@
 const path = require('path');
 const postCssImport = require('postcss-import');
 const autoprefixer = require('autoprefixer');
-const postCssCalc = require('postcss-calc');
-const postCssNesting = require('postcss-nesting');
 const postCssCustomMedia = require('postcss-custom-media');
 const postCssGlobalData = require('@csstools/postcss-global-data');
-const postCssMediaMinMax = require('postcss-media-minmax');
 const postCssRelativeColorSyntax = require('@csstools/postcss-relative-color-syntax');
 const postCssOmitImports = require('./webpack/postcss-omit-imports');
 const { generateStripesAlias, tryResolve } = require('./webpack/module-paths');
