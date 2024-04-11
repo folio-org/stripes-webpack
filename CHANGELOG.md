@@ -3,6 +3,7 @@
 ## 5.2.0 IN PROGRESS
 
 * Don't worry about the order of CSS imports across modules. Refs STRWEB-110.
+* Remove postcss-plugins: postcss-nesting, postcss-custom-properties, postcss-color-function, postcss-calc. Add CSS variables entry point in webpack config. Refs STRWEB-111.
 
 ## [5.1.0](https://github.com/folio-org/stripes-webpack/tree/v5.1.0) (2024-03-12)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v5.0.0...v5.1.0)
