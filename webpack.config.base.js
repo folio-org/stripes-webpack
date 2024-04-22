@@ -42,7 +42,7 @@ const specificReact = generateStripesAlias('react');
 
 const baseConfig = {
   entry: {
-    css: ['@folio/stripes-components/lib/global.css'],
+    css: ['@folio/stripes-components/lib/global.css', '@folio/stripes-components/lib/variables.css'],
     stripesConfig: {
       import: 'stripes-config.js'
     },
