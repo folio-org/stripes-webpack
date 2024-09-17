@@ -10,7 +10,11 @@
     "test": "mocha --opts ./test/mocha.opts './test/webpack/**/*.js'"
   },
   "engines": {
-    "node": ">=12.0.0"
+    "node": ">=20.0.0"
+  },
+  "main": {},
+  "bin": {
+    "stripes": "./build/stripes-build-cli.js"
   },
   "dependencies": {
     "@babel/core": "^7.9.0",
@@ -39,6 +43,7 @@
     "babel-plugin-remove-jsx-attributes": "^0.0.2",
     "buffer": "^6.0.3",
     "commander": "^2.9.0",
+    "configstore": "^3.1.1",
     "connect-history-api-fallback": "^1.3.0",
     "core-js": "^3.6.1",
     "crypto-browserify": "^3.12.0",
