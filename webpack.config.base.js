@@ -117,6 +117,16 @@ const baseConfig = {
         resourceQuery: /icon/, // stcom icons use this query on the resource.
         use: ['@svgr/webpack']
       },
+      // allow import of arbitrary files as strings by appending `?raw` to the import.
+      // use it like:
+      //   import someString from "./someTxtFile.txt?raw"
+      // see https://github.com/webpack/webpack/discussions/16775#discussioncomment-5233250
+      // see https://webpack.js.org/guides/asset-modules/
+      // this facilitates importing large files as strings, e.g. XSLT
+      {
+        type: 'asset/source',
+        resourceQuery: /raw/,
+      },
     ],
   },
 };
