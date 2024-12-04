@@ -92,14 +92,24 @@ const buildConfig = (metadata) => {
             filename: './img/[name].[contenthash].[ext]',
           },
         },
+        // {
+        //   test: /\.svg$/,
+        //   use: [{
+        //     loader: 'url-loader',
+        //     options: {
+        //       esModule: false,
+        //     },
+        //   }]
+        // },
         {
           test: /\.svg$/,
-          use: [{
-            loader: 'url-loader',
-            options: {
-              esModule: false,
-            },
-          }]
+          type: 'asset/inline',
+          resourceQuery: { not: /icon/ } // exclude built-in icons from stripes-components which are loaded as react components.
+        },
+        {
+          test: /\.svg$/,
+          resourceQuery: /icon/, // stcom icons use this query on the resource.
+          use: ['@svgr/webpack']
         },
         {
           test: /\.js.map$/,
