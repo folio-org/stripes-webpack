@@ -2,6 +2,8 @@
 
 ## 5.3.0 IN PROGRESS
 
+* Remove unused `babel-plugin-remove-jsx-attributes`. Refs STRWEB-120.
+
 ## [5.2.0](https://github.com/folio-org/stripes-webpack/tree/v5.2.0) (2024-10-09)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v5.1.0...v5.2.0)
 
