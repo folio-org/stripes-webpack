@@ -264,4 +264,5 @@ module.exports = {
   getNonTranspiledModules,
   getTranspiledModules,
   getTranspiledCssPaths,
+  locatePackageJsonPath,
 };
