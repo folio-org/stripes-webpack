@@ -103,6 +103,11 @@ const baseConfig = {
         }],
       },
       {
+        test: /\.js$/,
+        enforce: 'pre',
+        use: ['source-map-loader'],
+      },
+      {
         test: /\.js.map$/,
         enforce: 'pre',
         use: ['source-map-loader'],
