@@ -1,6 +1,6 @@
 # Change history for stripes-webpack
 
-## 5.3.0 IN PROGRESS
+## 6.0.0 IN PROGRESS
 
 * Remove unused `babel-plugin-remove-jsx-attributes`. Refs STRWEB-120.
 
