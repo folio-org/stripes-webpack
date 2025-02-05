@@ -3,6 +3,7 @@
 ## 6.0.0 IN PROGRESS
 
 * Remove unused `babel-plugin-remove-jsx-attributes`. Refs STRWEB-120.
+* *BREAKING* Bump NodeJS to v20. Refs STRWEB-127.
 * *BREAKING* Upgrade `@csstools` plugins to current versions. Refs STRWEB-126.
 
 ## [5.2.0](https://github.com/folio-org/stripes-webpack/tree/v5.2.0) (2024-10-09)
