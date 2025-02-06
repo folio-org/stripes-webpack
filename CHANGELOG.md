@@ -1,5 +1,9 @@
 # Change history for stripes-webpack
 
+## 5.2.1 IN PROGRESS
+
+* Replace `crypto` polyfill with an empty module. Refs STRWEB-130.
+
 ## [5.2.0](https://github.com/folio-org/stripes-webpack/tree/v5.2.0) (2024-10-09)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v5.1.0...v5.2.0)
 
