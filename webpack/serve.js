@@ -9,7 +9,6 @@ const applyWebpackOverrides = require('./apply-webpack-overrides');
 const logger = require('./logger')();
 const buildConfig = require('../webpack.config.cli.dev');
 const sharedStylesConfig = require('../webpack.config.cli.shared.styles');
-const buildServiceWorkerConfig = require('../webpack.config.service.worker');
 
 const cwd = path.resolve();
 const platformModulePath = path.join(cwd, 'node_modules');
@@ -24,13 +23,6 @@ module.exports = function serve(stripesConfig, options) {
   return new Promise((resolve) => {
     logger.log('starting serve...');
     const app = express();
-
-    // service worker config
-    // update resolve/resolveLoader in order to find the micro-stripes-config
-    // virtual module configured by buildServiceWorkerConfig()
-    const serviceWorkerConfig = buildServiceWorkerConfig(stripesConfig);
-    serviceWorkerConfig.resolve = { modules: ['node_modules', platformModulePath, coreModulePath] };
-    serviceWorkerConfig.resolveLoader = { modules: ['node_modules', platformModulePath, coreModulePath] };
 
     let config = buildConfig(stripesConfig);
 
@@ -49,7 +41,7 @@ module.exports = function serve(stripesConfig, options) {
     config = applyWebpackOverrides(options.webpackOverrides, config);
 
     logger.log('assign final webpack config', config);
-    const compiler = webpack([serviceWorkerConfig, config]);
+    const compiler = webpack(config);
     const [swCompiler, stripesCompiler] = compiler.compilers;
 
     stripesCompiler.hooks.done.tap('StripesCoreServe', stats => resolve(stats));
@@ -64,10 +56,6 @@ module.exports = function serve(stripesConfig, options) {
     // To handle rewrites without the dot rule, we should include the static middleware twice
     // https://github.com/bripkens/connect-history-api-fallback/blob/master/examples/static-files-and-index-rewrite
     app.use(staticFileMiddleware);
-
-    app.use(webpackDevMiddleware(swCompiler, {
-      publicPath: serviceWorkerConfig.output.publicPath,
-    }));
 
     // Process index rewrite before webpack-dev-middleware
     // to respond with webpack's dist copy of index.html
