@@ -42,9 +42,8 @@ module.exports = function serve(stripesConfig, options) {
 
     logger.log('assign final webpack config', config);
     const compiler = webpack(config);
-    const [swCompiler, stripesCompiler] = compiler.compilers;
 
-    stripesCompiler.hooks.done.tap('StripesCoreServe', stats => resolve(stats));
+    compiler.hooks.done.tap('StripesCoreServe', stats => resolve(stats));
 
     const port = options.port || process.env.STRIPES_PORT || 3000;
     const host = options.host || process.env.STRIPES_HOST || 'localhost';
@@ -64,11 +63,11 @@ module.exports = function serve(stripesConfig, options) {
       htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
     }));
 
-    app.use(webpackDevMiddleware(stripesCompiler, {
+    app.use(webpackDevMiddleware(compiler, {
       publicPath: config.output.publicPath,
     }));
 
-    app.use(webpackHotMiddleware(stripesCompiler));
+    app.use(webpackHotMiddleware(compiler));
 
     app.listen(port, host, (err) => {
       if (err) {
