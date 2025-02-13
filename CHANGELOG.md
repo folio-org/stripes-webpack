@@ -6,6 +6,7 @@
 * *BREAKING* Bump NodeJS to v20. Refs STRWEB-127.
 * *BREAKING* Upgrade `@csstools` plugins to current versions. Refs STRWEB-126.
 * Replace `crypto` polyfill with an empty module. Refs STRWEB-130.
+* *BREAKING* remove service-worker handling. Refs STRWEB-125.
 
 ## [5.2.0](https://github.com/folio-org/stripes-webpack/tree/v5.2.0) (2024-10-09)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v5.1.0...v5.2.0)
