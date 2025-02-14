@@ -3,7 +3,6 @@
 ## 6.0.0 IN PROGRESS
 
 * Remove unused `babel-plugin-remove-jsx-attributes`. Refs STRWEB-120.
-* *BREAKING* Bump NodeJS to v20. Refs STRWEB-127.
 * *BREAKING* Upgrade `@csstools` plugins to current versions. Refs STRWEB-126.
 * Replace `crypto` polyfill with an empty module. Refs STRWEB-130.
 * *BREAKING* remove service-worker handling. Refs STRWEB-125.
