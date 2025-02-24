@@ -1,6 +1,7 @@
 # Change history for stripes-webpack
 
-## 6.0.0 IN PROGRESS
+## [6.0.0](https://github.com/folio-org/stripes-webpack/tree/v6.0.0) (2025-02-24)
+[Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v5.2.0...v6.0.0)
 
 * Remove unused `babel-plugin-remove-jsx-attributes`. Refs STRWEB-120.
 * *BREAKING* Upgrade `@csstools` plugins to current versions. Refs STRWEB-126.
