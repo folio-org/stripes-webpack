@@ -1,11 +1,19 @@
 # Change history for stripes-webpack
 
-## 6.0.0 IN PROGRESS
+## 6.1.0 IN PROGRESS
+
+## [6.0.0](https://github.com/folio-org/stripes-webpack/tree/v6.0.0) (2025-02-24)
+[Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v5.2.0...v6.0.0)
 
 * Remove unused `babel-plugin-remove-jsx-attributes`. Refs STRWEB-120.
 * *BREAKING* Upgrade `@csstools` plugins to current versions. Refs STRWEB-126.
 * Replace `crypto` polyfill with an empty module. Refs STRWEB-130.
 * *BREAKING* remove service-worker handling. Refs STRWEB-125.
+
+## [5.2.1](https://github.com/folio-org/stripes-webpack/tree/v5.2.1) (2025-02-18)
+[Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v5.2.0...v5.2.1)
+
+* Replace `crypto` polyfill with an empty module. Refs STRWEB-130.
 
 ## [5.2.0](https://github.com/folio-org/stripes-webpack/tree/v5.2.0) (2024-10-09)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v5.1.0...v5.2.0)
