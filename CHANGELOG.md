@@ -1,6 +1,12 @@
 # Change history for stripes-webpack
 
-## 5.3.0 IN PROGRESS
+## 6.0.0 IN PROGRESS
+
+* Remove unused `babel-plugin-remove-jsx-attributes`. Refs STRWEB-120.
+* *BREAKING* Upgrade `@csstools` plugins to current versions. Refs STRWEB-126.
+* Replace `crypto` polyfill with an empty module. Refs STRWEB-130.
+* *BREAKING* remove service-worker handling. Refs STRWEB-125.
+* Unlock `esbuild-loader` from `~3.0.0`, bumping to `^4.2.2`. Refs STRWEB-95.
 
 ## [5.2.0](https://github.com/folio-org/stripes-webpack/tree/v5.2.0) (2024-10-09)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v5.1.0...v5.2.0)
