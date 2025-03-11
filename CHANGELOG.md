@@ -1,6 +1,7 @@
 # Change history for stripes-webpack
 
-## 6.0.1 IN PROGRESS
+## [6.0.1](https://github.com/folio-org/stripes-webpack/tree/v6.0.1) (2025-03-11)
+[Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v6.0.0...v6.0.1)
 
 * Unlock `esbuild-loader` from `~3.0.0`, bumping to `^4.2.2`. Refs STRWEB-95.
 
