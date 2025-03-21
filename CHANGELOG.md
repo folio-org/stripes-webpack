@@ -3,6 +3,7 @@
 ## 6.1.0 IN PROGRESS
 
 * Unlock `esbuild-loader` from `~3.0.0`, bumping to `^4.2.2`. Refs STRWEB-95.
+* Prune dead code, `stripes.js` and its dep `commander`. Refs STRWEB-134.
 
 ## [6.0.0](https://github.com/folio-org/stripes-webpack/tree/v6.0.0) (2025-02-24)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v5.2.0...v6.0.0)
