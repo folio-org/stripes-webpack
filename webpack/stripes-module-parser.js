@@ -49,7 +49,7 @@ function iconPropsFromConfig(icon) {
 
 // Handles the parsing of one Stripes module's configuration and metadata
 class StripesModuleParser {
-  constructor(moduleName, overrideConfig, context, aliases) {
+  constructor(moduleName, overrideConfig, context, aliases, lazy) {
     logger.log(`initializing parser for ${moduleName}...`);
     this.moduleName = moduleName;
     this.modulePath = '';
@@ -57,6 +57,7 @@ class StripesModuleParser {
     this.overrideConfig = overrideConfig;
     this.packageJson = this.loadModulePackageJson(context, aliases);
     this.warnings = [];
+    this.lazy = lazy;
   }
 
   // Loads a given module's package.json and errors when it fails
@@ -101,15 +102,25 @@ class StripesModuleParser {
     return {
       name: this.nameOnly,
       actsAs,
-      config: this.config || this.parseStripesConfig(this.moduleName, this.packageJson),
+      config: this.config || this.parseStripesConfig(this.moduleName, this.packageJson, actsAs),
       metadata: this.metadata || this.parseStripesMetadata(this.packageJson),
     };
   }
 
   // Validates and parses a module's stripes data
-  parseStripesConfig(moduleName, packageJson) {
+  parseStripesConfig(moduleName, packageJson, actsAs = []) {
     const { stripes, description, version } = packageJson;
-    const getModule = new Function([], `return require('${moduleName}').default;`);
+
+    // Do not lazy load handlers
+    // more details in https://issues.folio.org/browse/STRWEB-52
+    // and https://issues.folio.org/browse/STRWEB-53
+    const getModule = (actsAs.includes('handler') || !this.lazy) ?
+      new Function([], `return require('${moduleName}').default;`) :
+      new Function([], `
+        const { lazy } = require('react');
+        return lazy(() => import(/* webpackChunkName: "${moduleName}" */ '${moduleName}'));`
+      );
+
     const stripesConfig = _.omit(Object.assign({}, stripes, this.overrideConfig, {
       module: moduleName,
       getModule,
@@ -184,7 +195,7 @@ class StripesModuleParser {
 // The helper loops over a tenant's enabled modules and parses each module
 // The resulting config is grouped by stripes module type (app, settings, plugin, etc.)
 // The metadata is grouped by module name
-function parseAllModules(enabledModules, context, aliases) {
+function parseAllModules(enabledModules, context, aliases, lazy) {
   const allModuleConfigs = {
     app: [],
   };
@@ -194,7 +205,7 @@ function parseAllModules(enabledModules, context, aliases) {
   let warnings = [];
 
   _.forOwn(enabledModules, (overrideConfig, moduleName) => {
-    const moduleParser = new StripesModuleParser(moduleName, overrideConfig, context, aliases);
+    const moduleParser = new StripesModuleParser(moduleName, overrideConfig, context, aliases, lazy);
     const parsedModule = moduleParser.parseModule();
 
     // config

@@ -12,12 +12,12 @@ module.exports = function build(stripesConfig, options) {
   return new Promise((resolve, reject) => {
     logger.log('starting build...');
 
-    let config = buildConfig(stripesConfig);
+    let config = buildConfig(stripesConfig, options);
 
     config = sharedStylesConfig(config, {});
 
     if (!options.skipStripesBuild) {
-      config.plugins.push(new StripesWebpackPlugin({ stripesConfig, createDll: options.createDll }));
+      config.plugins.push(new StripesWebpackPlugin({ stripesConfig, createDll: options.createDll, lazy: options.lazy }));
     }
 
     config.resolve.modules = ['node_modules', platformModulePath];
