@@ -1,6 +1,8 @@
 const path = require('path');
 const _ = require('lodash');
 const semver = require('semver');
+const validateNpmPackageName = require('validate-npm-package-name');
+
 const modulePaths = require('./module-paths');
 const StripesBuildError = require('./stripes-build-error');
 const logger = require('./logger')('stripesModuleParser');
@@ -53,7 +55,7 @@ class StripesModuleParser {
     logger.log(`initializing parser for ${moduleName}...`);
     this.moduleName = moduleName;
     this.modulePath = '';
-    this.nameOnly = moduleName.replace(/.*\//, '');
+    this.nameOnly = moduleName.replace(/.*\//, ''); // name without scope
     this.overrideConfig = overrideConfig;
     this.packageJson = this.loadModulePackageJson(context, aliases);
     this.warnings = [];
@@ -107,9 +109,32 @@ class StripesModuleParser {
     };
   }
 
-  // Validates and parses a module's stripes data
+  // parseStripesConfig
+  // Ignore the name. This function has nothing to do with stripes.config.js;
+  // rather, it takes a module's package data and constructs a webpack loader
+  // function and returns it embedded in an object that wraps up the loader
+  // along with some other package data. The return value is shaped nominally
+  // like this:
+  // {
+  //    ...package::stripes,
+  //    module: package::name
+  //    getModule: webpack loader function
+  //    description: package::description
+  //    version: package::version
+  // }
+  //
+  // @param {string} moduleName
+  // @param {object} packageJson
+  // @param {array} actsAs
+  //
+  // @returns {object}
   parseStripesConfig(moduleName, packageJson, actsAs = []) {
     const { stripes, description, version } = packageJson;
+
+    const isValid = validateNpmPackageName(moduleName);
+    if (!isValid.validForNewPackages) {
+      throw new StripesBuildError(`${moduleName} is not a valid NPM package name according to https://www.npmjs.com/package/validate-npm-package-name`);
+    }
 
     // Do not lazy load handlers
     // more details in https://issues.folio.org/browse/STRWEB-52
