@@ -10,7 +10,7 @@ const cli = require('./webpack.config.cli');
 const esbuildLoaderRule = require('./webpack/esbuild-loader-rule');
 const { getModulesPaths, getStripesModulesPaths, getTranspiledModules } = require('./webpack/module-paths');
 
-const buildConfig = (stripesConfig) => {
+const buildConfig = (stripesConfig, options = {}) => {
   const modulePaths = getModulesPaths(stripesConfig.modules);
   const stripesModulePaths = getStripesModulesPaths();
   const allModulePaths = [...stripesModulePaths, ...modulePaths];
@@ -23,6 +23,27 @@ const buildConfig = (stripesConfig) => {
       level: 'warn',
     },
   });
+
+  const splitChunks = {
+    // Do not process stripes chunk
+    chunks: (chunk) => {
+      return chunk.name !== 'stripes';
+    },
+    cacheGroups: {
+      // this cache group will be omitted by minimizer
+      stripes: {
+        // only include already transpiled modules
+        test: (module) => transpiledModulesRegex.test(module.resource),
+        name: 'stripes',
+        chunks: 'all'
+      },
+    },
+  };
+
+  if (options.lazy) {
+    splitChunks.chunks = 'all';
+    splitChunks.cacheGroups = undefined;
+  }
 
   const transpiledModules = getTranspiledModules(allModulePaths);
   const transpiledModulesRegex = new RegExp(transpiledModules.join('|'));
@@ -40,21 +61,7 @@ const buildConfig = (stripesConfig) => {
         css: true,
       }),
     ],
-    splitChunks: {
-      // Do not process stripes chunk
-      chunks: (chunk) => {
-        return chunk.name !== 'stripes';
-      },
-      cacheGroups: {
-        // this cache group will be omitted by minimizer
-        stripes: {
-          // only include already transpiled modules
-          test: (module) => transpiledModulesRegex.test(module.resource),
-          name: 'stripes',
-          chunks: 'all'
-        },
-      },
-    },
+    splitChunks,
   }
 
   prodConfig.module.rules.push(esbuildLoaderRule(allModulePaths));
