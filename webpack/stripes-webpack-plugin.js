@@ -11,6 +11,7 @@ module.exports = class StripesWebpackPlugin {
   constructor(options) {
     this.stripesConfig = options.stripesConfig;
     this.createDll = options.createDll;
+    this.lazy = options.lazy;
   }
 
   apply(compiler) {
@@ -18,7 +19,7 @@ module.exports = class StripesWebpackPlugin {
     const isProduction = compiler.options.mode === 'production';
 
     const stripesPlugins = [
-      new StripesConfigPlugin(this.stripesConfig),
+      new StripesConfigPlugin(this.stripesConfig, this.lazy),
       new StripesTranslationsPlugin(this.stripesConfig),
       new StripesDuplicatesPlugin(this.stripesConfig),
     ];

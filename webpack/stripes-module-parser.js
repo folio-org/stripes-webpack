@@ -1,6 +1,8 @@
 const path = require('path');
 const _ = require('lodash');
 const semver = require('semver');
+const validateNpmPackageName = require('validate-npm-package-name');
+
 const modulePaths = require('./module-paths');
 const StripesBuildError = require('./stripes-build-error');
 const logger = require('./logger')('stripesModuleParser');
@@ -49,14 +51,15 @@ function iconPropsFromConfig(icon) {
 
 // Handles the parsing of one Stripes module's configuration and metadata
 class StripesModuleParser {
-  constructor(moduleName, overrideConfig, context, aliases) {
+  constructor(moduleName, overrideConfig, context, aliases, lazy) {
     logger.log(`initializing parser for ${moduleName}...`);
     this.moduleName = moduleName;
     this.modulePath = '';
-    this.nameOnly = moduleName.replace(/.*\//, '');
+    this.nameOnly = moduleName.replace(/.*\//, ''); // name without scope
     this.overrideConfig = overrideConfig;
     this.packageJson = this.loadModulePackageJson(context, aliases);
     this.warnings = [];
+    this.lazy = lazy;
   }
 
   // Loads a given module's package.json and errors when it fails
@@ -101,15 +104,48 @@ class StripesModuleParser {
     return {
       name: this.nameOnly,
       actsAs,
-      config: this.config || this.parseStripesConfig(this.moduleName, this.packageJson),
+      config: this.config || this.parseStripesConfig(this.moduleName, this.packageJson, actsAs),
       metadata: this.metadata || this.parseStripesMetadata(this.packageJson),
     };
   }
 
-  // Validates and parses a module's stripes data
-  parseStripesConfig(moduleName, packageJson) {
+  // parseStripesConfig
+  // Ignore the name. This function has nothing to do with stripes.config.js;
+  // rather, it takes a module's package data and constructs a webpack loader
+  // function and returns it embedded in an object that wraps up the loader
+  // along with some other package data. The return value is shaped nominally
+  // like this:
+  // {
+  //    ...package::stripes,
+  //    module: package::name
+  //    getModule: webpack loader function
+  //    description: package::description
+  //    version: package::version
+  // }
+  //
+  // @param {string} moduleName
+  // @param {object} packageJson
+  // @param {array} actsAs
+  //
+  // @returns {object}
+  parseStripesConfig(moduleName, packageJson, actsAs = []) {
     const { stripes, description, version } = packageJson;
-    const getModule = new Function([], `return require('${moduleName}').default;`);
+
+    const isValid = validateNpmPackageName(moduleName);
+    if (!isValid.validForNewPackages) {
+      throw new StripesBuildError(`${moduleName} is not a valid NPM package name according to https://www.npmjs.com/package/validate-npm-package-name`);
+    }
+
+    // Do not lazy load handlers
+    // more details in https://issues.folio.org/browse/STRWEB-52
+    // and https://issues.folio.org/browse/STRWEB-53
+    const getModule = (actsAs.includes('handler') || !this.lazy) ?
+      new Function([], `return require('${moduleName}').default;`) :
+      new Function([], `
+        const { lazy } = require('react');
+        return lazy(() => import(/* webpackChunkName: "${moduleName}" */ '${moduleName}'));`
+      );
+
     const stripesConfig = _.omit(Object.assign({}, stripes, this.overrideConfig, {
       module: moduleName,
       getModule,
@@ -184,7 +220,7 @@ class StripesModuleParser {
 // The helper loops over a tenant's enabled modules and parses each module
 // The resulting config is grouped by stripes module type (app, settings, plugin, etc.)
 // The metadata is grouped by module name
-function parseAllModules(enabledModules, context, aliases) {
+function parseAllModules(enabledModules, context, aliases, lazy) {
   const allModuleConfigs = {
     app: [],
   };
@@ -194,7 +230,7 @@ function parseAllModules(enabledModules, context, aliases) {
   let warnings = [];
 
   _.forOwn(enabledModules, (overrideConfig, moduleName) => {
-    const moduleParser = new StripesModuleParser(moduleName, overrideConfig, context, aliases);
+    const moduleParser = new StripesModuleParser(moduleName, overrideConfig, context, aliases, lazy);
     const parsedModule = moduleParser.parseModule();
 
     // config
