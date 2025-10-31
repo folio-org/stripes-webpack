@@ -70,7 +70,7 @@ const buildConfig = (stripesConfig) => {
 
   // add resolutions for node utilities required for test suites.
   devConfig.resolve.fallback = {
-    "crypto": require.resolve('crypto-browserify'),
+    "crypto": false,
     "stream": require.resolve('stream-browserify'),
     "util": require.resolve('util-ex'),
   };

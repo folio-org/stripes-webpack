@@ -17,10 +17,12 @@ const logger = require('./logger')('stripesConfigPlugin');
 const stripesConfigPluginHooksMap = new WeakMap();
 
 module.exports = class StripesConfigPlugin {
-  constructor(options) {
+  // options is actually stripes.config.js
+  constructor(options, lazy) {
     logger.log('initializing...');
 
     this.options = _.omit(options, 'branding', 'errorLogging');
+    this.lazy = lazy;
   }
 
   // Establish hooks for other plugins to update the config, providing existing config as context
@@ -39,8 +41,13 @@ module.exports = class StripesConfigPlugin {
   }
 
   apply(compiler) {
-    const config = this.options;
-    this.config = config;
+    const enabledModules = this.options.modules;
+    logger.log('enabled modules:', enabledModules);
+    const { config, metadata, icons, stripesDeps, warnings } = stripesModuleParser.parseAllModules(enabledModules, compiler.context, compiler.options.resolve.alias, this.lazy);
+    this.mergedConfig = Object.assign({}, this.options, { modules: config });
+    this.metadata = metadata;
+    this.icons = icons;
+    this.warnings = warnings;
     // Prep the virtual module now, we will write to it when ready
     this.virtualModule = new VirtualModulesPlugin();
     this.virtualModule.apply(compiler);
