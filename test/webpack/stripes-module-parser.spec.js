@@ -14,22 +14,30 @@ const enabledModules = {
   '@folio/developer': {},
 };
 const icons = [
-  { name: 'one',
+  {
+    name: 'one',
     alt: 'alt for one',
     fileName: 'oneFile',
-    title: 'a title for one' },
-  { name: 'two',
+    title: 'a title for one'
+  },
+  {
+    name: 'two',
     alt: 'alt for two',
     fileName: 'twoFile',
-    title: 'a title for two' },
+    title: 'a title for two'
+  },
 ];
 const welcomePageEntries = [
-  { iconName: 'one',
+  {
+    iconName: 'one',
     headline: 'welcome headline',
-    description: 'welcome description' },
-  { iconName: 'two',
+    description: 'welcome description'
+  },
+  {
+    iconName: 'two',
     headline: 'another welcome headline',
-    description: 'another welcome description' },
+    description: 'another welcome description'
+  },
 ];
 let mockPackageJson;
 
@@ -150,9 +158,11 @@ describe('The stripes-module-parser', function () {
 
       it('falls back to icon.name when icon.fileName is not specified', function () {
         const iconsNoFileName = [
-          { name: 'one',
+          {
+            name: 'one',
             alt: 'alt for one',
-            title: 'a title for one' },
+            title: 'a title for one'
+          },
         ];
         const result = this.sut.getIconMetadata(iconsNoFileName);
         expect(result.one).to.include({
@@ -224,7 +234,7 @@ describe('parseAllModules function', function () {
 
     it('returns config and metadata collections', function () {
       const result = this.sut(enabledModules, context, aliases);
-      expect(result).to.be.an('object').with.all.keys('config', 'metadata', 'stripesDeps', 'icons', 'warnings');
+      expect(result).to.be.an('object').with.all.keys('config', 'metadata', 'stripesDeps', 'icons', 'warnings', 'lazyImports');
     });
 
     it('returns config grouped by stripes type', function () {

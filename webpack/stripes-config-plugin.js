@@ -46,11 +46,12 @@ module.exports = class StripesConfigPlugin {
   apply(compiler) {
     const enabledModules = this.options.modules;
     logger.log('enabled modules:', enabledModules);
-    const { config, metadata, icons, stripesDeps, warnings } = stripesModuleParser.parseAllModules(enabledModules, compiler.context, compiler.options.resolve.alias, this.lazy);
+    const { config, metadata, icons, stripesDeps, warnings, lazyImports } = stripesModuleParser.parseAllModules(enabledModules, compiler.context, compiler.options.resolve.alias, this.lazy);
     this.mergedConfig = Object.assign({}, this.options, { modules: config });
     this.metadata = metadata;
     this.icons = icons;
     this.warnings = warnings;
+    this.lazyImports = lazyImports;
     // Prep the virtual module now, we will write to it when ready
     this.virtualModule = new VirtualModulesPlugin();
     this.virtualModule.apply(compiler);
@@ -76,6 +77,7 @@ module.exports = class StripesConfigPlugin {
 
     // Create a virtual module for Webpack to include in the build
     const stripesVirtualModule = `
+      ${Array.from(this.lazyImports).join('\n')}
       const { okapi, config, modules } = ${serialize(this.mergedConfig, { space: 2 })};
       const branding = ${stripesSerialize.serializeWithRequire(pluginData.branding)};
       const errorLogging = ${stripesSerialize.serializeWithRequire(pluginData.errorLogging)};
