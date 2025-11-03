@@ -9,8 +9,8 @@ const stripesModuleParser = require('../../webpack/stripes-module-parser');
 const stripesSerialize = require('../../webpack/stripes-serialize');
 
 const compilerStub = {
-  apply: () => {},
-  plugin: () => {},
+  apply: () => { },
+  plugin: () => { },
   options: {
     resolve: {
       alias: {
@@ -21,19 +21,19 @@ const compilerStub = {
   },
   hooks: {
     afterPlugins: {
-      tap: () => {},
+      tap: () => { },
     },
     emit: {
-      tapAsync: () => {},
+      tapAsync: () => { },
     },
     afterEnvironment: {
-      tap: () => {}
+      tap: () => { }
     },
     afterResolvers: {
-      tap: () => {}
+      tap: () => { }
     },
     watchRun: {
-      tapAsync: () => {}
+      tapAsync: () => { }
     },
   },
   context: '/context/path',
@@ -98,7 +98,7 @@ describe('The stripes-config-plugin', function () {
 
   describe('afterPlugins method', function () {
     beforeEach(function () {
-      this.sandbox.stub(stripesModuleParser, 'parseAllModules').returns({ config: 'something', metadata: 'something' });
+      this.sandbox.stub(stripesModuleParser, 'parseAllModules').returns({ config: 'something', metadata: 'something', lazyImports: {} });
       this.sandbox.stub(VirtualModulesPlugin.prototype, 'writeModule').returns({});
       this.sandbox.stub(stripesSerialize, 'serializeWithRequire').returns({});
       this.sut = new StripesConfigPlugin(mockConfig);
@@ -147,7 +147,7 @@ describe('The stripes-config-plugin', function () {
 
     it('assigns warnings to the Webpack compilation', function () {
       this.sut.warnings = ['uh-oh', 'something happened'];
-      this.sut.processWarnings(compilerStub, () => {});
+      this.sut.processWarnings(compilerStub, () => { });
       expect(compilerStub.warnings).to.be.an('array').with.length(1);
       expect(compilerStub.warnings[0]).to.match(/uh-oh/);
       expect(compilerStub.warnings[0]).to.match(/something happened/);
@@ -155,7 +155,7 @@ describe('The stripes-config-plugin', function () {
 
     it('does not assign warnings when not present', function () {
       this.sut.warnings = [];
-      this.sut.processWarnings(compilerStub, () => {});
+      this.sut.processWarnings(compilerStub, () => { });
       expect(compilerStub.warnings).to.be.an('array').with.length(0);
     });
   });
