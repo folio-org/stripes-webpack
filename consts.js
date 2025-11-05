@@ -2,9 +2,9 @@
 const singletons = {
   '@folio/stripes': '^9.3.0',
   '@folio/stripes-shared-context': '^1.0.0',
-  'react': '~18.2',
-  'react-dom': '~18.2',
-  'react-intl': '^6.8.0',
+  'react': '~18.3',
+  'react-dom': '~18.3',
+  'react-intl': '^7.1.14',
   'react-query': '^3.39.3',
   'react-redux': '^8.1',
   'react-router': '^5.2.0',
@@ -13,6 +13,9 @@ const singletons = {
   'rxjs': '^6.6.3'
 };
 
+const defaultRegistryUrl = 'http://localhost:3001/registry';
+
 module.exports = {
+  defaultRegistryUrl,
   singletons,
 };

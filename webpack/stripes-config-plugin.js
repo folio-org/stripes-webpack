@@ -10,8 +10,10 @@ const _ = require('lodash');
 const VirtualModulesPlugin = require('webpack-virtual-modules');
 const serialize = require('serialize-javascript');
 const { SyncHook } = require('tapable');
+const stripesModuleParser = require('./stripes-module-parser');
 const StripesBuildError = require('./stripes-build-error');
 const stripesSerialize = require('./stripes-serialize');
+const { defaultRegistryUrl } = require('../consts');
 const logger = require('./logger')('stripesConfigPlugin');
 
 const stripesConfigPluginHooksMap = new WeakMap();
@@ -20,7 +22,9 @@ module.exports = class StripesConfigPlugin {
   // options is actually stripes.config.js
   constructor(options, lazy) {
     logger.log('initializing...');
-
+    if (!_.isObject(options.modules)) {
+      throw new StripesBuildError('stripes-config-plugin was not provided a "modules" object for enabling stripes modules');
+    }
     this.options = _.omit(options, 'branding', 'errorLogging');
     this.lazy = lazy;
   }
@@ -44,7 +48,14 @@ module.exports = class StripesConfigPlugin {
     const enabledModules = this.options.modules;
     logger.log('enabled modules:', enabledModules);
     const { config, metadata, icons, stripesDeps, warnings } = stripesModuleParser.parseAllModules(enabledModules, compiler.context, compiler.options.resolve.alias, this.lazy);
-    this.mergedConfig = Object.assign({}, this.options, { modules: config });
+    const modulesInitialState = {
+      app: [],
+      handler: [],
+      plugin: [],
+      settings: [],
+    };
+    this.mergedOkapi = Object.assign({ registryUrl: defaultRegistryUrl }, this.options.okapi);
+    this.mergedConfig = Object.assign({ modules: modulesInitialState }, this.options, { modules: config, okapi: this.mergedOkapi });
     this.metadata = metadata;
     this.icons = icons;
     this.warnings = warnings;
@@ -71,10 +82,13 @@ module.exports = class StripesConfigPlugin {
 
     // Create a virtual module for Webpack to include in the build
     const stripesVirtualModule = `
-      const { okapi, config } = ${serialize(this.config, { space: 2 })};
+      const { okapi, config, modules } = ${serialize(this.mergedConfig, { space: 2 })};
+      const errorLogging = ${stripesSerialize.serializeWithRequire(pluginData.errorLogging)};
       const branding = ${stripesSerialize.serializeWithRequire(pluginData.branding)};
       const translations = ${serialize(pluginData.translations, { space: 2 })};
-      export { okapi, config, branding, translations };
+      const metadata = ${stripesSerialize.serializeWithRequire(this.metadata)};
+      const icons = ${stripesSerialize.serializeWithRequire(this.icons)};
+      export { branding, config, errorLogging, icons, metadata, modules, okapi, translations };
     `;
 
     logger.log('writing virtual module...', stripesVirtualModule);
