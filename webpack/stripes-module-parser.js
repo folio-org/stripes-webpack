@@ -136,15 +136,10 @@ class StripesModuleParser {
       throw new StripesBuildError(`${moduleName} is not a valid NPM package name according to https://www.npmjs.com/package/validate-npm-package-name`);
     }
 
-    // Do not lazy load handlers
-    // more details in https://issues.folio.org/browse/STRWEB-52
-    // and https://issues.folio.org/browse/STRWEB-53
-    const getModule = (actsAs.includes('handler') || !this.lazy) ?
-      new Function([], `return require('${moduleName}').default;`) :
-      new Function([], `
-        const { lazy } = require('react');
-        return lazy(() => import(/* webpackChunkName: "${moduleName}" */ '${moduleName}'));`
-      );
+    const getModule = (this.lazy && !actsAs.includes('handler')) ?
+      new Function([], `return ${this.safeImportName(moduleName)};`) :
+      new Function([], `return require('${moduleName}').default;`)
+      ;
 
     const stripesConfig = _.omit(Object.assign({}, stripes, this.overrideConfig, {
       module: moduleName,
@@ -215,6 +210,18 @@ class StripesModuleParser {
       };
     });
   }
+
+  /**
+   * safeImportName
+   * Convert a package-name to a value safe for importing, e.g. given @folio/users
+   * return foliousers for use like `import foliousers from '@folio/users';`
+   *
+   * @param {string} str
+   * @returns input string with non-word characters removed
+   */
+  safeImportName(str) {
+    return str.replaceAll(/\W/g, '');
+  }
 }
 
 // The helper loops over a tenant's enabled modules and parses each module
@@ -227,11 +234,16 @@ function parseAllModules(enabledModules, context, aliases, lazy) {
   const allMetadata = {};
   const unsortedStripesDeps = {};
   const icons = {};
+  const lazyImports = new Set(["import { lazy } from 'react';"]);
   let warnings = [];
 
   _.forOwn(enabledModules, (overrideConfig, moduleName) => {
     const moduleParser = new StripesModuleParser(moduleName, overrideConfig, context, aliases, lazy);
     const parsedModule = moduleParser.parseModule();
+
+    if (lazy) {
+      lazyImports.add(`const ${moduleParser.safeImportName(moduleName)} = lazy(() => import(/* webpackChunkName: "${moduleName}" */ '${moduleName}'));`);
+    }
 
     // config
     parsedModule.actsAs.forEach(type => {
@@ -303,6 +315,7 @@ function parseAllModules(enabledModules, context, aliases, lazy) {
     stripesDeps,
     icons,
     warnings,
+    lazyImports,
   };
 }
 
