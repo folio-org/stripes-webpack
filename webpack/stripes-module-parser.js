@@ -136,7 +136,7 @@ class StripesModuleParser {
       throw new StripesBuildError(`${moduleName} is not a valid NPM package name according to https://www.npmjs.com/package/validate-npm-package-name`);
     }
 
-    const getModule = (this.lazy) ?
+    const getModule = (this.lazy && !actsAs.includes('handler')) ?
       new Function([], `return ${this.safeImportName(moduleName)};`) :
       new Function([], `return require('${moduleName}').default;`)
       ;
