@@ -118,7 +118,8 @@ class StripesModuleParser {
   // {
   //    ...package::stripes,
   //    module: package::name
-  //    getModule: webpack loader function
+  //    getModule: webpack loader function, sync or async and wrapped in lazy()
+  //    getUnsuspendedModule: webpack loader function, async without lazy()
   //    description: package::description
   //    version: package::version
   // }
@@ -136,14 +137,22 @@ class StripesModuleParser {
       throw new StripesBuildError(`${moduleName} is not a valid NPM package name according to https://www.npmjs.com/package/validate-npm-package-name`);
     }
 
-    const getModule = (this.lazy && !actsAs.includes('handler')) ?
-      new Function([], `return ${this.safeImportName(moduleName)};`) :
-      new Function([], `return require('${moduleName}').default;`)
-      ;
+    // getModule() and getUnsuspendedModule() are the functions stripes-core
+    // calls to load the
+    let getModule = new Function([], `return require('${moduleName}').default;`);
+    let getUnsuspendedModule = undefined;
+
+    // when building a tree-split bundle, provide TWO loader functions, one
+    // that wraps
+    if (this.lazy) {
+      getModule = new Function([], `return ${this.safeImportName(moduleName)};`);
+      getUnsuspendedModule = new Function([], `return ${this.unsuspendedImportName(moduleName)};`);
+    }
 
     const stripesConfig = _.omit(Object.assign({}, stripes, this.overrideConfig, {
       module: moduleName,
       getModule,
+      getUnsuspendedModule,
       description,
       version,
     }), TOP_LEVEL_ONLY);
@@ -216,18 +225,31 @@ class StripesModuleParser {
    * Convert a package-name to a value safe for importing, e.g. given @folio/users
    * return foliousers for use like `import foliousers from '@folio/users';`
    *
-   * @param {string} str
+   * @param {string} str package-name, e.g. @folio/users
    * @returns input string with non-word characters removed
    */
   safeImportName(str) {
     return str.replaceAll(/\W/g, '');
   }
+
+  /**
+   * unsuspendedImportName
+   * Convert a package-name to a value safe for importing, and then prefix it
+   * with Unsuspended, e.g. given @folio/users return Unsuspended_foliousers.
+   *
+   * @param {string} str package-name, e.g. @folio/users
+   * @returns input string with Unsuspended_ prefix and non-word characters
+   *   removed
+   */
+  unsuspendedImportName(str) {
+    return `Unsuspended_${this.safeImportName(str)}`;
+  }
 }
 
 // The helper loops over a tenant's enabled modules and parses each module
-// The resulting config is grouped by stripes module type (app, settings, plugin, etc.)
+// The resulting config is grouped by actsAs[] values (app, settings, plugin, etc.)
 // The metadata is grouped by module name
-function parseAllModules(enabledModules, context, aliases, lazy) {
+function parseAllModules(enabledModules, context, aliases, lazy = false) {
   const allModuleConfigs = {
     app: [],
   };
@@ -242,7 +264,13 @@ function parseAllModules(enabledModules, context, aliases, lazy) {
     const parsedModule = moduleParser.parseModule();
 
     if (lazy) {
+      // async import wrapped in lazy() for use with <Suspense> boundaries
       lazyImports.add(`const ${moduleParser.safeImportName(moduleName)} = lazy(() => import(/* webpackChunkName: "${moduleName}" */ '${moduleName}'));`);
+
+      // async import for handlers that are loaded outside the render cycle
+      if (parsedModule.actsAs.includes('handler')) {
+        lazyImports.add(`const ${moduleParser.unsuspendedImportName(moduleName)} = import(/* webpackChunkName: "${moduleName}" */ '${moduleName}');`);
+      }
     }
 
     // config
