@@ -46,6 +46,7 @@ const mockConfig = {
     '@folio/search': {},
     '@folio/developer': {},
   },
+  config: {},
 };
 
 describe('The stripes-config-plugin', function () {
