@@ -6,7 +6,8 @@ module.exports = {
   coverageReporters: ['lcov'],
   reporters: ['jest-junit', 'default'],
   "testMatch": [
-    "**/**/*.spec.js"
+    "**/**/*.spec.js",
+    "**/**/*.test.js",
   ],
   testPathIgnorePatterns: ['/node_modules/', '/test/bigtest/', '/test/ui-testing/'],
 
