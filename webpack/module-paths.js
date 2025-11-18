@@ -63,7 +63,7 @@ function locateStripesModule(context, moduleName, alias, ...segments) {
   }
 
   // When available, try for the alias first
-  if (alias[moduleName]) {
+  if (alias && alias[moduleName]) {
     tryPaths.unshift({
       request: path.join(alias[moduleName], ...segments),
     });
