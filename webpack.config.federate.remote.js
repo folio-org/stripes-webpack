@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const StripesTranslationsPlugin = require('./webpack/stripes-translations-plugin');
 const { container } = webpack;
 const { processExternals, processShared } = require('./webpack/utils');
 const { getStripesModulesPaths } = require('./webpack/module-paths');
@@ -8,8 +9,10 @@ const esbuildLoaderRule = require('./webpack/esbuild-loader-rule');
 const { singletons } = require('./consts');
 
 const buildConfig = (metadata) => {
-  const { host, port, name, displayName } = metadata;
-  const mainEntry = path.join(process.cwd(), 'src', 'index.js');
+  const { host, port, name, displayName, main } = metadata;
+
+  // using main from metadata since the location of main could vary between modules.
+  let mainEntry = path.join(process.cwd(), main || 'index.js');
   const stripesModulePaths = getStripesModulesPaths();
   const translationsPath = path.join(process.cwd(), 'translations', displayName.split('.').shift());
   const iconsPath = path.join(process.cwd(), 'icons');
@@ -17,6 +20,7 @@ const buildConfig = (metadata) => {
   // yeah, yeah, soundsPath vs sound. sorry. `sound` is a legacy name.
   // other paths are plural and I'm sticking with that convention.
   const soundsPath = path.join(process.cwd(), 'sound');
+
   const shared = processShared(singletons, { singleton: true });
 
   const config = {
@@ -121,6 +125,7 @@ const buildConfig = (metadata) => {
     // TODO: remove this after stripes-config is gone.
     externals: processExternals({ 'stripes-config': true }),
     plugins: [
+      new StripesTranslationsPlugin({ federate: true }),
       new MiniCssExtractPlugin({ filename: 'style.css', ignoreOrder: false }),
       new container.ModuleFederationPlugin({
         library: { type: 'var', name },

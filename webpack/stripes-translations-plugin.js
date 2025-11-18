@@ -16,23 +16,30 @@ function prefixKeys(obj, prefix) {
 
 module.exports = class StripesTranslationPlugin {
   constructor(options) {
+    // in module federation mode, we emit translations for the module being built and
+    // for any stripesDeps it has.
+    this.federate = options?.federate || false;
+
     // Include stripes-core et al because they have translations
-    this.modules = {
+    // translations should come from the host application for stripes
+    // rather than being overwritten by consuming apps.
+    this.modules = this.federate ? {} : {
       '@folio/stripes-core': {},
       '@folio/stripes-components': {},
       '@folio/stripes-smart-components': {},
       '@folio/stripes-form': {},
       '@folio/stripes-ui': {},
     };
-    Object.assign(this.modules, options.modules);
-    this.languageFilter = options.config.languages || [];
+
+    Object.assign(this.modules, options?.modules);
+    this.languageFilter = options?.config?.languages || [];
     logger.log('language filter', this.languageFilter);
   }
 
   apply(compiler) {
     // Used to help locate modules
     this.context = compiler.context;
-      // 'publicPath' is not present when running tests via karma-webpack
+    // 'publicPath' is not present when running tests via karma-webpack
     // so when running in test mode use absolute 'path'.
     this.publicPath = process.env.NODE_ENV !== 'test' ? compiler.options.output.publicPath : `./absolute${compiler.options.output.path}`;
     this.aliases = compiler.options.resolve.alias;
@@ -44,21 +51,30 @@ module.exports = class StripesTranslationPlugin {
       new webpack.ContextReplacementPlugin(/moment[/\\]locale/, filterRegex).apply(compiler);
     }
 
-    // Hook into stripesConfigPlugin to supply paths to translation files
-    // and gather additional modules from stripes.stripesDeps
-    StripesConfigPlugin.getPluginHooks(compiler).beforeWrite.tap({ name: 'StripesTranslationsPlugin', context: true }, (context, config) => {
-      // Gather all translations available in each module
-      const allTranslations = this.gatherAllTranslations();
+    if (this.federate) {
+      const packageJsonPath = path.join(this.context, 'package.json');
+      const packageJson = StripesTranslationPlugin.loadFile(packageJsonPath);
 
-      const fileData = this.generateFileNames(allTranslations);
-      const allFiles = _.mapValues(fileData, data => data.browserPath);
-
-      config.translations = allFiles;
-      logger.log('stripesConfigPluginBeforeWrite', config.translations);
+      this.modules[packageJson.name] = {};
+      if (packageJson) {
+        const stripesDeps = packageJson?.stripes?.stripesDeps;
+        if (stripesDeps) {
+          stripesDeps.forEach((dep) => {
+            // TODO: merge translations from all versions of stripesDeps
+            this.modules[dep] = {};
+          });
+        }
+      }
 
       compiler.hooks.thisCompilation.tap('StripesTranslationsPlugin', (compilation) => {
-        // Emit merged translations to the output directory
-        compilation.hooks.processAssets.tap('StripesTranslationsPlugin', () => {
+        compilation.hooks.processAssets.tap({
+          name: 'StripesTranslationsPlugin',
+          stage: compilation.PROCESS_ASSETS_STAGE_PRE_PROCESS
+        }, () => {
+
+          const allTranslations = this.gatherAllTranslations();
+          const fileData = this.generateFileNames(allTranslations, false);
+
           Object.keys(allTranslations).forEach((language) => {
             logger.log(`emitting translations for ${language} --> ${fileData[language].emitPath}`);
             const content = JSON.stringify(allTranslations[language]);
@@ -69,7 +85,34 @@ module.exports = class StripesTranslationPlugin {
           });
         });
       });
-    });
+    } else {
+      // Hook into stripesConfigPlugin to supply paths to translation files
+      // and gather additional modules from stripes.stripesDeps
+      StripesConfigPlugin.getPluginHooks(compiler).beforeWrite.tap({ name: 'StripesTranslationsPlugin', context: true }, (context, config) => {
+        // Gather all translations available in each module
+        const allTranslations = this.gatherAllTranslations();
+
+        const fileData = this.generateFileNames(allTranslations);
+        const allFiles = _.mapValues(fileData, data => data.browserPath);
+
+        config.translations = allFiles;
+        logger.log('stripesConfigPluginBeforeWrite', config.translations);
+
+        compiler.hooks.thisCompilation.tap('StripesTranslationsPlugin', (compilation) => {
+          // Emit merged translations to the output directory
+          compilation.hooks.processAssets.tap('StripesTranslationsPlugin', () => {
+            Object.keys(allTranslations).forEach((language) => {
+              logger.log(`emitting translations for ${language} --> ${fileData[language].emitPath}`);
+              const content = JSON.stringify(allTranslations[language]);
+              compilation.assets[fileData[language].emitPath] = {
+                source: () => content,
+                size: () => content.length,
+              };
+            });
+          });
+        });
+      });
+    }
   }
 
   // Locate each module's translations directory (current) or package.json data (fallback)
@@ -170,14 +213,14 @@ module.exports = class StripesTranslationPlugin {
   }
 
   // Assign output path names for each to be accessed later by stripes-config-plugin
-  generateFileNames(allTranslations) {
+  generateFileNames(allTranslations, useSuffix = true) {
     const files = {};
-    const timestamp = Date.now(); // To facilitate cache busting, could also generate a hash
+    const timestamp = useSuffix ? Date.now() : ''; // To facilitate cache busting, could also generate a hash
     Object.keys(allTranslations).forEach((language) => {
       files[language] = {
         // Fetching from the browser must take into account public path. The replace regex removes double slashes
         browserPath: `${this.publicPath}/translations/${language}-${timestamp}.json`.replace(/\/\//, '/'),
-        emitPath: `translations/${language}-${timestamp}.json`,
+        emitPath: `translations/${language}${timestamp ? `-${timestamp}` : ''}.json`,
       };
     });
     return files;
