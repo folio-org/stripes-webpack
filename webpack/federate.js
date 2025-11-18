@@ -26,7 +26,7 @@ module.exports = async function federate(options = {}) {
   const host = `http://localhost`;
   const url = `${host}:${port}/remoteEntry.js`;
 
-  const { name: packageName, version, description, stripes } = require(packageJsonPath);
+  const { name: packageName, version, description, stripes, main } = require(packageJsonPath);
   const { permissionSets: _, ...stripesRest } = stripes;
   const name = snakeCase(packageName);
   const metadata = {
@@ -37,6 +37,7 @@ module.exports = async function federate(options = {}) {
     port,
     url,
     name,
+    main,
     ...stripesRest,
   };
 
