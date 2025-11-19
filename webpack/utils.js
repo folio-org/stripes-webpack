@@ -14,8 +14,20 @@ const processExternals = (peerDeps) => {
   }, {});
 };
 
+const processShared = (shared, options = {}) => {
+  return Object.keys(shared).reduce((acc, name) => {
+    acc[name] = {
+      requiredVersion: shared[name],
+      ...options
+    };
+
+    return acc;
+  }, {});
+};
+
 module.exports = {
   processExternals,
   isDevelopment,
   isProduction,
+  processShared,
 };

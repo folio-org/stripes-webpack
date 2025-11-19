@@ -13,6 +13,7 @@ const { SyncHook } = require('tapable');
 const stripesModuleParser = require('./stripes-module-parser');
 const StripesBuildError = require('./stripes-build-error');
 const stripesSerialize = require('./stripes-serialize');
+const { defaultRegistryUrl } = require('../consts');
 const logger = require('./logger')('stripesConfigPlugin');
 
 const stripesConfigPluginHooksMap = new WeakMap();
@@ -47,7 +48,14 @@ module.exports = class StripesConfigPlugin {
     const enabledModules = this.options.modules;
     logger.log('enabled modules:', enabledModules);
     const { config, metadata, icons, stripesDeps, warnings, lazyImports } = stripesModuleParser.parseAllModules(enabledModules, compiler.context, compiler.options.resolve.alias, this.lazy);
-    this.mergedConfig = Object.assign({}, this.options, { modules: config });
+    const modulesInitialState = {
+      app: [],
+      handler: [],
+      plugin: [],
+      settings: [],
+    };
+    this.mergedOkapi = Object.assign({ registryUrl: defaultRegistryUrl }, this.options.okapi);
+    this.mergedConfig = Object.assign({ modules: modulesInitialState }, this.options, { modules: config, okapi: this.mergedOkapi });
     this.metadata = metadata;
     this.icons = icons;
     this.warnings = warnings;
@@ -58,18 +66,16 @@ module.exports = class StripesConfigPlugin {
 
     StripesConfigPlugin.getPluginHooks(compiler).beforeWrite.tap(
       { name: 'StripesConfigPlugin', context: true },
-      context => Object.assign(context, { config, metadata, icons, stripesDeps, warnings }));
+      context => Object.assign(context, { config }));
 
     // Wait until after other plugins to generate virtual stripes-config
     compiler.hooks.afterPlugins.tap('StripesConfigPlugin', (theCompiler) => this.afterPlugins(theCompiler));
-    compiler.hooks.emit.tapAsync('StripesConfigPlugin', (compilation, callback) => this.processWarnings(compilation, callback));
   }
 
   afterPlugins(compiler) {
     // Data provided by other stripes plugins via hooks
     const pluginData = {
       branding: {},
-      errorLogging: {},
       translations: {},
     };
 
@@ -79,22 +85,15 @@ module.exports = class StripesConfigPlugin {
     const stripesVirtualModule = `
       ${Array.from(this.lazyImports).join('\n')}
       const { okapi, config, modules } = ${serialize(this.mergedConfig, { space: 2 })};
-      const branding = ${stripesSerialize.serializeWithRequire(pluginData.branding)};
       const errorLogging = ${stripesSerialize.serializeWithRequire(pluginData.errorLogging)};
+      const branding = ${stripesSerialize.serializeWithRequire(pluginData.branding)};
       const translations = ${serialize(pluginData.translations, { space: 2 })};
       const metadata = ${stripesSerialize.serializeWithRequire(this.metadata)};
       const icons = ${stripesSerialize.serializeWithRequire(this.icons)};
-      export { okapi, config, modules, branding, errorLogging, translations, metadata, icons };
+      export { branding, config, errorLogging, icons, metadata, modules, okapi, translations };
     `;
 
     logger.log('writing virtual module...', stripesVirtualModule);
     this.virtualModule.writeModule('node_modules/stripes-config.js', stripesVirtualModule);
-  }
-
-  processWarnings(compilation, callback) {
-    if (this.warnings.length) {
-      compilation.warnings.push(new StripesBuildError(`stripes-config-plugin:\n  ${this.warnings.join('\n  ')}`));
-    }
-    callback();
   }
 };
