@@ -4,14 +4,15 @@ const path = require('path');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { EsbuildPlugin } = require('esbuild-loader');
+const sharedStylesConfig = require('./webpack.config.cli.shared.styles');
 
-const config = {
+let config = {
   mode: 'production',
   devtool: 'source-map',
   entry: path.resolve('./index.js'),
   output: {
     library: {
-      type: 'umd',
+      type: 'module',
     },
     path: path.resolve('./dist'),
     filename: 'index.js',
@@ -27,6 +28,9 @@ const config = {
           loader: 'tsx',
           jsx: 'automatic',
         },
+        resolve: {
+          fullySpecified: false,
+        }
       },
       {
         test: /\.(woff2?)$/,
@@ -70,6 +74,11 @@ const config = {
         },
       },
       {
+        test: /\.svg$/,
+        type: 'asset/inline',
+        resourceQuery: { not: /icon/ } // exclude built-in icons from stripes-components which are loaded as react components.
+      },
+      {
         test: /\.js.map$/,
         enforce: "pre",
         use: ['source-map-loader'],
@@ -77,6 +86,9 @@ const config = {
     ]
   },
   externals: {},
+  experiments: {
+    outputModule: true,
+  }
 };
 
 config.optimization = {
@@ -95,5 +107,7 @@ config.plugins = [
   }),
   new webpack.EnvironmentPlugin(['NODE_ENV']),
 ];
+
+config = sharedStylesConfig(config, { moduleName: '@folio/stripes-core' });
 
 module.exports = config;

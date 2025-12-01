@@ -5,9 +5,9 @@
 
 const singletons = {
   '@folio/stripes': '^9.3.0',
-  '@folio/stripes-components': '^13.1.0',
   '@folio/stripes-connect': '^10.0.1',
-  '@folio/stripes-core': '^11.1.0',
+  '@folio/stripes-core/index': '^11.1.0',
+  '@folio/stripes-components': '^13.1.0',
   '@folio/stripes-shared-context': '^1.0.0',
   "moment": "^2.29.0",
   'react': '~18.3',

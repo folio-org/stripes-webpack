@@ -80,6 +80,9 @@ module.exports = (modulePaths) => {
   return {
     test: /\.js$/,
     include: shouldModuleBeIncluded,
+    resolve: {
+      fullySpecified: false,
+    },
     oneOf: [
       {
         // handle all bigtest files and interactor files via babel
@@ -107,6 +110,6 @@ module.exports = (modulePaths) => {
           },
         ],
       },
-   ],
+    ],
   };
 };

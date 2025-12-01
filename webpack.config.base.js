@@ -5,9 +5,9 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
-const { ModuleFederationPlugin } = require('webpack').container;
+const { ModuleFederationPlugin } = require('@module-federation/enhanced/webpack');
 
-const { generateStripesAlias,  } = require('./webpack/module-paths');
+const { generateStripesAlias, } = require('./webpack/module-paths');
 const { processShared } = require('./webpack/utils');
 const typescriptLoaderRule = require('./webpack/typescript-loader-rule');
 const { isProduction } = require('./webpack/utils');
@@ -70,7 +70,7 @@ const baseConfig = {
     }),
     new webpack.EnvironmentPlugin(['NODE_ENV']),
     new RemoveEmptyScriptsPlugin(),
-    new ModuleFederationPlugin({ name: 'host', shared }),
+    new ModuleFederationPlugin({ name: 'host', exposes: {}, shared }),
   ],
   module: {
     rules: [
@@ -167,7 +167,7 @@ const buildConfig = (modulePaths) => {
     test: /\.css$/,
     exclude: [cssDistPathRegex],
     use: [
-      { loader: isProduction ? MiniCssExtractPlugin.loader : 'style-loader'  },
+      { loader: isProduction ? MiniCssExtractPlugin.loader : 'style-loader' },
       {
         loader: 'css-loader',
         options: {

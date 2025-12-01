@@ -1,3 +1,6 @@
+// This file is responsible for building a federated bundle AND
+// starting the dev server for the module to serve the bundle.
+
 const path = require('path');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
@@ -25,6 +28,7 @@ module.exports = async function federate(options = {}) {
   const port = options.port ?? await portfinder.getPortPromise();
   const host = `http://localhost`;
   const url = `${host}:${port}/remoteEntry.js`;
+  const entry = `${host}:${port}/mf-manifest.json`;
 
   const { name: packageName, version, description, stripes, main } = require(packageJsonPath);
   const { permissionSets: _, ...stripesRest } = stripes;
@@ -38,6 +42,7 @@ module.exports = async function federate(options = {}) {
     url,
     name,
     main,
+    entry,
     ...stripesRest,
   };
 

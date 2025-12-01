@@ -19,12 +19,13 @@ module.exports = function transpile(options = {}) {
       const { name, peerDependencies } = packageJson;
 
       config.output.library = {
-        type: 'umd',
-        name,
+        type: 'module',
       };
 
+      const externs = { 'stripes-config': 'stripes-config', ...peerDependencies };
       if (peerDependencies) {
-        config.externals = processExternals(peerDependencies);
+        config.externals = processExternals(externs);
+        config.externalsType = 'module-import';
       }
     }
 

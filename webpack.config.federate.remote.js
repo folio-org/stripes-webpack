@@ -2,7 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const StripesTranslationsPlugin = require('./webpack/stripes-translations-plugin');
-const { container } = webpack;
+const { ModuleFederationPlugin } = require('@module-federation/enhanced/webpack');
 const { processExternals, processShared } = require('./webpack/utils');
 const { getStripesModulesPaths } = require('./webpack/module-paths');
 const esbuildLoaderRule = require('./webpack/esbuild-loader-rule');
@@ -27,6 +27,7 @@ const buildConfig = (metadata) => {
     name,
     devtool: 'inline-source-map',
     mode: 'development',
+    target: 'web',
     entry: mainEntry,
     output: {
       publicPath: `${host}:${port}/`,
@@ -127,12 +128,13 @@ const buildConfig = (metadata) => {
     plugins: [
       new StripesTranslationsPlugin({ federate: true }),
       new MiniCssExtractPlugin({ filename: 'style.css', ignoreOrder: false }),
-      new container.ModuleFederationPlugin({
+      new ModuleFederationPlugin({
         library: { type: 'var', name },
         name,
         filename: 'remoteEntry.js',
         exposes: {
           './MainEntry': mainEntry,
+          '.': mainEntry,
         },
         shared
       }),

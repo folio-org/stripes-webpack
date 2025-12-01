@@ -1,17 +1,30 @@
 const isDevelopment = process.env.NODE_ENV === 'development';
 const isProduction = process.env.NODE_ENV === 'production';
-const processExternals = (peerDeps) => {
-  return Object.keys(peerDeps).reduce((acc, name) => {
-    acc[name] = {
-      root: name,
-      commonjs2: name,
-      commonjs: name,
-      amd: name,
-      umd: name
-    };
+const externMapping = {
+  'stripes-config': 'stripes-config',
+};
 
-    return acc;
-  }, {});
+const processExternals = (peerDeps) => {
+  // return Object.keys(peerDeps).reduce((acc, name) => {
+  //   acc[name] = {
+  //     root: name,
+  //     commonjs2: name,
+  //     commonjs: name,
+  //     amd: name,
+  //     umd: name
+  //   };
+
+  //   return acc;
+  // }, {});
+  const externs = {};
+  Object.keys(peerDeps).forEach((dep) => {
+    if (externMapping[dep]) {
+      externs[dep] = externMapping[dep];
+    } else {
+      externs[dep] = dep;
+    }
+  });
+  return externs;
 };
 
 const processShared = (shared, options = {}) => {
