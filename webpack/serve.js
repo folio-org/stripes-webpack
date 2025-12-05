@@ -9,6 +9,7 @@ const applyWebpackOverrides = require('./apply-webpack-overrides');
 const logger = require('./logger')();
 const buildConfig = require('../webpack.config.cli.dev');
 const sharedStylesConfig = require('../webpack.config.cli.shared.styles');
+const registryServer = require('./registryServer');
 
 const cwd = path.resolve();
 const platformModulePath = path.join(cwd, 'node_modules');
@@ -23,6 +24,22 @@ module.exports = function serve(stripesConfig, options) {
   return new Promise((resolve) => {
     logger.log('starting serve...');
     const app = express();
+
+
+    // stripes module registry
+    if (stripesConfig.okapi.entitlementUrl) {
+      const { entitlementUrl } = stripesConfig.okapi;
+
+      // Start the local registry server if the entitlementUrl is not an absolute URL ex localhost:3001/registry
+      if (entitlementUrl.includes('localhost')) {
+        try {
+          registryServer.start(entitlementUrl);
+        }
+        catch (e) {
+          console.error(e)
+        }
+      }
+    }
 
     let config = buildConfig(stripesConfig);
 

@@ -9,6 +9,10 @@ const buildBaseConfig = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
 const esbuildLoaderRule = require('./webpack/esbuild-loader-rule');
 const { getModulesPaths, getStripesModulesPaths, getTranspiledModules } = require('./webpack/module-paths');
+const { processShared } = require('./webpack/utils');
+const { ModuleFederationPlugin } = require('webpack').container;
+const { singletons } = require('./consts');
+
 
 const buildConfig = (stripesConfig, options = {}) => {
   const modulePaths = getModulesPaths(stripesConfig.modules);
@@ -53,6 +57,14 @@ const buildConfig = (stripesConfig, options = {}) => {
       process: 'process/browser.js',
     }),
   ]);
+
+  // build platform with Module Federation if entitlementUrl is provided
+  if (stripesConfig.okapi.entitlementUrl) {
+    const shared = processShared(singletons, { singleton: true, eager: true });
+    prodConfig.plugins.push(
+      new ModuleFederationPlugin({ name: 'host', shared })
+    );
+  }
 
   prodConfig.optimization = {
     mangleWasmImports: false,
