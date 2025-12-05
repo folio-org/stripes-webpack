@@ -27,11 +27,18 @@ module.exports = function serve(stripesConfig, options) {
 
 
     // stripes module registry
-    try {
-      registryServer.start();
-    }
-    catch (e) {
-      console.error(e)
+    if (stripesConfig.okapi.entitlementUrl) {
+      const { entitlementUrl } = stripesConfig.okapi;
+
+      // Start the local registry server if the entitlementUrl is not an absolute URL ex localhost:3001/registry
+      if (entitlementUrl.includes('localhost')) {
+        try {
+          registryServer.start(entitlementUrl);
+        }
+        catch (e) {
+          console.error(e)
+        }
+      }
     }
 
     let config = buildConfig(stripesConfig);

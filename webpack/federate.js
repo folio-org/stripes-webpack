@@ -43,12 +43,12 @@ module.exports = async function federate(options = {}) {
 
   const config = buildConfig(metadata);
 
-  // TODO: allow for configuring registryUrl via env var or stripes config
-  const registryUrl = 'http://localhost:3001/registry';
+  // TODO: allow for configuring entitlementUrl via env var or stripes config
+  const entitlementUrl = 'http://localhost:3001/registry';
 
   // update registry
-  axios.post(registryUrl, metadata).catch(error => {
-    console.error(`Registry not found. Please check ${registryUrl}`);
+  axios.post(entitlementUrl, metadata).catch(error => {
+    console.error(`Registry not found. Please check ${entitlementUrl}`);
     process.exit();
   });
 
@@ -59,9 +59,9 @@ module.exports = async function federate(options = {}) {
 
   compiler.hooks.shutdown.tapPromise('AsyncShutdownHook', async (stats) => {
     try {
-      await axios.delete(registryUrl, { data: metadata });
+      await axios.delete(entitlementUrl, { data: metadata });
     } catch (error) {
-      console.error(`registry not found. Please check ${registryUrl}`);
+      console.error(`registry not found. Please check ${entitlementUrl}`);
     }
   });
 };

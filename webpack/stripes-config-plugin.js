@@ -13,7 +13,7 @@ const { SyncHook } = require('tapable');
 const stripesModuleParser = require('./stripes-module-parser');
 const StripesBuildError = require('./stripes-build-error');
 const stripesSerialize = require('./stripes-serialize');
-const { defaultRegistryUrl } = require('../consts');
+const { defaultentitlementUrl } = require('../consts');
 const logger = require('./logger')('stripesConfigPlugin');
 
 const stripesConfigPluginHooksMap = new WeakMap();
@@ -54,8 +54,7 @@ module.exports = class StripesConfigPlugin {
       plugin: [],
       settings: [],
     };
-    this.mergedOkapi = Object.assign({ registryUrl: defaultRegistryUrl }, this.options.okapi);
-    this.mergedConfig = Object.assign({ modules: modulesInitialState }, this.options, { modules: config, okapi: this.mergedOkapi });
+    this.mergedConfig = Object.assign({ modules: modulesInitialState }, this.options, { modules: config });
     this.metadata = metadata;
     this.icons = icons;
     this.warnings = warnings;

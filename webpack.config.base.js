@@ -5,16 +5,12 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
-const { ModuleFederationPlugin } = require('webpack').container;
 
-const { generateStripesAlias,  } = require('./webpack/module-paths');
+const { generateStripesAlias, } = require('./webpack/module-paths');
 const { processShared } = require('./webpack/utils');
 const typescriptLoaderRule = require('./webpack/typescript-loader-rule');
 const { isProduction } = require('./webpack/utils');
 const { getTranspiledCssPaths } = require('./webpack/module-paths');
-const { singletons } = require('./consts');
-
-const shared = processShared(singletons, { singleton: true, eager: true });
 
 // React doesn't like being included multiple times as can happen when using
 // yarn link. Here we find a more specific path to it by first looking in
@@ -70,7 +66,6 @@ const baseConfig = {
     }),
     new webpack.EnvironmentPlugin(['NODE_ENV']),
     new RemoveEmptyScriptsPlugin(),
-    new ModuleFederationPlugin({ name: 'host', shared }),
   ],
   module: {
     rules: [
@@ -137,7 +132,7 @@ const baseConfig = {
   },
 };
 
-const buildConfig = (modulePaths) => {
+const buildConfig = (modulePaths, federatePlatform = false) => {
   const transpiledCssPaths = getTranspiledCssPaths(modulePaths);
   const cssDistPathRegex = /dist[\/\\]style\.css/;
 
@@ -167,7 +162,7 @@ const buildConfig = (modulePaths) => {
     test: /\.css$/,
     exclude: [cssDistPathRegex],
     use: [
-      { loader: isProduction ? MiniCssExtractPlugin.loader : 'style-loader'  },
+      { loader: isProduction ? MiniCssExtractPlugin.loader : 'style-loader' },
       {
         loader: 'css-loader',
         options: {

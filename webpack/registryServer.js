@@ -5,7 +5,7 @@ const cors = require('cors');
 const registry = { remotes: {} };
 
 const registryServer = {
-  start: () => {
+  start: (url) => {
     const app = express();
 
     app.use(express.json());
@@ -35,7 +35,8 @@ const registryServer = {
       res.status(200).send(`Remote ${name} removed`);
     });
 
-    app.listen(3001, () => {
+    const port = new URL(url).port || 3001;
+    app.listen(port, () => {
       console.log('Starting registry server at http://localhost:3001');
     });
   }

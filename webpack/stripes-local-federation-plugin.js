@@ -1,4 +1,8 @@
-// This webpack plugin wraps all other stripes webpack plugins to simplify inclusion within the webpack config
+// This plugin is used for local development/debugging related to Module Federation of ui-modules.
+// it spawns child processes to start remote ui-modules defined in stripes.config.js if those modules are included
+// within the same workspace. If the module is not within the same workspace, the 'stripes federate' command will have to be
+// executed manually from the directory of that module.
+
 const spawn = require('child_process').spawn;
 const path = require('path');
 const portfinder = require('portfinder');
@@ -7,7 +11,7 @@ const { locateStripesModule } = require('./module-paths');
 
 portfinder.setBasePort(3002);
 
-module.exports = class StripesFederationPlugin {
+module.exports = class StripesLocalFederationPlugin {
   constructor(stripesConfig) {
     this.stripesConfig = stripesConfig;
   }
@@ -21,8 +25,8 @@ module.exports = class StripesFederationPlugin {
 
       portfinder.getPort((err, port) => {
         const child = spawn(`yarn stripes federate --port ${port}`, {
-            cwd: basePath,
-            shell: true,
+          cwd: basePath,
+          shell: true,
         });
 
         child.stdout.pipe(process.stdout);

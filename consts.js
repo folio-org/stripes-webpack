@@ -21,9 +21,9 @@ const singletons = {
   'rxjs': '^6.6.3'
 };
 
-const defaultRegistryUrl = 'http://localhost:3001/registry';
+const defaultentitlementUrl = 'http://localhost:3001/registry';
 
 module.exports = {
-  defaultRegistryUrl,
+  defaultentitlementUrl,
   singletons,
 };
