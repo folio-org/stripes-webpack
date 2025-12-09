@@ -51,6 +51,14 @@ function iconPropsFromConfig(icon) {
 
 // Handles the parsing of one Stripes module's configuration and metadata
 class StripesModuleParser {
+  /**
+   *
+   * @param {string} moduleName fully qualified NPM package name, e.g. @folio/users
+   * @param {object} overrideConfig build-time params from stripes.config.js
+   * @param {string} context base path for module resolution
+   * @param {*} aliases
+   * @param {boolean} lazy w
+   */
   constructor(moduleName, overrideConfig, context, aliases, lazy) {
     logger.log(`initializing parser for ${moduleName}...`);
     this.moduleName = moduleName;
@@ -104,31 +112,36 @@ class StripesModuleParser {
     return {
       name: this.nameOnly,
       actsAs,
-      config: this.config || this.parseStripesConfig(this.moduleName, this.packageJson, actsAs),
-      metadata: this.metadata || this.parseStripesMetadata(this.packageJson),
+      config: this.config || this.extractConfig(this.moduleName, this.packageJson, actsAs),
+      metadata: this.metadata || this.extractMetadata(this.packageJson),
     };
   }
 
-  // parseStripesConfig
-  // Ignore the name. This function has nothing to do with stripes.config.js;
-  // rather, it takes a module's package data and constructs a webpack loader
-  // function and returns it embedded in an object that wraps up the loader
-  // along with some other package data. The return value is shaped nominally
-  // like this:
-  // {
-  //    ...package::stripes,
-  //    module: package::name
-  //    getModule: webpack loader function
-  //    description: package::description
-  //    version: package::version
-  // }
-  //
-  // @param {string} moduleName
-  // @param {object} packageJson
-  // @param {array} actsAs
-  //
-  // @returns {object}
-  parseStripesConfig(moduleName, packageJson, actsAs = []) {
+  /**
+   * extractConfig
+   * Combine some of a package's stripes attributes with webpack loader
+   * functions to produce the module's runtime configuration.
+   * The return value is shaped nominally like:
+   * {
+   *   ...package::stripes,
+   *   module: package::name
+   *   getModule?: sync webpack loader function; monolithic builds only
+   *   getDynamicModule?: async webpack loader function; code-split builds only
+   *   description: package::description
+   *   version: package::version
+   * }
+   *
+   * Note that while getModule() returns the module's default export directly,
+   * getDynamicModule() returns a Promise that returns the module and it is up
+   * to the calling code to extract the default export. React.lazy() does that
+   * automatically, which is why it is important _not_ to do it here.
+   *
+   * @param {string} moduleName
+   * @param {object} JSON.parse'd packageJson
+   * @param {array} actsAs
+   * @returns {object}
+   */
+  extractConfig(moduleName, packageJson, actsAs = []) {
     const { stripes, description, version } = packageJson;
 
     const isValid = validateNpmPackageName(moduleName);
@@ -136,25 +149,32 @@ class StripesModuleParser {
       throw new StripesBuildError(`${moduleName} is not a valid NPM package name according to https://www.npmjs.com/package/validate-npm-package-name`);
     }
 
-    const getModule = (this.lazy && !actsAs.includes('handler')) ?
-      new Function([], `return ${this.safeImportName(moduleName)};`) :
-      new Function([], `return require('${moduleName}').default;`)
-      ;
-
-    const stripesConfig = _.omit(Object.assign({}, stripes, this.overrideConfig, {
-      module: moduleName,
-      getModule,
-      description,
-      version,
-    }), TOP_LEVEL_ONLY);
+    const stripesConfig = _.omit({
+      ...stripes,
+      ...this.overrideConfig,
+      ...{
+        module: moduleName,
+        ...(!this.lazy && { getModule: new Function([], `return require('${moduleName}').default;`) }),
+        ...(this.lazy && { getDynamicModule: new Function([], `return import(/* webpackChunkName: "${moduleName}" */ '${moduleName}');`) }),
+        description,
+        version,
+      }
+    }, TOP_LEVEL_ONLY);
     logger.log('config:', stripesConfig);
 
     return stripesConfig;
   }
 
-  // Extract metadata defined here:
-  // https://github.com/folio-org/stripes-core/blob/master/doc/app-metadata.md
-  parseStripesMetadata(packageJson) {
+  /**
+   * extractMetadata
+   * Take a module's package data, assemble an object matching the values
+   * defined at https://github.com/folio-org/stripes-core/blob/master/doc/app-metadata.md
+   * and return it.
+   *
+   * @param {object} JSON.parse'd package.json data
+   * @returns {object}
+   */
+  extractMetadata(packageJson) {
     const icons = this.getIconMetadata(packageJson.stripes.icons, packageJson.stripes.type === 'app');
     const welcomePageEntries = this.getWelcomePageEntries(packageJson.stripes.welcomePageEntries, icons);
 
@@ -210,40 +230,23 @@ class StripesModuleParser {
       };
     });
   }
-
-  /**
-   * safeImportName
-   * Convert a package-name to a value safe for importing, e.g. given @folio/users
-   * return foliousers for use like `import foliousers from '@folio/users';`
-   *
-   * @param {string} str
-   * @returns input string with non-word characters removed
-   */
-  safeImportName(str) {
-    return str.replaceAll(/\W/g, '');
-  }
 }
 
 // The helper loops over a tenant's enabled modules and parses each module
-// The resulting config is grouped by stripes module type (app, settings, plugin, etc.)
+// The resulting config is grouped by actsAs[] values (app, settings, plugin, etc.)
 // The metadata is grouped by module name
-function parseAllModules(enabledModules, context, aliases, lazy) {
+function parseAllModules(enabledModules, context, aliases, lazy = false) {
   const allModuleConfigs = {
     app: [],
   };
   const allMetadata = {};
   const unsortedStripesDeps = {};
   const icons = {};
-  const lazyImports = new Set(["import { lazy } from 'react';"]);
   let warnings = [];
 
   _.forOwn(enabledModules, (overrideConfig, moduleName) => {
     const moduleParser = new StripesModuleParser(moduleName, overrideConfig, context, aliases, lazy);
     const parsedModule = moduleParser.parseModule();
-
-    if (lazy) {
-      lazyImports.add(`const ${moduleParser.safeImportName(moduleName)} = lazy(() => import(/* webpackChunkName: "${moduleName}" */ '${moduleName}'));`);
-    }
 
     // config
     parsedModule.actsAs.forEach(type => {
@@ -315,7 +318,6 @@ function parseAllModules(enabledModules, context, aliases, lazy) {
     stripesDeps,
     icons,
     warnings,
-    lazyImports,
   };
 }
 
