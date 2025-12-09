@@ -82,9 +82,9 @@ describe('The stripes-module-parser', function () {
       this.sut.modulePath = '/path/to/module';
     });
 
-    describe('parseStripesConfig', function () {
+    describe('extractConfig', function () {
       it('returns a parsed config', function () {
-        const result = this.sut.parseStripesConfig('@folio/users', this.packageJson);
+        const result = this.sut.extractConfig('@folio/users', this.packageJson);
         expect(result).to.be.an('object').with.keys(
           'module', 'getModule', 'description', 'version', 'displayName', 'route', 'welcomePageEntries',
         );
@@ -92,19 +92,19 @@ describe('The stripes-module-parser', function () {
 
       it('applies overrides from tenant config', function () {
         this.sut.overrideConfig = { displayName: 'something else' };
-        const result = this.sut.parseStripesConfig('@folio/users', this.packageJson);
+        const result = this.sut.extractConfig('@folio/users', this.packageJson);
         expect(result.displayName).to.equal('something else');
       });
 
       it('assigns getModule function', function () {
-        const result = this.sut.parseStripesConfig('@folio/users', this.packageJson);
+        const result = this.sut.extractConfig('@folio/users', this.packageJson);
         expect(result.getModule).to.be.a('function');
       });
     });
 
-    describe('parseStripesMetadata', function () {
+    describe('extractMetadata', function () {
       it('returns metadata', function () {
-        const result = this.sut.parseStripesMetadata(this.packageJson);
+        const result = this.sut.extractMetadata(this.packageJson);
         expect(result).to.be.an('object').with.keys(
           'name', 'version', 'description', 'license', 'feedback', 'type', 'shortTitle', 'fullTitle',
           'defaultPopoverSize', 'defaultPreviewWidth', 'helpPage', 'icons', 'welcomePageEntries',
@@ -234,7 +234,7 @@ describe('parseAllModules function', function () {
 
     it('returns config and metadata collections', function () {
       const result = this.sut(enabledModules, context, aliases);
-      expect(result).to.be.an('object').with.all.keys('config', 'metadata', 'stripesDeps', 'icons', 'warnings', 'lazyImports');
+      expect(result).to.be.an('object').with.all.keys('config', 'metadata', 'stripesDeps', 'icons', 'warnings');
     });
 
     it('returns config grouped by stripes type', function () {
