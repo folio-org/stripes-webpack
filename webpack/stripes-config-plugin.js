@@ -65,16 +65,18 @@ module.exports = class StripesConfigPlugin {
 
     StripesConfigPlugin.getPluginHooks(compiler).beforeWrite.tap(
       { name: 'StripesConfigPlugin', context: true },
-      context => Object.assign(context, { config }));
+      context => Object.assign(context, { config, metadata, icons, stripesDeps, warnings }));
 
     // Wait until after other plugins to generate virtual stripes-config
     compiler.hooks.afterPlugins.tap('StripesConfigPlugin', (theCompiler) => this.afterPlugins(theCompiler));
+    compiler.hooks.emit.tapAsync('StripesConfigPlugin', (compilation, callback) => this.processWarnings(compilation, callback));
   }
 
   afterPlugins(compiler) {
     // Data provided by other stripes plugins via hooks
     const pluginData = {
       branding: {},
+      errorLogging: {},
       translations: {},
     };
 
@@ -84,8 +86,8 @@ module.exports = class StripesConfigPlugin {
     const stripesVirtualModule = `
       ${Array.from(this.lazyImports).join('\n')}
       const { okapi, config, modules } = ${serialize(this.mergedConfig, { space: 2 })};
-      const errorLogging = ${stripesSerialize.serializeWithRequire(pluginData.errorLogging)};
       const branding = ${stripesSerialize.serializeWithRequire(pluginData.branding)};
+      const errorLogging = ${stripesSerialize.serializeWithRequire(pluginData.errorLogging)};
       const translations = ${serialize(pluginData.translations, { space: 2 })};
       const metadata = ${stripesSerialize.serializeWithRequire(this.metadata)};
       const icons = ${stripesSerialize.serializeWithRequire(this.icons)};
@@ -94,5 +96,12 @@ module.exports = class StripesConfigPlugin {
 
     logger.log('writing virtual module...', stripesVirtualModule);
     this.virtualModule.writeModule('node_modules/stripes-config.js', stripesVirtualModule);
+  }
+
+  processWarnings(compilation, callback) {
+    if (this.warnings.length) {
+      compilation.warnings.push(new StripesBuildError(`stripes-config-plugin:\n  ${this.warnings.join('\n  ')}`));
+    }
+    callback();
   }
 };
