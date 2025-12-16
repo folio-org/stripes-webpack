@@ -3,7 +3,7 @@
 // within the same workspace. If the module is not within the same workspace, the 'stripes federate' command will have to be
 // executed manually from the directory of that module.
 
-const spawn = require('child_process').spawn;
+const spawnSync = require('child_process').spawnSync;
 const path = require('path');
 const portfinder = require('portfinder');
 
@@ -24,9 +24,9 @@ module.exports = class StripesLocalFederationPlugin {
       const basePath = path.dirname(packageJsonPath);
 
       portfinder.getPort((err, port) => {
-        const child = spawn(`yarn stripes federate --port ${port}`, {
+        const child = spawnSync(`yarn stripes federate --port ${port}`, {
           cwd: basePath,
-          shell: true,
+          shell: process.platform === 'win32', // true on windows, false elsewhere...
         });
 
         child.stdout.pipe(process.stdout);
