@@ -89,6 +89,12 @@ module.exports = class StripesTranslationPlugin {
       // Hook into stripesConfigPlugin to supply paths to translation files
       // and gather additional modules from stripes.stripesDeps
       StripesConfigPlugin.getPluginHooks(compiler).beforeWrite.tap({ name: 'StripesTranslationsPlugin', context: true }, (context, config) => {
+        // Add stripesDeps to the list of modules to load translations from
+        for (const [key, value] of Object.entries(context.stripesDeps)) {
+          // TODO: merge translations from all versions of stripesDeps
+          this.modules[key] = value[value.length - 1];
+        }
+
         // Gather all translations available in each module
         const allTranslations = this.gatherAllTranslations();
 
