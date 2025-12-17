@@ -6,8 +6,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
 
-const { generateStripesAlias, } = require('./webpack/module-paths');
-const { processShared } = require('./webpack/utils');
+const { generateStripesAlias } = require('./webpack/module-paths');
 const typescriptLoaderRule = require('./webpack/typescript-loader-rule');
 const { isProduction } = require('./webpack/utils');
 const { getTranspiledCssPaths } = require('./webpack/module-paths');
@@ -132,7 +131,8 @@ const baseConfig = {
   },
 };
 
-const buildConfig = (modulePaths, federatePlatform = false) => {
+
+const buildConfig = (modulePaths) => {
   const transpiledCssPaths = getTranspiledCssPaths(modulePaths);
   const cssDistPathRegex = /dist[\/\\]style\.css/;
 
@@ -162,7 +162,7 @@ const buildConfig = (modulePaths, federatePlatform = false) => {
     test: /\.css$/,
     exclude: [cssDistPathRegex],
     use: [
-      { loader: isProduction ? MiniCssExtractPlugin.loader : 'style-loader' },
+      { loader: isProduction ? MiniCssExtractPlugin.loader : 'style-loader'  },
       {
         loader: 'css-loader',
         options: {
