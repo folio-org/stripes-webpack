@@ -1,3 +1,7 @@
+// This configuration file is used for building individual ui modules for a
+// federated module platform setup.
+// note the static hosted folders "icons", "translations", "sounds" in the devserver config.
+
 const path = require('path');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
