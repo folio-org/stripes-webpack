@@ -6,6 +6,7 @@
 * Prune dead code, `stripes.js` and its dep `commander`. Refs STRWEB-134.
 * Provide `getDynamicModule`, returning a module via `import()`. Refs STRWEB-137.
 * Add `StripesLocalFederation` plugin, inject module federation plugin for federated platforms and modules. Refs STRIPES-861.
+* Adjust `StripesTranslationsPlugin` for working at the module level and including translations from `stripesDeps`. Refs STRIPES-861.
 
 ## [6.0.0](https://github.com/folio-org/stripes-webpack/tree/v6.0.0) (2025-02-24)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v5.2.0...v6.0.0)
