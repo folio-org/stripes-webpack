@@ -67,6 +67,13 @@ const buildConfig = (metadata) => {
           },
         },
         {
+          test: /\.(mp3|m4a)$/,
+          type: 'asset/resource',
+          generator: {
+            filename: './sound/[name].[contenthash].[ext]',
+          },
+        },
+        {
           test: /\.css$/,
           use: [
             {
