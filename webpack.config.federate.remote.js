@@ -107,15 +107,6 @@ const buildConfig = (metadata) => {
             filename: './img/[name].[contenthash].[ext]',
           },
         },
-        // {
-        //   test: /\.svg$/,
-        //   use: [{
-        //     loader: 'url-loader',
-        //     options: {
-        //       esModule: false,
-        //     },
-        //   }]
-        // },
         {
           test: /\.svg$/,
           type: 'asset/inline',
