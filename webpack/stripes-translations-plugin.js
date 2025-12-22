@@ -16,8 +16,6 @@ function prefixKeys(obj, prefix) {
 
 module.exports = class StripesTranslationPlugin {
   constructor(options) {
-    // in module federation mode, we emit translations for the module being built and
-    // for any stripesDeps it has.
     this.federate = options?.federate || false;
 
     // Include stripes-core et al because they have translations
@@ -51,6 +49,13 @@ module.exports = class StripesTranslationPlugin {
       new webpack.ContextReplacementPlugin(/moment[/\\]locale/, filterRegex).apply(compiler);
     }
 
+    // In module federation mode, we emit translations for the module being built and
+    // for any stripesDeps it has. Since the translations for 'stripes-core', components, form, etc are
+    // provided by a host application, we do not include them here.
+    // Translations are loaded at runtime from the built static 'translations' directory when the remote itself is loaded.
+    // In a monolithic build, StripesTranslationsPlugin is included in StripesConfigPlugin as
+    // its list of generated files is passed to the `stripes-config` virtual module as its `translations` object.
+    // In the monolithic build, the `stripes-config` virtual module's file path information is used to load translations.
     if (this.federate) {
       const packageJsonPath = path.join(this.context, 'package.json');
       const packageJson = StripesTranslationPlugin.loadFile(packageJsonPath);
@@ -66,6 +71,8 @@ module.exports = class StripesTranslationPlugin {
         }
       }
 
+      // for usage at the module level, this plugin is used independently of the `StripesConfigPlugin`, so we
+      // register hooks under itself rather then the config plugin.
       compiler.hooks.thisCompilation.tap('StripesTranslationsPlugin', (compilation) => {
         compilation.hooks.processAssets.tap({
           name: 'StripesTranslationsPlugin',
