@@ -1,7 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
-const axios = require('axios');
 const { snakeCase } = require('lodash');
 const portfinder = require('portfinder');
 
@@ -46,11 +45,25 @@ module.exports = async function federate(options = {}) {
   // TODO: allow for configuring entitlementUrl via env var or stripes config
   const entitlementUrl = 'http://localhost:3001/registry';
 
+  const requestHeader = {
+    "Content-Type": "application/json",
+  };
+
   // update registry
-  axios.post(entitlementUrl, metadata).catch(error => {
-    console.error(`Registry not found. Please check ${entitlementUrl}`);
-    process.exit();
-  });
+  await fetch(
+    entitlementUrl, {
+    method: 'POST',
+    headers: requestHeader,
+    body: JSON.stringify(metadata),
+  })
+    .catch(error => {
+      console.error(`Registry not found. Please check ${entitlementUrl}`);
+      process.exit();
+    });
+  // axios.post(entitlementUrl, metadata).catch(error => {
+  //   console.error(`Registry not found. Please check ${entitlementUrl}`);
+  //   process.exit();
+  // });
 
   const compiler = webpack(config);
   const server = new WebpackDevServer(config.devServer, compiler);
@@ -59,7 +72,14 @@ module.exports = async function federate(options = {}) {
 
   compiler.hooks.shutdown.tapPromise('AsyncShutdownHook', async (stats) => {
     try {
-      await axios.delete(entitlementUrl, { data: metadata });
+      await fetch(entitlementUrl, {
+        method: 'DELETE',
+        headers: requestHeader,
+        body: JSON.stringify(metadata),
+      }).catch(error => {
+        throw new Error(error);
+      });
+      // await axios.delete(entitlementUrl, { data: metadata });
     } catch (error) {
       console.error(`registry not found. Please check ${entitlementUrl}`);
     }
