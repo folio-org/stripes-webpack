@@ -9,7 +9,7 @@ const esbuildLoaderRule = require('./webpack/esbuild-loader-rule');
 const utils = require('./webpack/utils');
 const buildBaseConfig = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
-const { singletons } = require('./consts');
+const { getPlatformSingletons } = require('./consts');
 const { ModuleFederationPlugin } = require('webpack').container;
 const { processShared } = require('./webpack/utils');
 
@@ -64,7 +64,7 @@ const buildConfig = (stripesConfig) => {
 
   // Enable module federation, setting up the host platform to share singletons (react, stripes-core, etc) with remote modules.
   if (stripesConfig.okapi.entitlementUrl) {
-    const shared = processShared(singletons, { singleton: true, eager: true });
+    const shared = processShared(getPlatformSingletons, { singleton: true, eager: true });
     devConfig.plugins.push(new ModuleFederationPlugin({ name: 'host', shared }));
   }
 

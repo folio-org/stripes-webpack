@@ -32,6 +32,7 @@
     "@csstools/postcss-global-data": "^3.0.0",
     "@csstools/postcss-relative-color-syntax": "^3.0.7",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.4",
+    "@octokit/rest": "^19.0.7",
     "@svgr/webpack": "^8.1.0",
     "add-asset-html-webpack-plugin": "^6.0.0",
     "autoprefixer": "^10.4.13",

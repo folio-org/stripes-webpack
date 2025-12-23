@@ -1,4 +1,5 @@
-// TODO: should these come from https://github.com/folio-org/stripes-core/blob/1d5d4f00a3756702e828856d4ef9349ceb9f1c08/package.json#L116-L129
+const { Octokit } = require('@octokit/rest');
+
 // Anythign that we want *the platform to provide to modules should be here.
 // If an item is not in this list, modules will each load their own version of it.
 // This can be problematic for React Context if mutliple copies of the same context are loaded.
@@ -21,9 +22,64 @@ const singletons = {
   'rxjs': '^6.6.3'
 };
 
+/** getPlatformSingletons
+* get singletons from platform deps
+* TODO - specify versions/branches of platform/stripes and additional entries...
+*/
+const getPlatformSingletons = async () => {
+  const platformSingletons = {};
+  const octokit = new Octokit();
+
+  try {
+    const platformPkg = await octokit.request('GET /repos/folio-org/platform-complete/contents/package.json', {
+      headers: {
+        accept: 'application/vnd.github.raw+json'
+      }
+    });
+
+    if (platformPkg.status === 200) {
+      const pkgObject = JSON.parse(platformPkg.data);
+      Object.keys(singletons).forEach(dep => {
+        const depVersion = pkgObject.dependencies[dep];
+        if (depVersion) {
+          platformSingletons[dep] = depVersion;
+        }
+      });
+    } else {
+      throw new Error('Error retrieving singletons list from platform. Falling back to static list');
+    }
+
+    // fetch dep versions from stripes...
+    const stripesPkg = await octokit.request('GET /repos/folio-org/stripes/contents/package.json', {
+      headers: {
+        accept: 'application/vnd.github.raw+json'
+      }
+    });
+
+    if (stripesPkg.status === 200) {
+      const pkgObject = JSON.parse(stripesPkg.data);
+      Object.keys(singletons).forEach(dep => {
+        const depVersion = pkgObject.dependencies[dep];
+        if (depVersion) {
+          platformSingletons[dep] = depVersion;
+        }
+      });
+    } else {
+      throw new Error('Error retrieving singletons list from stripes version. Falling back to static list');
+    }
+
+    return platformSingletons;
+  } catch (e) {
+    console.log(e);
+    return singletons;
+  }
+}
+
+
 const defaultentitlementUrl = 'http://localhost:3001/registry';
 
 module.exports = {
   defaultentitlementUrl,
   singletons,
+  getPlatformSingletons
 };

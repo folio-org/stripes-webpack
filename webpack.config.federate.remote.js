@@ -10,9 +10,9 @@ const { container } = webpack;
 const { processExternals, processShared } = require('./webpack/utils');
 const { getStripesModulesPaths } = require('./webpack/module-paths');
 const esbuildLoaderRule = require('./webpack/esbuild-loader-rule');
-const { singletons } = require('./consts');
+const { getPlatformSingletons } = require('./consts');
 
-const buildConfig = (metadata) => {
+const buildConfig = async (metadata) => {
   const { host, port, name, displayName, main } = metadata;
 
   // using main from metadata since the location of main could vary between modules.
@@ -25,7 +25,8 @@ const buildConfig = (metadata) => {
   // other paths are plural and I'm sticking with that convention.
   const soundsPath = path.join(process.cwd(), 'sound');
 
-  const shared = processShared(singletons, { singleton: true });
+  const configSingletons = await getPlatformSingletons();
+  const shared = processShared(configSingletons, { singleton: true });
 
   const config = {
     name,
