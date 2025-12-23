@@ -9,8 +9,8 @@ const StripesTranslationsPlugin = require('../../webpack/stripes-translations-pl
 
 // Stub the parts of the webpack compiler that the StripesTranslationsPlugin interacts with
 const compilerStub = {
-  apply: () => {},
-  plugin: () => {},
+  apply: () => { },
+  plugin: () => { },
   options: {
     output: {
       publicPath: '/',
@@ -21,22 +21,22 @@ const compilerStub = {
   },
   hooks: {
     beforeWrite: {
-      tap: () => {},
+      tap: () => { },
     },
     emit: {
-      tapAsync: () => {},
+      tapAsync: () => { },
     },
     processAssets: {
-      tap: () => {},
+      tap: () => { },
     },
     thisCompilation: {
-      tap: () => {},
+      tap: () => { },
     },
     contextModuleFactory: {
-      tap: () => {},
+      tap: () => { },
     },
     afterResolve: {
-      tap: () => {},
+      tap: () => { },
     }
   }
 };
@@ -52,6 +52,8 @@ describe('The stripes-translations-plugin', function () {
         '@folio/checkout': {},
       },
     };
+
+    this.stripesFederateConfig = { ...this.stripesConfig, federate: true };
   });
 
   describe('constructor', function () {
@@ -89,12 +91,12 @@ describe('The stripes-translations-plugin', function () {
       this.sandbox.spy(webpack.ContextReplacementPlugin.prototype, 'apply');
       this.sandbox.spy(compilerStub.hooks.emit, 'tapAsync');
       this.sandbox.spy(compilerStub.hooks.thisCompilation, 'tap');
-      this.sandbox.stub(StripesTranslationsPlugin, 'loadFile').returns({ key1: 'Value 1', key2: 'Value 2' });
+      this.sandbox.stub(StripesTranslationsPlugin, 'loadFile').returns({ key1: 'Value 1', key2: 'Value 2', name: 'testPackage', stripes: { stripesDeps: ['stripes-federate-dependency'] } });
       this.compilationStub = {
         assets: {},
         hooks: {
           processAssets: {
-            tap: () => {}
+            tap: () => { }
           },
         },
       };
@@ -131,10 +133,43 @@ describe('The stripes-translations-plugin', function () {
       expect(this.sut.modules).to.be.an('object').with.property('stripes-dependency');
     });
 
+    it('includes certain modules and stripes-deps in "federate" mpode', function () {
+      // federate mode is per-module, so the plugin executes outside of StripesConfigPlugin, with its own hook.
+      this.sut = new StripesTranslationsPlugin(this.stripesFederateConfig);
+      this.sut.apply({ ...compilerStub, context: __dirname });
+
+      expect(this.sut.modules).to.be.an('object').with.property('testPackage');
+      expect(this.sut.modules).to.be.an('object').with.property('stripes-federate-dependency');
+    });
+
     it('generates an emit function with all translations', function () {
       this.sut = new StripesTranslationsPlugin(this.stripesConfig);
       this.sut.apply(compilerStub);
       StripesConfigPlugin.getPluginHooks(compilerStub).beforeWrite.call({});
+
+      // Get the callback passed to 'thisCompilation' hook
+      const pluginArgs = compilerStub.hooks.thisCompilation.tap.getCall(0).args;
+      const compilerCallback = pluginArgs[1];
+
+      compilerCallback(this.compilationStub);
+
+      const compilationArgs = this.compilationStub.hooks.processAssets.tap.getCall(0).args;
+      const compilationCallback = compilationArgs[1];
+
+      // Call it and observe the modification to compilation.asset
+      compilationCallback();
+
+      const emitFiles = Object.keys(this.compilationStub.assets);
+
+      expect(emitFiles).to.have.length(3);
+      expect(emitFiles).to.match(/translations\/en-\d+\.json/);
+      expect(emitFiles).to.match(/translations\/es-\d+\.json/);
+      expect(emitFiles).to.match(/translations\/fr-\d+\.json/);
+    });
+
+    it('generates an emit function with all translations (federate mode)', function () {
+      this.sut = new StripesTranslationsPlugin(this.stripesFederateConfig);
+      this.sut.apply({ ...compilerStub, context: __dirname });
 
       // Get the callback passed to 'thisCompilation' hook
       const pluginArgs = compilerStub.hooks.thisCompilation.tap.getCall(0).args;
