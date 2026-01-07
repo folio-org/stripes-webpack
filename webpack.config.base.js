@@ -65,6 +65,7 @@ const baseConfig = {
     }),
     new webpack.EnvironmentPlugin(['NODE_ENV']),
     new RemoveEmptyScriptsPlugin(),
+    new webpack.ManifestPlugin({ entrypoints: true }),
   ],
   module: {
     rules: [
