@@ -108,6 +108,7 @@ describe('The stripes-module-parser', function () {
         expect(result).to.be.an('object').with.keys(
           'name', 'version', 'description', 'license', 'feedback', 'type', 'shortTitle', 'fullTitle',
           'defaultPopoverSize', 'defaultPreviewWidth', 'helpPage', 'icons', 'welcomePageEntries',
+          'subscribesTo',
         );
       });
     });
