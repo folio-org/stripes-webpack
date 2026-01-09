@@ -192,6 +192,7 @@ class StripesModuleParser {
       helpPage: packageJson.stripes.helpPage,
       icons,
       welcomePageEntries,
+      subscribesTo: packageJson.stripes.subscribesTo,
     };
     logger.log('metadata:', metadata);
     return metadata;
