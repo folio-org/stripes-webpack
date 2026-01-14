@@ -1,6 +1,7 @@
 // This configuration file is used for building individual ui modules for a
 // federated module platform setup.
-// note the static hosted folders "icons", "translations", "sounds" in the devserver config.
+// "icons", "translations", "sound" folders are statically hosted in the devServer config.
+// "icons" and "sound" directories, with subfolders are copied to the output folder for a production build.
 
 const path = require('path');
 const webpack = require('webpack');

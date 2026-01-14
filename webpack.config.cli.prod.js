@@ -11,10 +11,10 @@ const esbuildLoaderRule = require('./webpack/esbuild-loader-rule');
 const { getModulesPaths, getStripesModulesPaths, getTranspiledModules } = require('./webpack/module-paths');
 const { processShared } = require('./webpack/utils');
 const { ModuleFederationPlugin } = require('webpack').container;
-const { singletons } = require('./consts');
+const { getHostAppSingletons } = require('./consts');
 
 
-const buildConfig = (stripesConfig, options = {}) => {
+const buildConfig = async (stripesConfig, options = {}) => {
   const modulePaths = getModulesPaths(stripesConfig.modules);
   const stripesModulePaths = getStripesModulesPaths();
   const allModulePaths = [...stripesModulePaths, ...modulePaths];
@@ -60,6 +60,7 @@ const buildConfig = (stripesConfig, options = {}) => {
 
   // build platform with Module Federation if entitlementUrl is provided
   if (stripesConfig.okapi.entitlementUrl) {
+    const singletons = await getHostAppSingletons();
     const shared = processShared(singletons, { singleton: true, eager: true });
     prodConfig.plugins.push(
       new ModuleFederationPlugin({ name: 'host', shared })

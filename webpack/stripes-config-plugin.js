@@ -13,7 +13,6 @@ const { SyncHook } = require('tapable');
 const stripesModuleParser = require('./stripes-module-parser');
 const StripesBuildError = require('./stripes-build-error');
 const stripesSerialize = require('./stripes-serialize');
-const { defaultentitlementUrl } = require('../consts');
 const logger = require('./logger')('stripesConfigPlugin');
 
 const stripesConfigPluginHooksMap = new WeakMap();

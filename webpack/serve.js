@@ -81,7 +81,6 @@ module.exports = function serve(stripesConfig, options) {
     // To handle rewrites without the dot rule, we should include the static middleware twice
     // https://github.com/bripkens/connect-history-api-fallback/blob/master/examples/static-files-and-index-rewrite
     app.use(staticFileMiddleware);
-    // app.use(express.static(outputDir));
 
     // Process index rewrite before webpack-dev-middleware
     // to respond with webpack's dist copy of index.html
