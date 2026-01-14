@@ -5,11 +5,9 @@ const { Octokit } = require('@octokit/rest');
 // This can be problematic for React Context if mutliple copies of the same context are loaded.
 
 const singletons = {
-  '@folio/stripes': '^9.3.0',
   '@folio/stripes-components': '^13.1.0',
   '@folio/stripes-connect': '^10.0.1',
   '@folio/stripes-core': '^11.1.0',
-  '@folio/stripes-shared-context': '^1.0.0',
   "moment": "^2.29.0",
   'react': '~18.3',
   'react-dom': '~18.3',
@@ -22,64 +20,55 @@ const singletons = {
   'rxjs': '^6.6.3'
 };
 
-/** getPlatformSingletons
-* get singletons from platform deps
-* TODO - specify versions/branches of platform/stripes and additional entries...
+/** getHostAppSingletons
+* get singletons from stripes-core package.json on Github.
 */
-const getPlatformSingletons = async () => {
+const getHostAppSingletons = async () => {
   const platformSingletons = {};
-  const octokit = new Octokit();
 
-  try {
-    const platformPkg = await octokit.request('GET /repos/folio-org/platform-complete/contents/package.json', {
-      headers: {
-        accept: 'application/vnd.github.raw+json'
+  const handlePkgData = (corePkg) => {
+    const pkgObject = corePkg.data ? JSON.parse(corePkg.data) : corePkg;
+    const stripesCoreVersion = pkgObject.version;
+    platformSingletons['@folio/stripes-core'] = `~${stripesCoreVersion}`;
+    Object.keys(singletons).forEach(dep => {
+      const depVersion = pkgObject.peerDependencies[dep];
+      if (depVersion) {
+        platformSingletons[dep] = depVersion;
       }
     });
-
-    if (platformPkg.status === 200) {
-      const pkgObject = JSON.parse(platformPkg.data);
-      Object.keys(singletons).forEach(dep => {
-        const depVersion = pkgObject.dependencies[dep];
-        if (depVersion) {
-          platformSingletons[dep] = depVersion;
-        }
-      });
-    } else {
-      throw new Error('Error retrieving singletons list from platform. Falling back to static list');
-    }
-
-    // fetch dep versions from stripes...
-    const stripesPkg = await octokit.request('GET /repos/folio-org/stripes/contents/package.json', {
-      headers: {
-        accept: 'application/vnd.github.raw+json'
-      }
-    });
-
-    if (stripesPkg.status === 200) {
-      const pkgObject = JSON.parse(stripesPkg.data);
-      Object.keys(singletons).forEach(dep => {
-        const depVersion = pkgObject.dependencies[dep];
-        if (depVersion) {
-          platformSingletons[dep] = depVersion;
-        }
-      });
-    } else {
-      throw new Error('Error retrieving singletons list from stripes version. Falling back to static list');
-    }
-
-    return platformSingletons;
-  } catch (e) {
-    console.log(e);
-    return singletons;
   }
-}
 
+  let corePkg;
+  // try to get the locally installed stripes-core
+  try {
+    corePkg = require('@folio/stripes-core/package.json');
+  } catch (e) {
+    console.log('Unable to locate local stripes-core package.json, fetching from Github...');
+    try {
+      const octokit = new Octokit();
+      corePkg = await octokit.request('GET /repos/folio-org/stripes-core/contents/package.json', {
+        headers: {
+          accept: 'application/vnd.github.raw+json'
+        }
+      });
+
+      if (corePkg.status !== 200) {
+        throw new Error('Error retrieving singletons list from platform. Falling back to static list');
+      }
+    } catch (e) {
+      console.log(e);
+      return singletons;
+    }
+  }
+
+  handlePkgData(corePkg);
+  return platformSingletons;
+}
 
 const defaultentitlementUrl = 'http://localhost:3001/registry';
 
 module.exports = {
   defaultentitlementUrl,
   singletons,
-  getPlatformSingletons
+  getHostAppSingletons
 };

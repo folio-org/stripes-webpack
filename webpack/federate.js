@@ -11,9 +11,9 @@ const logger = require('./logger')();
 // Remotes will be serve starting from port 3002
 portfinder.setBasePort(3002);
 
-module.exports = async function federate(options = {}) {
+module.exports = async function federate(stripesConfig, options = {}, callback = () => { }) {
   logger.log('starting federation...');
-
+  const { entitlementUrl } = stripesConfig.okapi;
   const packageJsonPath = tryResolve(path.join(process.cwd(), 'package.json'));
 
   if (!packageJsonPath) {
@@ -21,9 +21,15 @@ module.exports = async function federate(options = {}) {
     process.exit();
   }
 
+  // publicPath for how remoteEntry will be accessed.
+  let url;
   const port = options.port ?? await portfinder.getPortPromise();
-  const host = `http://localhost`;
-  const url = `${host}:${port}/remoteEntry.js`;
+  const host = options.host ?? `http://localhost`;
+  if (options.publicPath) {
+    url = `${options.publicPath}/remoteEntry.js`
+  } else {
+    url = `${host}:${port}/remoteEntry.js`;
+  }
 
   const { name: packageName, version, description, stripes, main } = require(packageJsonPath);
   const { permissionSets: _, ...stripesRest } = stripes;
@@ -40,10 +46,12 @@ module.exports = async function federate(options = {}) {
     ...stripesRest,
   };
 
-  const config = buildConfig(metadata);
+  const config = await buildConfig(metadata, options);
 
-  // TODO: allow for configuring entitlementUrl via env var or stripes config
-  const entitlementUrl = 'http://localhost:3001/registry';
+  if (options.build) { // build only
+    webpack(config, callback);
+    return;
+  }
 
   const requestHeader = {
     "Content-Type": "application/json",
@@ -60,15 +68,11 @@ module.exports = async function federate(options = {}) {
       console.error(`Registry not found. Please check ${entitlementUrl}`);
       process.exit();
     });
-  // axios.post(entitlementUrl, metadata).catch(error => {
-  //   console.error(`Registry not found. Please check ${entitlementUrl}`);
-  //   process.exit();
-  // });
 
   const compiler = webpack(config);
   const server = new WebpackDevServer(config.devServer, compiler);
   console.log(`Starting remote server on port ${port}`);
-  server.start();
+
 
   compiler.hooks.shutdown.tapPromise('AsyncShutdownHook', async (stats) => {
     try {
@@ -79,9 +83,11 @@ module.exports = async function federate(options = {}) {
       }).catch(error => {
         throw new Error(error);
       });
-      // await axios.delete(entitlementUrl, { data: metadata });
     } catch (error) {
       console.error(`registry not found. Please check ${entitlementUrl}`);
     }
   });
+
+  // serve command expects a promise...
+  return server.start();
 };

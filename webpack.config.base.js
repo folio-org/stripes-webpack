@@ -65,6 +65,7 @@ const baseConfig = {
     }),
     new webpack.EnvironmentPlugin(['NODE_ENV']),
     new RemoveEmptyScriptsPlugin(),
+    new webpack.ManifestPlugin({ entrypoints: true }),
   ],
   module: {
     rules: [
@@ -162,7 +163,7 @@ const buildConfig = (modulePaths) => {
     test: /\.css$/,
     exclude: [cssDistPathRegex],
     use: [
-      { loader: isProduction ? MiniCssExtractPlugin.loader : 'style-loader'  },
+      { loader: isProduction ? MiniCssExtractPlugin.loader : 'style-loader' },
       {
         loader: 'css-loader',
         options: {

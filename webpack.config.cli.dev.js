@@ -9,7 +9,7 @@ const esbuildLoaderRule = require('./webpack/esbuild-loader-rule');
 const utils = require('./webpack/utils');
 const buildBaseConfig = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
-const { getPlatformSingletons } = require('./consts');
+const { getHostAppSingletons } = require('./consts');
 const { ModuleFederationPlugin } = require('webpack').container;
 const { processShared } = require('./webpack/utils');
 
@@ -17,7 +17,7 @@ const useBrowserMocha = () => {
   return tryResolve('mocha/mocha-es2018.js') ? 'mocha/mocha-es2018.js' : 'mocha';
 };
 
-const buildConfig = (stripesConfig) => {
+const buildConfig = async (stripesConfig) => {
   const modulePaths = getModulesPaths(stripesConfig.modules);
   const stripesModulePaths = getStripesModulesPaths();
   const allModulePaths = [...stripesModulePaths, ...modulePaths];
@@ -64,7 +64,8 @@ const buildConfig = (stripesConfig) => {
 
   // Enable module federation, setting up the host platform to share singletons (react, stripes-core, etc) with remote modules.
   if (stripesConfig.okapi.entitlementUrl) {
-    const shared = processShared(getPlatformSingletons, { singleton: true, eager: true });
+    const hostAppSingletons = await getHostAppSingletons();
+    const shared = processShared(hostAppSingletons, { singleton: true, eager: true });
     devConfig.plugins.push(new ModuleFederationPlugin({ name: 'host', shared }));
   }
 

@@ -5,6 +5,7 @@ const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
 const applyWebpackOverrides = require('./apply-webpack-overrides');
 const logger = require('./logger')();
 const buildConfig = require('../webpack.config.cli.prod');
+const federate = require('./federate');
 const sharedStylesConfig = require('../webpack.config.cli.shared.styles');
 const platformModulePath = path.join(path.resolve(), 'node_modules');
 
@@ -12,7 +13,27 @@ module.exports = function build(stripesConfig, options) {
   return new Promise((resolve, reject) => {
     logger.log('starting build...');
 
-    let config = buildConfig(stripesConfig, options);
+    const buildCallback = (err, stats) => {
+      if (err) {
+        console.error(err.stack || err);
+        if (err.details) {
+          console.error(err.details);
+        }
+        reject(err);
+      } else {
+        resolve(stats);
+      }
+    };
+
+    let config;
+    if (options.context.isUiModule && options.federate) {
+      return federate(
+        stripesConfig,
+        { ...options, build: true, mode: 'production' },
+        buildCallback);
+    } else {
+      config = buildConfig(stripesConfig, options)
+    }
 
     config = sharedStylesConfig(config, {});
 
@@ -73,16 +94,6 @@ module.exports = function build(stripesConfig, options) {
 
     logger.log('assign final webpack config', config);
 
-    webpack(config, (err, stats) => {
-      if (err) {
-        console.error(err.stack || err);
-        if (err.details) {
-          console.error(err.details);
-        }
-        reject(err);
-      } else {
-        resolve(stats);
-      }
-    });
+    webpack(config, buildCallback);
   });
 };

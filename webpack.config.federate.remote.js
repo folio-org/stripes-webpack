@@ -5,14 +5,15 @@
 const path = require('path');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyPlugin = require("copy-webpack-plugin");
 const StripesTranslationsPlugin = require('./webpack/stripes-translations-plugin');
 const { container } = webpack;
 const { processExternals, processShared } = require('./webpack/utils');
 const { getStripesModulesPaths } = require('./webpack/module-paths');
 const esbuildLoaderRule = require('./webpack/esbuild-loader-rule');
-const { getPlatformSingletons } = require('./consts');
+const { getHostAppSingletons } = require('./consts');
 
-const buildConfig = async (metadata) => {
+const buildConfig = async (metadata, options) => {
   const { host, port, name, displayName, main } = metadata;
 
   // using main from metadata since the location of main could vary between modules.
@@ -25,37 +26,16 @@ const buildConfig = async (metadata) => {
   // other paths are plural and I'm sticking with that convention.
   const soundsPath = path.join(process.cwd(), 'sound');
 
-  const configSingletons = await getPlatformSingletons();
+  const configSingletons = await getHostAppSingletons();
   const shared = processShared(configSingletons, { singleton: true });
 
   const config = {
     name,
-    devtool: 'inline-source-map',
-    mode: 'development',
+    mode: options.mode || 'development',
     entry: mainEntry,
     output: {
-      publicPath: `${host}:${port}/`,
-    },
-    devServer: {
-      port: port,
-      open: false,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-      },
-      static: [
-        {
-          directory: translationsPath,
-          publicPath: '/translations'
-        },
-        {
-          directory: iconsPath,
-          publicPath: '/icons'
-        },
-        {
-          directory: soundsPath,
-          publicPath: '/sounds'
-        },
-      ]
+      publicPath: options.mode === 'production' ? options.publicPath ?? 'auto' : `${host}:${port}/`,
+      path: options.outputPath ? path.resolve(options.outputPath) : undefined
     },
     module: {
       rules: [
@@ -141,6 +121,47 @@ const buildConfig = async (metadata) => {
       }),
     ]
   };
+
+  // for a build/production mode copy sounds and icons to the output folder...
+  if (options.mode === 'production') {
+    config.plugins.push(
+      new CopyPlugin({
+        patterns: [
+          { from: 'sound', to: 'sound', noErrorOnMissing: true },
+          { from: 'icons', to: 'icons', noErrorOnMissing: true }
+        ]
+      })
+    )
+  } else {
+    // in development mode, setup the devserver...
+    config.devtool = 'inline-source-map';
+    config.devserver = {
+      port: port,
+      open: false,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
+      static: [
+        {
+          directory: translationsPath,
+          publicPath: '/translations'
+        },
+        {
+          directory: iconsPath,
+          publicPath: '/icons'
+        },
+        {
+          directory: soundsPath,
+          publicPath: '/sounds'
+        },
+      ]
+    }
+  }
+
+  if (options.minify === false) {
+    config.optimization = config.optimization || {};
+    config.optimization.minimize = false;
+  }
 
   return config;
 }
