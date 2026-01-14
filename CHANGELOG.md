@@ -5,6 +5,7 @@
 * Unlock `esbuild-loader` from `~3.0.0`, bumping to `^4.2.2`. Refs STRWEB-95.
 * Prune dead code, `stripes.js` and its dep `commander`. Refs STRWEB-134.
 * Provide `getDynamicModule`, returning a module via `import()`. Refs STRWEB-137.
+* Add `subscribesTo` field to module metadata. Refs STRWEB-143.
 * Generate an asset manifest for the build. Refs STRWEB-144.
 
 ## [6.0.0](https://github.com/folio-org/stripes-webpack/tree/v6.0.0) (2025-02-24)
