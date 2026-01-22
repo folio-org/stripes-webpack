@@ -2,10 +2,17 @@ const express = require('express');
 const cors = require('cors');
 
 // Registry data
-const registry = { discovery: [] };
+const registry = {
+  discovery: [{
+    id: 'folio_stripes-1.0',
+    version: '1.0',
+    name: 'folio_stripes',
+    url: 'http://localhost:3000'
+  }]
+};
 
 const registryServer = {
-  start: (url) => {
+  start: (url, tenant = 'diku') => {
     const app = express();
 
     app.use(express.json());
@@ -25,6 +32,8 @@ const registryServer = {
 
     // return entire registry for machines
     app.get('/registry', (_, res) => res.json(registry));
+
+    app.get(`/registry/entitlements/${tenant}/applications`, (_, res) => res.json(registry));
 
     // return entire registry for humans
     app.get('/code', (_, res) => res.send(`<pre>${JSON.stringify(registry, null, 2)}</pre>`));

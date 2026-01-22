@@ -38,13 +38,13 @@ module.exports = function serve(stripesConfig, options) {
 
     // stripes module registry
     if (options.federate && stripesConfig.okapi.entitlementUrl) {
-      const { entitlementUrl } = stripesConfig.okapi;
+      const { entitlementUrl, tenant } = stripesConfig.okapi;
 
       // If the entitlement URL points to 'localhost', start a local registry for development/debug.
       // For production, entitlementUrl will point to some non-local endpoint and the UI will fetch accordingly.
       if (entitlementUrl.includes('localhost')) {
         try {
-          registryServer.start(entitlementUrl);
+          registryServer.start(entitlementUrl, tenant);
         }
         catch (e) {
           console.error(e)
