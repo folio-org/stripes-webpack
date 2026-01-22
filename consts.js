@@ -1,5 +1,3 @@
-const { Octokit } = require('@octokit/rest');
-
 // Anythign that we want *the platform to provide to modules should be here.
 // If an item is not in this list, modules will each load their own version of it.
 // This can be problematic for React Context if mutliple copies of the same context are loaded.
@@ -17,14 +15,14 @@ const singletons = {
   'react-router': '^5.2.0',
   'react-router-dom': '^5.2.0',
   'redux-observable': '^1.2.0',
-  'rxjs': '^6.6.3'
+  'rxjs': '^6.6.3',
 };
 
 /** getHostAppSingletons
 * get singletons from stripes-core package.json on Github.
 */
-const getHostAppSingletons = async () => {
-  const platformSingletons = {};
+const getHostAppSingletons = () => {
+  let platformSingletons = {};
 
   const handlePkgData = (corePkg) => {
     const pkgObject = corePkg.data ? JSON.parse(corePkg.data) : corePkg;
@@ -36,6 +34,7 @@ const getHostAppSingletons = async () => {
         platformSingletons[dep] = depVersion;
       }
     });
+    platformSingletons = { ...platformSingletons, ...singletons };
   }
 
   let corePkg;
@@ -43,22 +42,8 @@ const getHostAppSingletons = async () => {
   try {
     corePkg = require('@folio/stripes-core/package.json');
   } catch (e) {
-    console.log('Unable to locate local stripes-core package.json, fetching from Github...');
-    try {
-      const octokit = new Octokit();
-      corePkg = await octokit.request('GET /repos/folio-org/stripes-core/contents/package.json', {
-        headers: {
-          accept: 'application/vnd.github.raw+json'
-        }
-      });
-
-      if (corePkg.status !== 200) {
-        throw new Error('Error retrieving singletons list from platform. Falling back to static list');
-      }
-    } catch (e) {
-      console.log(e);
-      return singletons;
-    }
+    corePkg = singletons;
+    throw new Error('Error retrieving singletons list from platform. Falling back to static list');
   }
 
   handlePkgData(corePkg);

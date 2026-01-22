@@ -14,7 +14,7 @@ const { getStripesModulesPaths } = require('./webpack/module-paths');
 const esbuildLoaderRule = require('./webpack/esbuild-loader-rule');
 const { getHostAppSingletons } = require('./consts');
 
-const buildConfig = async (metadata, options) => {
+const buildConfig = (metadata, options) => {
   const { host, port, name, displayName, main } = metadata;
 
   // using main from metadata since the location of main could vary between modules.
@@ -27,7 +27,7 @@ const buildConfig = async (metadata, options) => {
   // other paths are plural and I'm sticking with that convention.
   const soundsPath = path.join(process.cwd(), 'sound');
 
-  const configSingletons = await getHostAppSingletons();
+  const configSingletons = getHostAppSingletons();
   const shared = processShared(configSingletons, { singleton: true });
 
   const config = {
@@ -35,7 +35,7 @@ const buildConfig = async (metadata, options) => {
     mode: options.mode || 'development',
     entry: mainEntry,
     output: {
-      publicPath: options.mode === 'production' ? options.publicPath ?? 'auto' : `${host}:${port}/`,
+      publicPath: 'auto', // webpack will determine publicPath of script at runtime.
       path: options.outputPath ? path.resolve(options.outputPath) : undefined
     },
     module: {
@@ -136,7 +136,7 @@ const buildConfig = async (metadata, options) => {
   } else {
     // in development mode, setup the devserver...
     config.devtool = 'inline-source-map';
-    config.devserver = {
+    config.devServer = {
       port: port,
       open: false,
       headers: {

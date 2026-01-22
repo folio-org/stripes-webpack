@@ -21,6 +21,8 @@ const serverRoot = path.join(__dirname, '..');
 module.exports = function serve(stripesConfig, options) {
   // serving a locally federated module
   if (options.federate && options.context.isUiModule) {
+    // override default port 3000 option, as locally federated modules will be on >= 3002...
+    options.port = options.port !== 3000 ? options.port : undefined;
     return federate(stripesConfig, options);
   }
 

@@ -32,7 +32,7 @@ module.exports = function build(stripesConfig, options) {
         { ...options, build: true, mode: 'production' },
         buildCallback);
     } else {
-      config = await buildConfig(stripesConfig, options)
+      config = buildConfig(stripesConfig, options)
     }
 
     config = sharedStylesConfig(config, {});
