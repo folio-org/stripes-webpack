@@ -47,7 +47,7 @@ module.exports = async function federate(stripesConfig, options = {}, callback =
     ...stripesRest,
   };
 
-  const config = await buildConfig(metadata, options);
+  const config = buildConfig(metadata, options);
 
   if (options.build) { // build only
     webpack(config, callback);
