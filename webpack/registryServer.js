@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 
 // Registry data
-const registry = { remotes: {} };
+const registry = { discovery: [] };
 
 const registryServer = {
   start: (url) => {
@@ -16,7 +16,10 @@ const registryServer = {
       const metadata = req.body;
       const { name } = metadata;
 
-      registry.remotes[name] = metadata;
+      if (registry.discovery.findIndex(r => r.name === name) === -1) {
+        registry.discovery.push(metadata)
+      }
+
       res.status(200).send(`Remote ${name} metadata updated`);
     });
 
@@ -30,7 +33,7 @@ const registryServer = {
       const metadata = req.body;
       const { name } = metadata;
 
-      delete registry.remotes[name];
+      registry.discovery = registry.discovery.filter(r => r.name !== name);
 
       res.status(200).send(`Remote ${name} removed`);
     });

@@ -40,8 +40,9 @@ module.exports = async function federate(stripesConfig, options = {}, callback =
     description,
     host,
     port,
-    url,
+    location: url,
     name,
+    id: `${name}-${version}`,
     main,
     ...stripesRest,
   };
