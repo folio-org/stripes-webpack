@@ -136,6 +136,11 @@ module.exports = class StripesTranslationPlugin {
       const locateContext = this.modules[mod].resolvedPath || this.context;
       const modPackageJsonPath = modulePaths.locateStripesModule(locateContext, mod, this.aliases, 'package.json');
 
+      // if this is a module-level build of a cloned module, the package.json will be in the current folder/context.
+      if (!modPackageJsonPath && this.federate) {
+        modPackageJsonPath = path.join(this.context, 'package.json');
+      }
+
       if (modPackageJsonPath) {
         const moduleName = StripesTranslationPlugin.getModuleName(mod);
         const modTranslationDir = modPackageJsonPath.replace('package.json', `translations/${moduleName}`);
