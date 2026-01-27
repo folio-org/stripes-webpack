@@ -42,6 +42,9 @@ const buildConfig = (metadata, options) => {
     stats: {
       errorDetails: true
     },
+    resolve: {
+      extensions: ['.js', '.json', '.ts', '.tsx'],
+    },
     module: {
       rules: [
         typescriptLoaderRule,
