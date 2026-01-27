@@ -12,6 +12,7 @@ const { container } = webpack;
 const { processExternals, processShared } = require('./webpack/utils');
 const { getStripesModulesPaths } = require('./webpack/module-paths');
 const esbuildLoaderRule = require('./webpack/esbuild-loader-rule');
+const typescriptLoaderRule = require('./webpack/typescript-loader-rule')
 const { getHostAppSingletons } = require('./consts');
 
 const buildConfig = (metadata, options) => {
@@ -38,8 +39,12 @@ const buildConfig = (metadata, options) => {
       publicPath: 'auto', // webpack will determine publicPath of script at runtime.
       path: options.outputPath ? path.resolve(options.outputPath) : undefined
     },
+    stats: {
+      errorDetails: true
+    },
     module: {
       rules: [
+        typescriptLoaderRule,
         esbuildLoaderRule(stripesModulePaths),
         {
           test: /\.(woff2?)$/,

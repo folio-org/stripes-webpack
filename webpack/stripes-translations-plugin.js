@@ -134,7 +134,7 @@ module.exports = class StripesTranslationPlugin {
     for (const mod of Object.keys(this.modules)) {
       // translations from module dependencies may need to be located relative to their dependent (eg. in yarn workspaces)
       const locateContext = this.modules[mod].resolvedPath || this.context;
-      const modPackageJsonPath = modulePaths.locateStripesModule(locateContext, mod, this.aliases, 'package.json');
+      let modPackageJsonPath = modulePaths.locateStripesModule(locateContext, mod, this.aliases, 'package.json');
 
       // if this is a module-level build of a cloned module, the package.json will be in the current folder/context.
       if (!modPackageJsonPath && this.federate) {
