@@ -76,17 +76,13 @@ module.exports = async function federate(stripesConfig, options = {}, callback =
 
 
   compiler.hooks.shutdown.tapPromise('AsyncShutdownHook', async (stats) => {
-    try {
-      await fetch(entitlementUrl, {
-        method: 'DELETE',
-        headers: requestHeader,
-        body: JSON.stringify(metadata),
-      }).catch(error => {
-        throw new Error(error);
-      });
-    } catch (error) {
-      console.error(`registry not found. Please check ${entitlementUrl}`);
-    }
+    await fetch(entitlementUrl, {
+      method: 'DELETE',
+      headers: requestHeader,
+      body: JSON.stringify(metadata),
+    }).catch(error => {
+      throw new Error(`registry not found. Please check ${entitlementUrl} : ${error}`);
+    });
   });
 
   // serve command expects a promise...
