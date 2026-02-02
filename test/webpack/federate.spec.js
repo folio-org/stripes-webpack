@@ -6,13 +6,11 @@ require('./test-setup.spec');
 
 describe('The federate function', function () {
   let fetchStub;
-  let webpackModule;
   let webpackStub;
   let WebpackDevServerModule;
   let WebpackDevServerStub;
   let tryResolveStub;
   let buildConfigStub;
-  let snakeCaseStub;
   let consoleLogStub;
   let consoleErrorStub;
   let processExitStub;
@@ -77,10 +75,6 @@ describe('The federate function', function () {
     } catch (e) {
       // ignore if cannot inject
     }
-
-    // Stub snakeCase before requiring federate (so destructured import picks up stub)
-    // const lodash = require('lodash');
-    // snakeCaseStub = sinon.stub(lodash, 'snakeCase').callsFake((s) => s.replace(/[^a-zA-Z0-9]+/g, '-'));
 
     // Stub console and process.exit
     consoleLogStub = sinon.stub(console, 'log');
