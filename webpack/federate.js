@@ -41,15 +41,12 @@ module.exports = async function federate(stripesConfig, options = {}, callback =
     process.exit();
   }
 
-  // publicPath for how remoteEntry will be accessed.
-  let url;
+  // These variables are for spinning up and serving a federated remote module locally.
+  // The values here are sent to the local discovery service to register the module
+  // and the port is passed through to webpack-dev-server to host the module in dev mode.
   const port = options.port ?? await findFreePort(3002);
   const host = options.host ?? 'http://localhost';
-  if (options.publicPath) {
-    url = `${options.publicPath}/remoteEntry.js`
-  } else {
-    url = `${host}:${port}/remoteEntry.js`;
-  }
+  const url = `${host}:${port}/remoteEntry.js`;
 
   const { name: packageName, version, description, stripes, main } = require(packageJsonPath);
   const { permissionSets: _, ...stripesRest } = stripes;
@@ -58,7 +55,6 @@ module.exports = async function federate(stripesConfig, options = {}, callback =
     module: packageName,
     version,
     description,
-    host,
     port,
     location: url,
     name,

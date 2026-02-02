@@ -16,7 +16,7 @@ const typescriptLoaderRule = require('./webpack/typescript-loader-rule')
 const { getHostAppSingletons } = require('./consts');
 
 const buildConfig = (metadata, options) => {
-  const { host, port, name, displayName, main } = metadata;
+  const { port, name, displayName, main } = metadata;
 
   // using main from metadata since the location of main could vary between modules.
   let mainEntry = path.join(process.cwd(), main || 'index.js');
@@ -28,9 +28,25 @@ const buildConfig = (metadata, options) => {
   // other paths are plural and I'm sticking with that convention.
   const soundsPath = path.join(process.cwd(), 'sound');
 
+  // Module federation resolves dependencies at runtime.
+  // 'shared' holds a key-value list of modules and versions that are common between
+  // the host app and the remote modules.
+  // When a remote ui-module is loaded, module federation runtime will check these
+  // dependencies and load the individual chunks accordingly.
+  // For dependencies that are configured as singletons, only a single version will be loaded from the host app.
+  // If a version is semver incompatible, a console warning will be emitted.
   const configSingletons = getHostAppSingletons();
   const shared = processShared(configSingletons, { singleton: true });
 
+  // general webpack config.
+  // Some noteworthy settings:
+  //  publicPath: 'auto' setting will include a bit of runtime logic so that the
+  //    loaded script can load its individual chunks.
+  //    For more info, see https://webpack.js.org/guides/public-path/#automatic-publicpath
+  //  entry: mainEntry - this is the 'trunk' of webpack's import tree - webpack will start here
+  //    and work its way through the module. This file is also 'exposed' via the module-federation
+  //    plugin as './MainEntry': mainEntry. When a remote module is loaded, the mod-fed api will
+  //    load 'MainEntry' by name, which imports/requires the module.
   const config = {
     name,
     mode: options.mode || 'development',
@@ -114,11 +130,15 @@ const buildConfig = (metadata, options) => {
         }
       ]
     },
-    // TODO: remove this after stripes-config is gone.
     externals: processExternals({ 'stripes-config': true }),
     plugins: [
       new StripesTranslationsPlugin({ federate: true }),
       new MiniCssExtractPlugin({ filename: 'style.css', ignoreOrder: false }),
+      // At runtime, the host app will
+      // 1. load the remoteEntry.js script as directed by the module's location.
+      // 2. remote entry requires its own set of chunks, determining location of those chunks (publicPath: 'auto' logic).
+      // 3. The above are stored in a 'container' (webpack/mod-fed term) - a global variable by the 'name' field.
+      //    The host app 'imports' the app via container.get('MainEntry') from the loaded code.
       new container.ModuleFederationPlugin({
         library: { type: 'var', name },
         name,
