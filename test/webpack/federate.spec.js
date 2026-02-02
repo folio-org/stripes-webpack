@@ -158,7 +158,7 @@ describe('The federate function', function () {
 
     await federate({ okapi: { entitlementUrl: 'http://localhost:3001/registry' } });
 
-    expect(consoleErrorStub).to.have.been.calledWith('Registry not found. Please check http://localhost:3001/registry');
+    expect(consoleErrorStub).to.have.been.calledWith(sinon.match(/^Local discovery not found/));
     expect(processExitStub).to.have.been.called;
   });
 

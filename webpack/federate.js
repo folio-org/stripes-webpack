@@ -75,16 +75,17 @@ module.exports = async function federate(stripesConfig, options = {}, callback =
   };
 
   // update registry
-  await fetch(
-    entitlementUrl, {
-    method: 'POST',
-    headers: requestHeader,
-    body: JSON.stringify(metadata),
-  })
-    .catch(error => {
-      console.error(`Registry not found. Please check ${entitlementUrl}`);
-      process.exit();
-    });
+  try {
+    await fetch(
+      entitlementUrl, {
+      method: 'POST',
+      headers: requestHeader,
+      body: JSON.stringify(metadata),
+    })
+  } catch (err) {
+    console.error(`Local discovery not found for module registration. Please check ${entitlementUrl}: ${err}`);
+    process.exit();
+  }
 
   const compiler = webpack(config);
   const server = new WebpackDevServer(config.devServer, compiler);
@@ -92,13 +93,15 @@ module.exports = async function federate(stripesConfig, options = {}, callback =
 
 
   compiler.hooks.shutdown.tapPromise('AsyncShutdownHook', async (stats) => {
-    await fetch(entitlementUrl, {
-      method: 'DELETE',
-      headers: requestHeader,
-      body: JSON.stringify(metadata),
-    }).catch(error => {
-      throw new Error(`registry not found. Please check ${entitlementUrl} : ${error}`);
-    });
+    try {
+      await fetch(entitlementUrl, {
+        method: 'DELETE',
+        headers: requestHeader,
+        body: JSON.stringify(metadata),
+      })
+    } catch (err) {
+      throw new Error(`Local discovery not found when removing module. Please check ${entitlementUrl} : ${err}`);
+    };
   });
 
   // serve command expects a promise...
