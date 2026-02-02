@@ -1,15 +1,35 @@
 const path = require('path');
+const net = require('net');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
 const { snakeCase } = require('lodash');
-const portfinder = require('portfinder');
 
 const buildConfig = require('../webpack.config.federate.remote');
 const { tryResolve } = require('./module-paths');
 const logger = require('./logger')();
 
-// Remotes will be serve starting from port 3002
-portfinder.setBasePort(3002);
+// Function to check if a port is free
+function isPortFree(port) {
+  return new Promise((resolve) => {
+    const server = net.createServer();
+    server.listen(port, () => {
+      server.close();
+      resolve(true);
+    });
+    server.on('error', () => {
+      resolve(false);
+    });
+  });
+}
+
+// Function to find the next free port starting from a given port
+async function findFreePort(startPort) {
+  let port = startPort;
+  while (!(await isPortFree(port))) {
+    port++;
+  }
+  return port;
+}
 
 module.exports = async function federate(stripesConfig, options = {}, callback = () => { }) {
   logger.log('starting federation...');
@@ -23,8 +43,8 @@ module.exports = async function federate(stripesConfig, options = {}, callback =
 
   // publicPath for how remoteEntry will be accessed.
   let url;
-  const port = options.port ?? await portfinder.getPortPromise();
-  const host = options.host ?? `http://localhost`;
+  const port = options.port ?? await findFreePort(3002);
+  const host = options.host ?? 'http://localhost';
   if (options.publicPath) {
     url = `${options.publicPath}/remoteEntry.js`
   } else {

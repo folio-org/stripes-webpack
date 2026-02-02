@@ -1,0 +1,10 @@
+{
+  "name": "test-module",
+  "version": "1.0.0",
+  "description": "test description",
+  "stripes": {
+    "permissionSets": ["perm1"],
+    "other": "config"
+  },
+  "main": "index.js"
+}
