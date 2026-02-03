@@ -63,7 +63,7 @@ const buildConfig = (stripesConfig) => {
   }
 
   // Enable module federation, setting up the host platform to share singletons (react, stripes-core, etc) with remote modules.
-  if (stripesConfig.okapi.entitlementUrl) {
+  if (stripesConfig.okapi.discoveryUrl) {
     const hostAppSingletons = getHostAppSingletons();
     const shared = processShared(hostAppSingletons, { singleton: true, eager: true });
     devConfig.plugins.push(new ModuleFederationPlugin({ name: 'host', shared }));

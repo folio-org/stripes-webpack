@@ -33,7 +33,7 @@ async function findFreePort(startPort) {
 
 module.exports = async function federate(stripesConfig, options = {}, callback = () => { }) {
   logger.log('starting federation...');
-  const { entitlementUrl } = stripesConfig.okapi;
+  const { discoveryUrl } = stripesConfig.okapi;
   const packageJsonPath = tryResolve(path.join(process.cwd(), 'package.json'));
 
   if (!packageJsonPath) {
@@ -77,13 +77,13 @@ module.exports = async function federate(stripesConfig, options = {}, callback =
   // update registry
   try {
     await fetch(
-      entitlementUrl, {
+      discoveryUrl, {
       method: 'POST',
       headers: requestHeader,
       body: JSON.stringify(metadata),
     })
   } catch (err) {
-    console.error(`Local discovery not found for module registration. Please check ${entitlementUrl}: ${err}`);
+    console.error(`Local discovery not found for module registration. Please check ${discoveryUrl}:${err}`);
     process.exit();
   }
 
@@ -94,13 +94,13 @@ module.exports = async function federate(stripesConfig, options = {}, callback =
 
   compiler.hooks.shutdown.tapPromise('AsyncShutdownHook', async (stats) => {
     try {
-      await fetch(entitlementUrl, {
+      await fetch(discoveryUrl, {
         method: 'DELETE',
         headers: requestHeader,
         body: JSON.stringify(metadata),
       })
     } catch (err) {
-      throw new Error(`Local discovery not found when removing module. Please check ${entitlementUrl} : ${err}`);
+      throw new Error(`Local discovery not found when removing module. Please check ${discoveryUrl} : ${err}`);
     };
   });
 

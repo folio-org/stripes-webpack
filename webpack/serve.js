@@ -41,14 +41,14 @@ module.exports = function serve(stripesConfig, options) {
     app.use(cors());
 
     // stripes module registry
-    if (options.federate && stripesConfig.okapi.entitlementUrl) {
-      const { entitlementUrl, tenant } = stripesConfig.okapi;
+    if (options.federate && stripesConfig.okapi.discoveryUrl) {
+      const { discoveryUrl, tenant } = stripesConfig.okapi;
 
-      // If the entitlement URL points to 'localhost', start a local registry for development/debug.
-      // For production, entitlementUrl will point to some non-local endpoint and the UI will fetch accordingly.
-      if (entitlementUrl.includes('localhost')) {
+      // If the discoveryUrl points to 'localhost', start a local registry for development/debug.
+      // For production, discoveryUrl will point to some non-local endpoint and the UI will fetch accordingly.
+      if (discoveryUrl.includes('localhost')) {
         try {
-          registryServer.start(entitlementUrl, tenant);
+          registryServer.start(discoveryUrl, tenant);
         }
         catch (e) {
           console.error(e)
