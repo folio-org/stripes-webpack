@@ -19,10 +19,7 @@ const registryServer = {
 
     app.use(express.json());
 
-    const corsOptions = {
-      origin: 'localhost'
-    };
-    app.use(cors(corsOptions));
+    app.use(cors());
 
     // add/update remote to registry
     app.post('/registry', (req, res) => {

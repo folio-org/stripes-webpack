@@ -38,10 +38,7 @@ module.exports = function serve(stripesConfig, options) {
 
     app.use(express.json());
 
-    const corsOptions = {
-      origin: 'localhost'
-    };
-    app.use(cors(corsOptions));
+    app.use(cors());
 
     // stripes module registry
     if (options.federate && stripesConfig.okapi.entitlementUrl) {
