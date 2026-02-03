@@ -16,23 +16,28 @@ function prefixKeys(obj, prefix) {
 
 module.exports = class StripesTranslationPlugin {
   constructor(options) {
+    this.federate = options?.federate || false;
+
     // Include stripes-core et al because they have translations
-    this.modules = {
+    // translations should come from the host application for stripes
+    // rather than being overwritten by consuming apps.
+    this.modules = this.federate ? {} : {
       '@folio/stripes-core': {},
       '@folio/stripes-components': {},
       '@folio/stripes-smart-components': {},
       '@folio/stripes-form': {},
       '@folio/stripes-ui': {},
     };
-    Object.assign(this.modules, options.modules);
-    this.languageFilter = options.config.languages || [];
+
+    Object.assign(this.modules, options?.modules);
+    this.languageFilter = options?.config?.languages || [];
     logger.log('language filter', this.languageFilter);
   }
 
   apply(compiler) {
     // Used to help locate modules
     this.context = compiler.context;
-      // 'publicPath' is not present when running tests via karma-webpack
+    // 'publicPath' is not present when running tests via karma-webpack
     // so when running in test mode use absolute 'path'.
     this.publicPath = process.env.NODE_ENV !== 'test' ? compiler.options.output.publicPath : `./absolute${compiler.options.output.path}`;
     this.aliases = compiler.options.resolve.alias;
@@ -44,27 +49,39 @@ module.exports = class StripesTranslationPlugin {
       new webpack.ContextReplacementPlugin(/moment[/\\]locale/, filterRegex).apply(compiler);
     }
 
-    // Hook into stripesConfigPlugin to supply paths to translation files
-    // and gather additional modules from stripes.stripesDeps
-    StripesConfigPlugin.getPluginHooks(compiler).beforeWrite.tap({ name: 'StripesTranslationsPlugin', context: true }, (context, config) => {
-      // Add stripesDeps
-      for (const [key, value] of Object.entries(context.stripesDeps)) {
-        // TODO: merge translations from all versions of stripesDeps
-        this.modules[key] = value[value.length - 1];
+    // In module federation mode, we emit translations for the module being built and
+    // for any stripesDeps it has. Since the translations for 'stripes-core', components, form, etc are
+    // provided by a host application, we do not include them here.
+    // Translations are loaded at runtime from the built static 'translations' directory when the remote itself is loaded.
+    // In a monolithic build, StripesTranslationsPlugin is included in StripesConfigPlugin as
+    // its list of generated files is passed to the `stripes-config` virtual module as its `translations` object.
+    // In the monolithic build, the `stripes-config` virtual module's file path information is used to load translations.
+    if (this.federate) {
+      const packageJsonPath = path.join(this.context, 'package.json');
+      const packageJson = StripesTranslationPlugin.loadFile(packageJsonPath);
+
+      this.modules[packageJson.name] = {};
+      if (packageJson) {
+        const stripesDeps = packageJson?.stripes?.stripesDeps;
+        if (stripesDeps) {
+          stripesDeps.forEach((dep) => {
+            // TODO: merge translations from all versions of stripesDeps
+            this.modules[dep] = {};
+          });
+        }
       }
 
-      // Gather all translations available in each module
-      const allTranslations = this.gatherAllTranslations();
-
-      const fileData = this.generateFileNames(allTranslations);
-      const allFiles = _.mapValues(fileData, data => data.browserPath);
-
-      config.translations = allFiles;
-      logger.log('stripesConfigPluginBeforeWrite', config.translations);
-
+      // for usage at the module level, this plugin is used independently of the `StripesConfigPlugin`, so we
+      // register hooks under itself rather then the config plugin.
       compiler.hooks.thisCompilation.tap('StripesTranslationsPlugin', (compilation) => {
-        // Emit merged translations to the output directory
-        compilation.hooks.processAssets.tap('StripesTranslationsPlugin', () => {
+        compilation.hooks.processAssets.tap({
+          name: 'StripesTranslationsPlugin',
+          stage: compilation.PROCESS_ASSETS_STAGE_PRE_PROCESS
+        }, () => {
+
+          const allTranslations = this.gatherAllTranslations();
+          const fileData = this.generateFileNames(allTranslations, false);
+
           Object.keys(allTranslations).forEach((language) => {
             logger.log(`emitting translations for ${language} --> ${fileData[language].emitPath}`);
             const content = JSON.stringify(allTranslations[language]);
@@ -75,7 +92,40 @@ module.exports = class StripesTranslationPlugin {
           });
         });
       });
-    });
+    } else {
+      // Hook into stripesConfigPlugin to supply paths to translation files
+      // and gather additional modules from stripes.stripesDeps
+      StripesConfigPlugin.getPluginHooks(compiler).beforeWrite.tap({ name: 'StripesTranslationsPlugin', context: true }, (context, config) => {
+        // Add stripesDeps to the list of modules to load translations from
+        for (const [key, value] of Object.entries(context.stripesDeps)) {
+          // TODO: merge translations from all versions of stripesDeps
+          this.modules[key] = value[value.length - 1];
+        }
+
+        // Gather all translations available in each module
+        const allTranslations = this.gatherAllTranslations();
+
+        const fileData = this.generateFileNames(allTranslations);
+        const allFiles = _.mapValues(fileData, data => data.browserPath);
+
+        config.translations = allFiles;
+        logger.log('stripesConfigPluginBeforeWrite', config.translations);
+
+        compiler.hooks.thisCompilation.tap('StripesTranslationsPlugin', (compilation) => {
+          // Emit merged translations to the output directory
+          compilation.hooks.processAssets.tap('StripesTranslationsPlugin', () => {
+            Object.keys(allTranslations).forEach((language) => {
+              logger.log(`emitting translations for ${language} --> ${fileData[language].emitPath}`);
+              const content = JSON.stringify(allTranslations[language]);
+              compilation.assets[fileData[language].emitPath] = {
+                source: () => content,
+                size: () => content.length,
+              };
+            });
+          });
+        });
+      });
+    }
   }
 
   // Locate each module's translations directory (current) or package.json data (fallback)
@@ -84,7 +134,12 @@ module.exports = class StripesTranslationPlugin {
     for (const mod of Object.keys(this.modules)) {
       // translations from module dependencies may need to be located relative to their dependent (eg. in yarn workspaces)
       const locateContext = this.modules[mod].resolvedPath || this.context;
-      const modPackageJsonPath = modulePaths.locateStripesModule(locateContext, mod, this.aliases, 'package.json');
+      let modPackageJsonPath = modulePaths.locateStripesModule(locateContext, mod, this.aliases, 'package.json');
+
+      // if this is a module-level build of a cloned module, the package.json will be in the current folder/context.
+      if (!modPackageJsonPath && this.federate) {
+        modPackageJsonPath = path.join(this.context, 'package.json');
+      }
 
       if (modPackageJsonPath) {
         const moduleName = StripesTranslationPlugin.getModuleName(mod);
@@ -176,14 +231,14 @@ module.exports = class StripesTranslationPlugin {
   }
 
   // Assign output path names for each to be accessed later by stripes-config-plugin
-  generateFileNames(allTranslations) {
+  generateFileNames(allTranslations, useSuffix = true) {
     const files = {};
-    const timestamp = Date.now(); // To facilitate cache busting, could also generate a hash
+    const timestamp = useSuffix ? Date.now() : ''; // To facilitate cache busting, could also generate a hash
     Object.keys(allTranslations).forEach((language) => {
       files[language] = {
         // Fetching from the browser must take into account public path. The replace regex removes double slashes
         browserPath: `${this.publicPath}/translations/${language}-${timestamp}.json`.replace(/\/\//, '/'),
-        emitPath: `translations/${language}-${timestamp}.json`,
+        emitPath: `translations/${language}${timestamp ? `-${timestamp}` : ''}.json`,
       };
     });
     return files;

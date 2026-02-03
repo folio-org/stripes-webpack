@@ -6,6 +6,8 @@
 * Prune dead code, `stripes.js` and its dep `commander`. Refs STRWEB-134.
 * Provide `getDynamicModule`, returning a module via `import()`. Refs STRWEB-137.
 * Add `subscribesTo` field to module metadata. Refs STRWEB-143.
+* Adjust `StripesTranslationsPlugin` for working at the module level and including translations from `stripesDeps`. Refs STRIPES-861.
+* Implement module federation functionality for building and serving remote modules. Refs STRIPES-861.
 * Generate an asset manifest for the build. Refs STRWEB-144.
 
 ## [6.0.0](https://github.com/folio-org/stripes-webpack/tree/v6.0.0) (2025-02-24)
