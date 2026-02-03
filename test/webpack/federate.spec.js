@@ -101,7 +101,7 @@ describe('The federate function', function () {
   });
 
   it('starts federation successfully', async function () {
-    const stripesConfig = { okapi: { entitlementUrl: 'http://localhost:3001/registry' } };
+    const stripesConfig = { okapi: { discoveryUrl: 'http://localhost:3001/registry' } };
 
     await federate(stripesConfig, { port: 3003 });
 
@@ -120,7 +120,7 @@ describe('The federate function', function () {
   });
 
   it('uses default port when not provided', async function () {
-    const stripesConfig = { okapi: { entitlementUrl: 'http://localhost:3001/registry' } };
+    const stripesConfig = { okapi: { discoveryUrl: 'http://localhost:3001/registry' } };
 
     await federate(stripesConfig);
 
@@ -137,7 +137,7 @@ describe('The federate function', function () {
 
     let thrown;
     try {
-      await federate({ okapi: { entitlementUrl: 'http://localhost:3001/registry' } });
+      await federate({ okapi: { discoveryUrl: 'http://localhost:3001/registry' } });
     } catch (e) {
       thrown = e;
     }
@@ -150,14 +150,14 @@ describe('The federate function', function () {
   it('exits when registry post fails', async function () {
     fetchStub.rejects(new Error('Network error'));
 
-    await federate({ okapi: { entitlementUrl: 'http://localhost:3001/registry' } });
+    await federate({ okapi: { discoveryUrl: 'http://localhost:3001/registry' } });
 
     expect(consoleErrorStub).to.have.been.calledWith(sinon.match(/^Local discovery not found/));
     expect(processExitStub).to.have.been.called;
   });
 
   it('handles shutdown hook (DELETE is called)', async function () {
-    const stripesConfig = { okapi: { entitlementUrl: 'http://localhost:3001/registry' } };
+    const stripesConfig = { okapi: { discoveryUrl: 'http://localhost:3001/registry' } };
 
     await federate(stripesConfig, { port: 3004 });
 
