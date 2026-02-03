@@ -10,7 +10,7 @@ const sharedStylesConfig = require('../webpack.config.cli.shared.styles');
 const platformModulePath = path.join(path.resolve(), 'node_modules');
 
 module.exports = function build(stripesConfig, options) {
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     logger.log('starting build...');
 
     const buildCallback = (err, stats) => {
