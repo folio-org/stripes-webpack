@@ -33,8 +33,15 @@ module.exports = function serve(stripesConfig, options) {
   return new Promise(async (resolve) => {
     logger.log('starting serve...');
     const app = express();
+
+    app.disable("x-powered-by");
+
     app.use(express.json());
-    app.use(cors());
+
+    const corsOptions = {
+      origin: 'localhost'
+    };
+    app.use(cors(corsOptions));
 
     // stripes module registry
     if (options.federate && stripesConfig.okapi.entitlementUrl) {

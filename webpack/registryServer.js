@@ -15,8 +15,14 @@ const registryServer = {
   start: (url, tenant = 'diku') => {
     const app = express();
 
+    app.disable("x-powered-by");
+
     app.use(express.json());
-    app.use(cors());
+
+    const corsOptions = {
+      origin: 'localhost'
+    };
+    app.use(cors(corsOptions));
 
     // add/update remote to registry
     app.post('/registry', (req, res) => {
