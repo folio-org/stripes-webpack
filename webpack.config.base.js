@@ -163,7 +163,7 @@ const buildConfig = (modulePaths) => {
     test: /\.css$/,
     exclude: [cssDistPathRegex],
     use: [
-      { loader: isProduction ? MiniCssExtractPlugin.loader : 'style-loader'  },
+      { loader: isProduction ? MiniCssExtractPlugin.loader : 'style-loader' },
       {
         loader: 'css-loader',
         options: {

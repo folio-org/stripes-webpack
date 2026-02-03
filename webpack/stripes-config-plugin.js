@@ -46,8 +46,14 @@ module.exports = class StripesConfigPlugin {
   apply(compiler) {
     const enabledModules = this.options.modules;
     logger.log('enabled modules:', enabledModules);
-    const { config, metadata, icons, stripesDeps, warnings } = stripesModuleParser.parseAllModules(enabledModules, compiler.context, compiler.options.resolve.alias, this.lazy);
-    this.mergedConfig = Object.assign({}, this.options, { modules: config });
+    const { config, metadata, icons, stripesDeps, warnings, lazyImports } = stripesModuleParser.parseAllModules(enabledModules, compiler.context, compiler.options.resolve.alias, this.lazy);
+    const modulesInitialState = {
+      app: [],
+      handler: [],
+      plugin: [],
+      settings: [],
+    };
+    this.mergedConfig = Object.assign({ modules: modulesInitialState }, this.options, { modules: config });
     this.metadata = metadata;
     this.icons = icons;
     this.warnings = warnings;
@@ -85,7 +91,7 @@ module.exports = class StripesConfigPlugin {
       const translations = ${serialize(pluginData.translations, { space: 2 })};
       const metadata = ${stripesSerialize.serializeWithRequire(this.metadata)};
       const icons = ${stripesSerialize.serializeWithRequire(this.icons)};
-      export { okapi, config, modules, branding, errorLogging, translations, metadata, icons };
+      export { branding, config, errorLogging, icons, metadata, modules, okapi, translations };
     `;
 
     logger.log('writing virtual module...', stripesVirtualModule);
