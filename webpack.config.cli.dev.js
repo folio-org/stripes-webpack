@@ -10,7 +10,7 @@ const utils = require('./webpack/utils');
 const buildBaseConfig = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
 const { getHostAppSingletons } = require('./consts');
-const { ModuleFederationPlugin } = require('webpack').container;
+const { ModuleFederationPlugin } = require('@module-federation/enhanced/webpack');
 const { processShared } = require('./webpack/utils');
 
 const useBrowserMocha = () => {

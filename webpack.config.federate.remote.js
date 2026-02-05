@@ -8,7 +8,7 @@ const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyPlugin = require("copy-webpack-plugin");
 const StripesTranslationsPlugin = require('./webpack/stripes-translations-plugin');
-const { container } = webpack;
+const { ModuleFederationPlugin } = require('@module-federation/enhanced/webpack');
 const { processExternals, processShared } = require('./webpack/utils');
 const { getStripesModulesPaths } = require('./webpack/module-paths');
 const esbuildLoaderRule = require('./webpack/esbuild-loader-rule');
@@ -139,12 +139,12 @@ const buildConfig = (metadata, options) => {
       // 2. remote entry requires its own set of chunks, determining location of those chunks (publicPath: 'auto' logic).
       // 3. The above are stored in a 'container' (webpack/mod-fed term) - a global variable by the 'name' field.
       //    The host app 'imports' the app via container.get('MainEntry') from the loaded code.
-      new container.ModuleFederationPlugin({
+      new ModuleFederationPlugin({
         library: { type: 'var', name },
         name,
         filename: 'remoteEntry.js',
         exposes: {
-          './MainEntry': mainEntry,
+          '.': mainEntry,
         },
         shared
       }),
