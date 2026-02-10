@@ -164,10 +164,14 @@ const buildConfig = (metadata, options) => {
   } else {
     // in development mode, setup the devserver...
     config.devtool = 'inline-source-map';
+    // turning off hot reloading and overlay since we're using the dev sever for hosting static files rather than actual dev work.
     config.devServer = {
       hot: false,
       port: port,
       open: false,
+      client: {
+        overlay: false,
+      },
       headers: {
         'Access-Control-Allow-Origin': '*',
       },
