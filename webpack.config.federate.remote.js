@@ -165,6 +165,7 @@ const buildConfig = (metadata, options) => {
     // in development mode, setup the devserver...
     config.devtool = 'inline-source-map';
     config.devServer = {
+      hot: false,
       port: port,
       open: false,
       headers: {
