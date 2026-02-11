@@ -59,10 +59,10 @@ const getHostAppSingletons = () => {
   return platformSingletons;
 }
 
-const defaultEntitlementUrl = 'http://localhost:3001/registry';
+const defaultDiscoveryUrl = 'http://localhost:3001/registry';
 
 module.exports = {
-  defaultEntitlementUrl,
+  defaultDiscoveryUrl,
   singletons,
   getHostAppSingletons
 };
