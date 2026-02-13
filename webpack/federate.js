@@ -49,7 +49,7 @@ module.exports = async function federate(stripesConfig, options = {}, callback =
   // and the port is passed through to webpack-dev-server to host the module in dev mode.
   const port = options.port ?? await findFreePort(3002);
   const host = options.host ?? 'http://localhost';
-  const url = `${host}:${port}/remoteEntry.js`;
+  const url = `${host}:${port}/mf-manifest.json`;
 
   const { name: packageName, version, description, stripes, main } = require(packageJsonPath);
   const { permissionSets: _, ...stripesRest } = stripes;

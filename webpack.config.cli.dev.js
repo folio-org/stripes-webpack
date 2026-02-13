@@ -64,9 +64,21 @@ const buildConfig = (stripesConfig) => {
 
   // Enable module federation, setting up the host platform to share singletons (react, stripes-core, etc) with remote modules.
   if (stripesConfig.okapi.discoveryUrl) {
+    devConfig.cache = false;
     const hostAppSingletons = getHostAppSingletons();
-    const shared = processShared(hostAppSingletons, { singleton: true, eager: true });
-    devConfig.plugins.push(new ModuleFederationPlugin({ name: 'host', shared }));
+    const shared = processShared(hostAppSingletons, { requiredVersion: 'auto', singleton: true, eager: true });
+    devConfig.plugins.push(new ModuleFederationPlugin({
+      experiments: {
+        provideExternalRuntime: true,
+        optimization: {
+          target: 'web',
+        }
+      },
+      name: 'host',
+      shared,
+      runtimePlugins: [require.resolve('./webpack/host-override-share-plugin')],
+      shareStrategy: 'loaded-first',
+    }));
   }
 
   // This alias avoids a console warning for react-dom patch

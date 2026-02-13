@@ -10,7 +10,7 @@ const cli = require('./webpack.config.cli');
 const esbuildLoaderRule = require('./webpack/esbuild-loader-rule');
 const { getModulesPaths, getStripesModulesPaths, getTranspiledModules } = require('./webpack/module-paths');
 const { processShared } = require('./webpack/utils');
-const { ModuleFederationPlugin } = require('webpack').container;
+const { ModuleFederationPlugin } = require('@module-federation/enhanced/webpack');
 const { getHostAppSingletons } = require('./consts');
 
 
@@ -61,21 +61,22 @@ const buildConfig = (stripesConfig, options = {}) => {
   // build platform with Module Federation if --federate flag is passed
   if (options.federate) {
     const singletons = getHostAppSingletons();
-    const shared = processShared(singletons, { singleton: true, eager: true });
+    const shared = processShared(singletons, { singleton: true, eager: false });
     prodConfig.plugins.push(
       new ModuleFederationPlugin({ name: 'host', shared })
     );
+  } else {
+    prodConfig.optimization = {
+      mangleWasmImports: false,
+      minimizer: [
+        new EsbuildPlugin({
+          css: true,
+        }),
+      ],
+      splitChunks,
+    }
   }
 
-  prodConfig.optimization = {
-    mangleWasmImports: false,
-    minimizer: [
-      new EsbuildPlugin({
-        css: true,
-      }),
-    ],
-    splitChunks,
-  }
 
   prodConfig.module.rules.push(esbuildLoaderRule(allModulePaths));
 

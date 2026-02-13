@@ -36,7 +36,7 @@ const buildConfig = (metadata, options) => {
   // For dependencies that are configured as singletons, only a single version will be loaded from the host app.
   // If a version is semver incompatible, a console warning will be emitted.
   const configSingletons = getHostAppSingletons();
-  const shared = processShared(configSingletons, { singleton: true });
+  const shared = processShared(configSingletons, { requiredVersion: 'auto', singleton: true, eager: false }, true);
 
   // general webpack config.
   // Some noteworthy settings:
@@ -55,6 +55,7 @@ const buildConfig = (metadata, options) => {
       publicPath: 'auto', // webpack will determine publicPath of script at runtime.
       path: options.outputPath ? path.resolve(options.outputPath) : undefined
     },
+    cache: false,
     stats: {
       errorDetails: true
     },
@@ -140,13 +141,17 @@ const buildConfig = (metadata, options) => {
       // 3. The above are stored in a 'container' (webpack/mod-fed term) - a global variable by the 'name' field.
       //    The host app 'imports' the app via container.get('MainEntry') from the loaded code.
       new ModuleFederationPlugin({
+        experiments: {
+          externalRuntime: true,
+        },
         library: { type: 'var', name },
         name,
         filename: 'remoteEntry.js',
         exposes: {
           '.': mainEntry,
         },
-        shared
+        shared,
+        shareStrategy: 'loaded-first',
       }),
     ]
   };

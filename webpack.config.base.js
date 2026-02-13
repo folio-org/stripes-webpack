@@ -70,7 +70,6 @@ const baseConfig = {
     }),
     new webpack.EnvironmentPlugin(['NODE_ENV']),
     new RemoveEmptyScriptsPlugin(),
-    new ModuleFederationPlugin({ name: 'host', exposes: {}, shared }),
   ],
   module: {
     rules: [
