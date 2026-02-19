@@ -61,7 +61,7 @@ const buildConfig = (stripesConfig, options = {}) => {
   // build platform with Module Federation if --federate flag is passed
   if (options.federate) {
     const singletons = getHostAppSingletons();
-    const shared = processShared(singletons, { singleton: true, eager: false });
+    const shared = processShared(singletons, { singleton: true, eager: true });
     prodConfig.plugins.push(
       new ModuleFederationPlugin({ name: 'host', shared })
     );

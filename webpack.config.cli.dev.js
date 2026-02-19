@@ -66,18 +66,17 @@ const buildConfig = (stripesConfig) => {
   if (stripesConfig.okapi.discoveryUrl) {
     devConfig.cache = false;
     const hostAppSingletons = getHostAppSingletons();
-    const shared = processShared(hostAppSingletons, { requiredVersion: 'auto', singleton: true, eager: true });
+    const shared = processShared(hostAppSingletons, { singleton: true, eager: true });
     devConfig.plugins.push(new ModuleFederationPlugin({
       experiments: {
-        provideExternalRuntime: true,
         optimization: {
           target: 'web',
         }
       },
       name: 'host',
       shared,
-      runtimePlugins: [require.resolve('./webpack/host-override-share-plugin')],
       shareStrategy: 'loaded-first',
+      runtimePlugins: [require.resolve('./webpack/host-override-share-plugin')],
     }));
   }
 

@@ -141,16 +141,14 @@ const buildConfig = (metadata, options) => {
       // 3. The above are stored in a 'container' (webpack/mod-fed term) - a global variable by the 'name' field.
       //    The host app 'imports' the app via container.get('MainEntry') from the loaded code.
       new ModuleFederationPlugin({
-        experiments: {
-          externalRuntime: true,
-        },
         library: { type: 'var', name },
         name,
         filename: 'remoteEntry.js',
         exposes: {
-          '.': mainEntry,
+          './MainEntry': mainEntry,
         },
         shared,
+        runtimePlugins: [require.resolve('./webpack/host-override-share-plugin')],
         shareStrategy: 'loaded-first',
       }),
     ]
