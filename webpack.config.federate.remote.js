@@ -36,7 +36,7 @@ const buildConfig = (metadata, options) => {
   // For dependencies that are configured as singletons, only a single version will be loaded from the host app.
   // If a version is semver incompatible, a console warning will be emitted.
   const configSingletons = getHostAppSingletons();
-  const shared = processShared(configSingletons, { requiredVersion: 'auto', singleton: true, eager: false }, true);
+  const shared = processShared(configSingletons, { singleton: true, eager: false }, true);
 
   // general webpack config.
   // Some noteworthy settings:
