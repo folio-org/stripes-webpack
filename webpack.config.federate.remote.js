@@ -148,6 +148,9 @@ const buildConfig = (metadata, options) => {
           './MainEntry': mainEntry,
         },
         shared,
+        experiments: {
+          externalRuntime: false,
+        },
         runtimePlugins: [require.resolve('./webpack/host-override-share-plugin')],
         shareStrategy: 'loaded-first',
       }),

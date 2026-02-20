@@ -69,6 +69,7 @@ const buildConfig = (stripesConfig) => {
     const shared = processShared(hostAppSingletons, { singleton: true, eager: true });
     devConfig.plugins.push(new ModuleFederationPlugin({
       experiments: {
+        provideExternalRuntime: true,
         optimization: {
           target: 'web',
         }
