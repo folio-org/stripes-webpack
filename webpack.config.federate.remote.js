@@ -150,8 +150,10 @@ const buildConfig = (metadata, options) => {
         shared,
         experiments: {
           externalRuntime: true,
+          optimization: {
+            target: 'web',
+          }
         },
-        runtimePlugins: [require.resolve('./webpack/host-override-share-plugin')],
         shareStrategy: 'loaded-first',
       }),
     ]
