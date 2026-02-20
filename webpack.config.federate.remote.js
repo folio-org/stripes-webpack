@@ -155,6 +155,7 @@ const buildConfig = (metadata, options) => {
           }
         },
         shareStrategy: 'loaded-first',
+        runtimePlugins: [require.resolve('./webpack/remote-runtime-plugin')],
       }),
     ]
   };
