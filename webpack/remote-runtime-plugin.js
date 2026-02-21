@@ -7,7 +7,6 @@
 const RemoteRuntimePlugin = () => ({
   name: 'remote-runtime-plugin',
   beforeInit(args) {
-    console.log('BeforeInit Remote', args);
 
     // get override plugin from host instance...
     const hostInstance = __FEDERATION__.__INSTANCES__[0];
@@ -20,10 +19,9 @@ const RemoteRuntimePlugin = () => ({
     }
 
     // injects it into new instance at runtime.
-    if (!args.userOptions.plugins) {
-      args.userOptions.plugins = [];
-    };
-    args.userOptions.plugins.unshift(hostOverridePlugin);
+    const { origin } = args;
+    origin.registerPlugin(hostOverridePlugin);
+
     return args;
   },
 });
