@@ -9,14 +9,23 @@ const RemoteRuntimePlugin = () => ({
   beforeInit(args) {
     console.log('BeforeInit Remote', args);
 
-    // const { origin } = args;
-    // if (origin.name !== 'host') {
-    //   console.log(`replacing shareInfo for ${origin.name} with host app shareScopeMap.`);
-    //   const hostInstance = __FEDERATION__.__INSTANCES__[0];
-    //   args.origin.shareScopeMap = hostInstance.shareScopeMap;
-    //   args.shareInfo = hostInstance.options.shared;
-    //   args.userOptions.shared = hostInstance.options.shared;
-    // }
+    // get override plugin from host instance...
+    const hostInstance = __FEDERATION__.__INSTANCES__[0];
+    if (!hostInstance) {
+      return args;
+    }
+    const hostOverridePlugin = hostInstance.options.plugins.find(plugin => plugin.name === 'host-override-share-plugin');
+    if (!hostOverridePlugin) {
+      return args;
+    }
+
+    // injects it into new instance at runtime.
+    if (!args.userOptions.plugins) {
+      args.userOptions.plugins = [];
+    };
+    args.userOptions.plugins.unshift(hostOverridePlugin);
     return args;
   },
 });
+
+export default RemoteRuntimePlugin;
