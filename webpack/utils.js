@@ -29,9 +29,9 @@ const processExternals = (peerDeps) => {
 // and applies additional options for the module federation configuration,
 // like setting the shared items as singletons, or using the 'eager' consumption
 // setting (chunks are included in the initial bundle whether than split out/lazy loaded)
-const processShared = (shared, options = {}, remote) => {
+const processShared = (shared, options = {}) => {
   return Object.keys(shared).reduce((acc, name) => {
-    acc[name] = remote ? options : {
+    acc[name] = {
       requiredVersion: shared[name],
       ...options
     };

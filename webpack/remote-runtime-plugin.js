@@ -3,6 +3,8 @@
 // we need to apply the host's plugins to the remote's container.
 // This plugin sets a lifecycle method Before initialization of the remote's ModuleFederation instance
 // to pass the host's runtime plugins to the remote container.
+// The name of the plugin needs to match here, so we import it from a constant.
+import { HOST_RUNTIME_PLUGIN_NAME } from "../consts.js";
 
 const RemoteRuntimePlugin = () => ({
   name: 'remote-runtime-plugin',
@@ -13,14 +15,14 @@ const RemoteRuntimePlugin = () => ({
     if (!hostInstance) {
       return args;
     }
-    const hostOverridePlugin = hostInstance.options.plugins.find(plugin => plugin.name === 'host-override-share-plugin');
-    if (!hostOverridePlugin) {
+    const hostInjectedPlugin = hostInstance.options.plugins.find(plugin => plugin.name === HOST_RUNTIME_PLUGIN_NAME);
+    if (!hostInjectedPlugin) {
       return args;
     }
 
     // injects it into new instance at runtime.
     const { origin } = args;
-    origin.registerPlugin(hostOverridePlugin);
+    origin.registerPlugins([hostInjectedPlugin]);
 
     return args;
   },

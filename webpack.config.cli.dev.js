@@ -69,15 +69,15 @@ const buildConfig = (stripesConfig) => {
     const shared = processShared(hostAppSingletons, { singleton: true, eager: true });
     devConfig.plugins.push(new ModuleFederationPlugin({
       experiments: {
-        provideExternalRuntime: true,
+        provideExternalRuntime: true, // mod-fed runtime only lives at host code. Reduces size of remote bundles.
         optimization: {
-          target: 'web',
+          target: 'web', // further reduces size of remote bundles.
         }
       },
       name: 'host',
       shared,
       shareStrategy: 'loaded-first',
-      runtimePlugins: [require.resolve('./webpack/host-override-share-plugin')],
+      runtimePlugins: [require.resolve('./webpack/stripes-injected-mf-runtime-plugin')], // requires the path to the plugin.
     }));
   }
 

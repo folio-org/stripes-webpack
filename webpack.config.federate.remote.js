@@ -36,7 +36,11 @@ const buildConfig = (metadata, options) => {
   // For dependencies that are configured as singletons, only a single version will be loaded from the host app.
   // If a version is semver incompatible, a console warning will be emitted.
   const configSingletons = getHostAppSingletons();
-  const shared = processShared(configSingletons, { singleton: true, eager: false, import: false }, true);
+
+  // singleton: true, eager: false, import: false options are set to ensure that shared modules are
+  // not included in the remote module bundle, but instead loaded from the host app at runtime.
+  // This keeps the remote module bundle smaller and avoids potential version conflicts between host and remote.
+  const shared = processShared(configSingletons, { singleton: true, eager: false, import: false });
 
   // general webpack config.
   // Some noteworthy settings:
