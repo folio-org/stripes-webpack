@@ -9,10 +9,7 @@ const buildBaseConfig = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
 const esbuildLoaderRule = require('./webpack/esbuild-loader-rule');
 const { getModulesPaths, getStripesModulesPaths, getTranspiledModules } = require('./webpack/module-paths');
-const { processShared } = require('./webpack/utils');
-const { ModuleFederationPlugin } = require('@module-federation/enhanced/webpack');
-const { getHostAppSingletons } = require('./consts');
-const { StripesInjectedMFRuntimePlugin } = require('./webpack/stripes-injected-mf-runtime-plugin');
+const { addHostMFConfig } = require('./module-federation-config');
 
 const buildConfig = (stripesConfig, options = {}) => {
   const modulePaths = getModulesPaths(stripesConfig.modules);
@@ -60,22 +57,7 @@ const buildConfig = (stripesConfig, options = {}) => {
 
   // build platform with Module Federation if --federate flag is passed
   if (options.federate) {
-    const singletons = getHostAppSingletons();
-    const shared = processShared(singletons, { singleton: true, eager: true });
-    prodConfig.plugins.push(
-      new ModuleFederationPlugin({
-        experiments: {
-          provideExternalRuntime: true,
-          optimization: {
-            target: 'web',
-          }
-        },
-        name: 'host',
-        shared,
-        shareStrategy: 'loaded-first',
-        runtimePlugins: [StripesInjectedMFRuntimePlugin()],
-      })
-    );
+    prodConfig = addHostMFConfig(prodConfig);
   } else {
     prodConfig.optimization = {
       mangleWasmImports: false,

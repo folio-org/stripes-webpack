@@ -9,9 +9,7 @@ const esbuildLoaderRule = require('./webpack/esbuild-loader-rule');
 const utils = require('./webpack/utils');
 const buildBaseConfig = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
-const { getHostAppSingletons } = require('./consts');
-const { ModuleFederationPlugin } = require('@module-federation/enhanced/webpack');
-const { processShared } = require('./webpack/utils');
+const { addHostMFConfig } = require('./module-federation-config');
 
 const useBrowserMocha = () => {
   return tryResolve('mocha/mocha-es2018.js') ? 'mocha/mocha-es2018.js' : 'mocha';
@@ -23,7 +21,7 @@ const buildConfig = (stripesConfig) => {
   const allModulePaths = [...stripesModulePaths, ...modulePaths];
 
   const base = buildBaseConfig(allModulePaths);
-  const devConfig = Object.assign({}, base, cli, {
+  let devConfig = Object.assign({}, base, cli, {
     name: 'development',
     devtool: 'inline-source-map',
     mode: 'development',
@@ -65,20 +63,7 @@ const buildConfig = (stripesConfig) => {
   // Enable module federation, setting up the host platform to share singletons (react, stripes-core, etc) with remote modules.
   if (stripesConfig.okapi.discoveryUrl) {
     devConfig.cache = false;
-    const hostAppSingletons = getHostAppSingletons();
-    const shared = processShared(hostAppSingletons, { singleton: true, eager: true });
-    devConfig.plugins.push(new ModuleFederationPlugin({
-      experiments: {
-        provideExternalRuntime: true, // mod-fed runtime only lives at host code. Reduces size of remote bundles.
-        optimization: {
-          target: 'web', // further reduces size of remote bundles.
-        }
-      },
-      name: 'host',
-      shared,
-      shareStrategy: 'loaded-first',
-      runtimePlugins: [require.resolve('./webpack/stripes-injected-mf-runtime-plugin')], // requires the path to the plugin.
-    }));
+    devConfig = addHostMFConfig(devConfig);
   }
 
   // This alias avoids a console warning for react-dom patch
