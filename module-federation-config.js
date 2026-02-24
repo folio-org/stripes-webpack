@@ -3,13 +3,6 @@ const { ModuleFederationPlugin } = require('@module-federation/enhanced/webpack'
 const { processShared } = require('./webpack/utils.js');
 const { getHostAppSingletons } = require('./consts.js');
 
-// At runtime, the host app will
-// 1. load the remoteEntry.js script as directed by the module's location.
-// 2. remote entry requires its own set of chunks, determining location of those chunks (publicPath: 'auto' logic).
-// 3. The above are stored in a 'container' (webpack/mod-fed term) - a global variable by the 'name' field.
-//    The host app 'imports' the app via container.get('MainEntry') from the loaded code.
-
-
 // Module federation resolves dependencies at runtime.
 // 'shared' holds a key-value list of modules and versions that are common between
 // the host app and the remote modules.
@@ -17,6 +10,12 @@ const { getHostAppSingletons } = require('./consts.js');
 // dependencies and load the individual chunks accordingly.
 // For dependencies that are configured as singletons, only a single version will be loaded from the host app.
 // If a version is semver incompatible, a console warning will be emitted.
+
+// At runtime, the host app will
+// 1. load the remoteEntry.js script as directed by the module's location.
+// 2. remote entry requires its own set of chunks, determining location of those chunks (publicPath: 'auto' logic).
+// 3. The above are stored in a 'container' (webpack/mod-fed term) - a global variable by the 'name' field.
+//    The host app 'imports' the app via container.get('MainEntry') from the loaded code.
 
 function addHostMFConfig(config) {
   // Get our list of shared singleton dependencies. This comes from the peerDeps of the installed stripes-core package.
