@@ -65,7 +65,6 @@ const HOST_RUNTIME_PLUGIN_NAME = 'stripes-injected-mf-runtime-plugin';
 
 module.exports = {
   defaultDiscoveryUrl,
-  defaultTenant,
   singletons,
   getHostAppSingletons,
   HOST_RUNTIME_PLUGIN_NAME,
