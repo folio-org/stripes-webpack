@@ -12,7 +12,7 @@ const buildConfig = require('../webpack.config.cli.dev');
 const sharedStylesConfig = require('../webpack.config.cli.shared.styles');
 const registryServer = require('./registryServer');
 const federate = require('./federate');
-const { defaultDiscoveryUrl, defaultTenant } = require('../consts');
+const { defaultDiscoveryUrl } = require('../consts');
 
 const cwd = path.resolve();
 const platformModulePath = path.join(cwd, 'node_modules');
@@ -43,13 +43,8 @@ module.exports = function serve(stripesConfig, options) {
 
     // stripes module registry
     if (options.federate) {
-      let discoveryUrl = defaultDiscoveryUrl;
-      let tenant = defaultTenant;
-      if (stripesConfig && stripesConfig.okapi) {
-        const { discoveryUrl: configDiscoveryUrl, tenant: configTenant } = stripesConfig.okapi;
-        discoveryUrl = configDiscoveryUrl;
-        tenant = configTenant;
-      }
+      const { discoveryUrl: configDiscoveryUrl, tenant } = stripesConfig.okapi;
+      let discoveryUrl = configDiscoveryUrl || defaultDiscoveryUrl;
 
       // If the discoveryUrl points to 'localhost', start a local registry for development/debug.
       // For production, discoveryUrl will point to some non-local endpoint and the UI will fetch accordingly.
