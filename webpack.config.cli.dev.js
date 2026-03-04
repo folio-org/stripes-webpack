@@ -21,7 +21,7 @@ const buildConfig = (stripesConfig) => {
   const allModulePaths = [...stripesModulePaths, ...modulePaths];
 
   const base = buildBaseConfig(allModulePaths);
-  let devConfig = Object.assign({}, base, cli, {
+  const devOverrides = {
     name: 'development',
     devtool: 'inline-source-map',
     mode: 'development',
@@ -34,7 +34,8 @@ const buildConfig = (stripesConfig) => {
       appendOnly: true,
       level: 'warn',
     },
-  });
+  };
+  let devConfig = { ...base, ...cli, ...devOverrides };
 
   // Override filename to remove the hash in development due to memory issues (STCOR-296)
   devConfig.output.filename = 'bundle.js';

@@ -16,14 +16,15 @@ const buildConfig = (stripesConfig, options = {}) => {
   const stripesModulePaths = getStripesModulesPaths();
   const allModulePaths = [...stripesModulePaths, ...modulePaths];
   const base = buildBaseConfig(allModulePaths);
-  const prodConfig = Object.assign({}, base, cli, {
+  const prodOverrides = {
     mode: 'production',
     devtool: 'source-map',
     infrastructureLogging: {
       appendOnly: true,
       level: 'warn',
     },
-  });
+  };
+  let prodConfig = { ...base, ...cli, ...prodOverrides };
 
   const splitChunks = {
     // Do not process stripes chunk

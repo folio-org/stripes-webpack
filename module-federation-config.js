@@ -23,7 +23,7 @@ function addHostMFConfig(config) {
   // applied to each dependency.
   const shared = processShared(getHostAppSingletons(), {
     singleton: true, // only one copy loaded
-    eager: true // include in the initial host bundle that loads before any remotes.
+    eager: true, // include in the initial host bundle that loads before any remotes.
   });
 
   config.plugins.push(
@@ -35,9 +35,9 @@ function addHostMFConfig(config) {
         }
       },
       name: 'host',
+      runtimePlugins: [path.resolve(__dirname, 'webpack', './stripes-injected-mf-runtime-plugin')],
       shared,
       shareStrategy: 'loaded-first',
-      runtimePlugins: [path.resolve(__dirname, 'webpack', './stripes-injected-mf-runtime-plugin')],
     }),
   );
 
@@ -53,25 +53,25 @@ function addRemoteMFConfig(config, options) {
   const shared = processShared(getHostAppSingletons(), { singleton: true, eager: false, import: false });
   config.plugins.push(
     new ModuleFederationPlugin({
-      library: { type: 'var', name },
-      name,
-      filename: 'remoteEntry.js',
-      exposes: {
-        './MainEntry': mainEntry,
-      },
-      shared,
       experiments: {
         externalRuntime: true, // remotes use the runtime provided by the host.
         optimization: {
           target: 'web', // further reduce size of the bundle.
         }
       },
-      shareStrategy: 'loaded-first',
+      exposes: {
+        './MainEntry': mainEntry,
+      },
+      filename: 'remoteEntry.js',
+      library: { type: 'var', name },
+      name,
       // runtime plugins of the host are not automatically shared with remotes, so we
       // inject them via another plugin.
       // Without this, the remotes would all have to be rebuilt to pick up changes
       // to runtime plugins. With this, we only have to rebuild the host app.
       runtimePlugins: [path.resolve(__dirname, 'webpack', './remote-runtime-plugin')],
+      shared,
+      shareStrategy: 'loaded-first',
     }));
 
   return config;
