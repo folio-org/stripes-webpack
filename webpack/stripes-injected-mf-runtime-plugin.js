@@ -15,7 +15,7 @@ const StripesInjectedMFRuntimePlugin = () => ({
 
     // Only proceed if there is a host modfed instance, meaning modfed has initialized.
     // these can be viewed in the console with the __FEDERATION__.__INSTANCES__ global variable.
-    const hostInstance = __FEDERATION__.__INSTANCES__[0];
+    const hostInstance = __FEDERATION__.__INSTANCES__?.[0];
     if (!hostInstance) {
       return args;
     }
@@ -23,7 +23,7 @@ const StripesInjectedMFRuntimePlugin = () => ({
     const { origin, shareInfo, pkgName } = args;
 
     // Only proceed if the host app provides a shared module of the same name.
-    const hostShared = hostInstance.options.shared[pkgName][0];
+    const hostShared = hostInstance.options.shared?.[pkgName]?.[0];
 
     if (!hostShared) {
       return args;
