@@ -6,7 +6,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
 
-const { generateStripesAlias, } = require('./webpack/module-paths');
+const { generateStripesAlias } = require('./webpack/module-paths');
 const typescriptLoaderRule = require('./webpack/typescript-loader-rule');
 const { isProduction } = require('./webpack/utils');
 const { getTranspiledCssPaths } = require('./webpack/module-paths');
@@ -65,6 +65,7 @@ const baseConfig = {
     }),
     new webpack.EnvironmentPlugin(['NODE_ENV']),
     new RemoveEmptyScriptsPlugin(),
+    new webpack.ManifestPlugin({ entrypoints: true }),
   ],
   module: {
     rules: [
@@ -130,6 +131,7 @@ const baseConfig = {
     ],
   },
 };
+
 
 const buildConfig = (modulePaths) => {
   const transpiledCssPaths = getTranspiledCssPaths(modulePaths);
