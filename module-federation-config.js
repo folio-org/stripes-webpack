@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require('node:path');
 const { ModuleFederationPlugin } = require('@module-federation/enhanced/webpack');
 const { processShared } = require('./webpack/utils.js');
 const { getHostAppSingletons } = require('./consts.js');

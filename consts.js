@@ -60,11 +60,13 @@ const getHostAppSingletons = () => {
 }
 
 const defaultDiscoveryUrl = 'http://localhost:3001/registry';
+const defaultTenant = 'diku';
 
 const HOST_RUNTIME_PLUGIN_NAME = 'stripes-injected-mf-runtime-plugin';
 
 module.exports = {
   defaultDiscoveryUrl,
+  defaultTenant,
   singletons,
   getHostAppSingletons,
   HOST_RUNTIME_PLUGIN_NAME,

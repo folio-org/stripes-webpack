@@ -32,7 +32,7 @@ const StripesInjectedMFRuntimePlugin = () => ({
     let hostVersion = hostShared.version;
 
     if (!satisfies(hostVersion, shareInfo.shareConfig.requiredVersion)) {
-      if (globalThis.__DEBUG_MISSED_DEPS__.findIndex(s => s.pkgName === pkgName && s.remoteApp === origin.name) === -1) {
+      if (globalThis.__DEBUG_MISSED_DEPS__.some(s => s.pkgName === pkgName && s.remoteApp === origin.name)) {
         globalThis.__DEBUG_MISSED_DEPS__.push({ pkgName, hostVersion: hostVersion, remoteApp: origin.name, ...shareInfo });
       }
     }
