@@ -59,6 +59,9 @@ const buildConfig = (stripesConfig, options = {}) => {
   // build platform with Module Federation if --federate flag is passed
   if (options.federate) {
     prodConfig = addHostMFConfig(prodConfig);
+    prodConfig.optimization = {
+      concatenateModules: false,
+    };
   } else {
     prodConfig.optimization = {
       mangleWasmImports: false,
