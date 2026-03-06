@@ -45,6 +45,11 @@ module.exports = function serve(stripesConfig, options) {
     if (options.federate) {
       const { discoveryUrl: configDiscoveryUrl, tenant } = stripesConfig.okapi;
       let discoveryUrl = configDiscoveryUrl || defaultDiscoveryUrl;
+      // since we purposefully used the --federate flag, if there isn't a discoveryUrl specified in our stripes-config, inject
+      // the default discoveryUrl.
+      if (!configDiscoveryUrl) {
+        stripesConfig.okapi.discoveryUrl = defaultDiscoveryUrl;
+      }
 
       // If the discoveryUrl points to 'localhost', start a local registry for development/debug.
       // For production, discoveryUrl will point to some non-local endpoint and the UI will fetch accordingly.
