@@ -90,6 +90,7 @@ const buildConfig = (metadata, options) => {
               options: {
                 modules: {
                   localIdentName: '[local]---[hash:base64:5]',
+                  localIdentHashSalt: name,
                 },
                 sourceMap: true,
                 importLoaders: 1,
