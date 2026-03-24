@@ -56,24 +56,24 @@ const buildConfig = (stripesConfig, options = {}) => {
     }),
   ]);
 
-  // build platform with Module Federation if --federate flag is passed
-  if (options.federate) {
-    prodConfig = addHostMFConfig(prodConfig);
-    prodConfig.optimization = {
-      concatenateModules: false,
-    };
-  } else {
-    prodConfig.optimization = {
-      mangleWasmImports: false,
-      minimizer: [
-        new EsbuildPlugin({
-          css: true,
-        }),
-      ],
-      splitChunks,
-    }
+  prodConfig.optimization = {
+    mangleWasmImports: false,
+    minimizer: [
+      new EsbuildPlugin({
+        css: true,
+      }),
+    ],
+    splitChunks,
   }
 
+  // build platform with Module Federation if --federate flag is passed
+  if (options.federate) {
+    prodConfig.optimization = {
+      concatenateModules: false,
+      ...prodConfig.optimization,
+    };
+    prodConfig = addHostMFConfig(prodConfig);
+  }
 
   prodConfig.module.rules.push(esbuildLoaderRule(allModulePaths));
 
