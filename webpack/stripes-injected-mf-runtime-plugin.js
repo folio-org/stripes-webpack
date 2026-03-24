@@ -1,7 +1,7 @@
 
 // This file can be used to attach lifecycle hooks to the module federation runtime logic.
 // See https://module-federation.io/guide/runtime/runtime-hooks.html for possible entries.
-import satisfies from 'semver/functions/satisfies';
+import satisfies from 'semver/functions/satisfies.js';
 import { HOST_RUNTIME_PLUGIN_NAME } from '../consts.js';
 
 const StripesInjectedMFRuntimePlugin = () => ({
@@ -32,7 +32,7 @@ const StripesInjectedMFRuntimePlugin = () => ({
     let hostVersion = hostShared.version;
 
     if (!satisfies(hostVersion, shareInfo.shareConfig.requiredVersion)) {
-      if (globalThis.__DEBUG_MISSED_DEPS__.some(s => s.pkgName === pkgName && s.remoteApp === origin.name)) {
+      if (!globalThis.__DEBUG_MISSED_DEPS__.some(s => s.pkgName === pkgName && s.remoteApp === origin.name)) {
         globalThis.__DEBUG_MISSED_DEPS__.push({ pkgName, hostVersion: hostVersion, remoteApp: origin.name, ...shareInfo });
       }
     }
