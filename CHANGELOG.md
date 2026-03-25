@@ -9,6 +9,7 @@
 * Adjust `StripesTranslationsPlugin` for working at the module level and including translations from `stripesDeps`. Refs STRIPES-861.
 * Implement module federation functionality for building and serving remote modules. Refs STRIPES-861.
 * Generate an asset manifest for the build. Refs STRWEB-144.
+* Upgrade serialize-javascript from 6 (EOL) to 7. Refs STRWEB-148.
 
 ## [6.0.0](https://github.com/folio-org/stripes-webpack/tree/v6.0.0) (2025-02-24)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v5.2.0...v6.0.0)
