@@ -78,6 +78,12 @@ const buildConfig = (metadata, options) => {
               options: {
                 modules: {
                   localIdentName: '[local]---[hash:base64:5]',
+                  // A hash salt based on the module name prevents
+                  // classname/style collisions between modules for common
+                  // shared dependencies like any of the stripes-* libraries.
+                  // This is not required in the monolithic builds since style duplication
+                  // is less of a problem there.
+                  localIdentHashSalt: name,
                 },
                 sourceMap: true,
                 importLoaders: 1,
