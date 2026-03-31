@@ -14,22 +14,30 @@ const enabledModules = {
   '@folio/developer': {},
 };
 const icons = [
-  { name: 'one',
+  {
+    name: 'one',
     alt: 'alt for one',
     fileName: 'oneFile',
-    title: 'a title for one' },
-  { name: 'two',
+    title: 'a title for one'
+  },
+  {
+    name: 'two',
     alt: 'alt for two',
     fileName: 'twoFile',
-    title: 'a title for two' },
+    title: 'a title for two'
+  },
 ];
 const welcomePageEntries = [
-  { iconName: 'one',
+  {
+    iconName: 'one',
     headline: 'welcome headline',
-    description: 'welcome description' },
-  { iconName: 'two',
+    description: 'welcome description'
+  },
+  {
+    iconName: 'two',
     headline: 'another welcome headline',
-    description: 'another welcome description' },
+    description: 'another welcome description'
+  },
 ];
 let mockPackageJson;
 
@@ -74,9 +82,9 @@ describe('The stripes-module-parser', function () {
       this.sut.modulePath = '/path/to/module';
     });
 
-    describe('parseStripesConfig', function () {
+    describe('extractConfig', function () {
       it('returns a parsed config', function () {
-        const result = this.sut.parseStripesConfig('@folio/users', this.packageJson);
+        const result = this.sut.extractConfig('@folio/users', this.packageJson);
         expect(result).to.be.an('object').with.keys(
           'module', 'getModule', 'description', 'version', 'displayName', 'route', 'welcomePageEntries',
         );
@@ -84,22 +92,23 @@ describe('The stripes-module-parser', function () {
 
       it('applies overrides from tenant config', function () {
         this.sut.overrideConfig = { displayName: 'something else' };
-        const result = this.sut.parseStripesConfig('@folio/users', this.packageJson);
+        const result = this.sut.extractConfig('@folio/users', this.packageJson);
         expect(result.displayName).to.equal('something else');
       });
 
       it('assigns getModule function', function () {
-        const result = this.sut.parseStripesConfig('@folio/users', this.packageJson);
+        const result = this.sut.extractConfig('@folio/users', this.packageJson);
         expect(result.getModule).to.be.a('function');
       });
     });
 
-    describe('parseStripesMetadata', function () {
+    describe('extractMetadata', function () {
       it('returns metadata', function () {
-        const result = this.sut.parseStripesMetadata(this.packageJson);
+        const result = this.sut.extractMetadata(this.packageJson);
         expect(result).to.be.an('object').with.keys(
           'name', 'version', 'description', 'license', 'feedback', 'type', 'shortTitle', 'fullTitle',
           'defaultPopoverSize', 'defaultPreviewWidth', 'helpPage', 'icons', 'welcomePageEntries',
+          'subscribesTo',
         );
       });
     });
@@ -150,9 +159,11 @@ describe('The stripes-module-parser', function () {
 
       it('falls back to icon.name when icon.fileName is not specified', function () {
         const iconsNoFileName = [
-          { name: 'one',
+          {
+            name: 'one',
             alt: 'alt for one',
-            title: 'a title for one' },
+            title: 'a title for one'
+          },
         ];
         const result = this.sut.getIconMetadata(iconsNoFileName);
         expect(result.one).to.include({

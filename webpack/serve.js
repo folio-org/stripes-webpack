@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const path = require('path');
 const express = require('express');
+const cors = require('cors');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
 const connectHistoryApiFallback = require('connect-history-api-fallback');
@@ -9,6 +10,8 @@ const applyWebpackOverrides = require('./apply-webpack-overrides');
 const logger = require('./logger')();
 const buildConfig = require('../webpack.config.cli.dev');
 const sharedStylesConfig = require('../webpack.config.cli.shared.styles');
+const registryServer = require('./registryServer');
+const federate = require('./federate');
 
 const cwd = path.resolve();
 const platformModulePath = path.join(cwd, 'node_modules');
@@ -16,6 +19,13 @@ const coreModulePath = path.join(__dirname, '..', 'node_modules');
 const serverRoot = path.join(__dirname, '..');
 
 module.exports = function serve(stripesConfig, options) {
+  // serving a locally federated module
+  if (options.federate && options.context.isUiModule) {
+    // override default port 3000 option, as locally federated modules will be on >= 3002...
+    options.port = options.port !== 3000 ? options.port : undefined;
+    return federate(stripesConfig, options);
+  }
+
   if (typeof stripesConfig.okapi !== 'object') throw new Error('Missing Okapi config');
   if (typeof stripesConfig.okapi.url !== 'string') throw new Error('Missing Okapi URL');
   if (stripesConfig.okapi.url.endsWith('/')) throw new Error('Trailing slash in Okapi URL will prevent Stripes from functioning');
@@ -23,6 +33,28 @@ module.exports = function serve(stripesConfig, options) {
   return new Promise((resolve) => {
     logger.log('starting serve...');
     const app = express();
+
+    app.disable("x-powered-by");
+
+    app.use(express.json());
+
+    app.use(cors());
+
+    // stripes module registry
+    if (options.federate && stripesConfig.okapi.discoveryUrl) {
+      const { discoveryUrl, tenant } = stripesConfig.okapi;
+
+      // If the discoveryUrl points to 'localhost', start a local registry for development/debug.
+      // For production, discoveryUrl will point to some non-local endpoint and the UI will fetch accordingly.
+      if (discoveryUrl.includes('localhost')) {
+        try {
+          registryServer.start(discoveryUrl, tenant);
+        }
+        catch (e) {
+          console.error(e)
+        }
+      }
+    }
 
     let config = buildConfig(stripesConfig);
 
@@ -68,7 +100,6 @@ module.exports = function serve(stripesConfig, options) {
     }));
 
     app.use(webpackHotMiddleware(compiler));
-
     app.listen(port, host, (err) => {
       if (err) {
         console.log(err);

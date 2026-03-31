@@ -9,8 +9,12 @@ const buildBaseConfig = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
 const esbuildLoaderRule = require('./webpack/esbuild-loader-rule');
 const { getModulesPaths, getStripesModulesPaths, getTranspiledModules } = require('./webpack/module-paths');
+const { processShared } = require('./webpack/utils');
+const { ModuleFederationPlugin } = require('webpack').container;
+const { getHostAppSingletons } = require('./consts');
 
-const buildConfig = (stripesConfig) => {
+
+const buildConfig = (stripesConfig, options = {}) => {
   const modulePaths = getModulesPaths(stripesConfig.modules);
   const stripesModulePaths = getStripesModulesPaths();
   const allModulePaths = [...stripesModulePaths, ...modulePaths];
@@ -24,6 +28,27 @@ const buildConfig = (stripesConfig) => {
     },
   });
 
+  const splitChunks = {
+    // Do not process stripes chunk
+    chunks: (chunk) => {
+      return chunk.name !== 'stripes';
+    },
+    cacheGroups: {
+      // this cache group will be omitted by minimizer
+      stripes: {
+        // only include already transpiled modules
+        test: (module) => transpiledModulesRegex.test(module.resource),
+        name: 'stripes',
+        chunks: 'all'
+      },
+    },
+  };
+
+  if (options.lazy) {
+    splitChunks.chunks = 'all';
+    splitChunks.cacheGroups = undefined;
+  }
+
   const transpiledModules = getTranspiledModules(allModulePaths);
   const transpiledModulesRegex = new RegExp(transpiledModules.join('|'));
 
@@ -33,6 +58,15 @@ const buildConfig = (stripesConfig) => {
     }),
   ]);
 
+  // build platform with Module Federation if --federate flag is passed
+  if (options.federate) {
+    const singletons = getHostAppSingletons();
+    const shared = processShared(singletons, { singleton: true, eager: true });
+    prodConfig.plugins.push(
+      new ModuleFederationPlugin({ name: 'host', shared })
+    );
+  }
+
   prodConfig.optimization = {
     mangleWasmImports: false,
     minimizer: [
@@ -40,21 +74,7 @@ const buildConfig = (stripesConfig) => {
         css: true,
       }),
     ],
-    splitChunks: {
-      // Do not process stripes chunk
-      chunks: (chunk) => {
-        return chunk.name !== 'stripes';
-      },
-      cacheGroups: {
-        // this cache group will be omitted by minimizer
-        stripes: {
-          // only include already transpiled modules
-          test: (module) => transpiledModulesRegex.test(module.resource),
-          name: 'stripes',
-          chunks: 'all'
-        },
-      },
-    },
+    splitChunks,
   }
 
   prodConfig.module.rules.push(esbuildLoaderRule(allModulePaths));

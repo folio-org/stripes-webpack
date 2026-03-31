@@ -9,7 +9,9 @@ const esbuildLoaderRule = require('./webpack/esbuild-loader-rule');
 const utils = require('./webpack/utils');
 const buildBaseConfig = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
-
+const { getHostAppSingletons } = require('./consts');
+const { ModuleFederationPlugin } = require('webpack').container;
+const { processShared } = require('./webpack/utils');
 
 const useBrowserMocha = () => {
   return tryResolve('mocha/mocha-es2018.js') ? 'mocha/mocha-es2018.js' : 'mocha';
@@ -56,8 +58,15 @@ const buildConfig = (stripesConfig) => {
   if (utils.isDevelopment) {
     devConfig.plugins = devConfig.plugins.concat([
       new webpack.HotModuleReplacementPlugin(),
-      new ReactRefreshWebpackPlugin()
+      new ReactRefreshWebpackPlugin(),
     ]);
+  }
+
+  // Enable module federation, setting up the host platform to share singletons (react, stripes-core, etc) with remote modules.
+  if (stripesConfig.okapi.discoveryUrl) {
+    const hostAppSingletons = getHostAppSingletons();
+    const shared = processShared(hostAppSingletons, { singleton: true, eager: true });
+    devConfig.plugins.push(new ModuleFederationPlugin({ name: 'host', shared }));
   }
 
   // This alias avoids a console warning for react-dom patch
