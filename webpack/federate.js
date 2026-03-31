@@ -7,6 +7,7 @@ const { snakeCase } = require('lodash');
 const buildConfig = require('../webpack.config.federate.remote');
 const { tryResolve } = require('./module-paths');
 const logger = require('./logger')();
+const { defaultDiscoveryUrl } = require('../consts');
 
 // Function to check if a port is free
 function isPortFree(port) {
@@ -33,7 +34,9 @@ async function findFreePort(startPort) {
 
 module.exports = async function federate(stripesConfig, options = {}, callback = () => { }) {
   logger.log('starting federation...');
-  const { discoveryUrl } = stripesConfig.okapi;
+  const { discoveryUrl: configDiscoveryUrl } = stripesConfig.okapi;
+  const discoveryUrl = configDiscoveryUrl || defaultDiscoveryUrl;
+
   const packageJsonPath = tryResolve(path.join(process.cwd(), 'package.json'));
 
   if (!packageJsonPath) {
@@ -81,7 +84,8 @@ module.exports = async function federate(stripesConfig, options = {}, callback =
       method: 'POST',
       headers: requestHeader,
       body: JSON.stringify(metadata),
-    })
+    });
+    console.log(`Module registered with local discovery at ${discoveryUrl}`);
   } catch (err) {
     console.error(`Local discovery not found for module registration. Please check ${discoveryUrl}:${err}`);
     process.exit();
