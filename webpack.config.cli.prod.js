@@ -9,24 +9,22 @@ const buildBaseConfig = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
 const esbuildLoaderRule = require('./webpack/esbuild-loader-rule');
 const { getModulesPaths, getStripesModulesPaths, getTranspiledModules } = require('./webpack/module-paths');
-const { processShared } = require('./webpack/utils');
-const { ModuleFederationPlugin } = require('webpack').container;
-const { getHostAppSingletons } = require('./consts');
-
+const { addHostMFConfig } = require('./module-federation-config');
 
 const buildConfig = (stripesConfig, options = {}) => {
   const modulePaths = getModulesPaths(stripesConfig.modules);
   const stripesModulePaths = getStripesModulesPaths();
   const allModulePaths = [...stripesModulePaths, ...modulePaths];
   const base = buildBaseConfig(allModulePaths);
-  const prodConfig = Object.assign({}, base, cli, {
+  const prodOverrides = {
     mode: 'production',
     devtool: 'source-map',
     infrastructureLogging: {
       appendOnly: true,
       level: 'warn',
     },
-  });
+  };
+  let prodConfig = { ...base, ...cli, ...prodOverrides };
 
   const splitChunks = {
     // Do not process stripes chunk
@@ -58,15 +56,6 @@ const buildConfig = (stripesConfig, options = {}) => {
     }),
   ]);
 
-  // build platform with Module Federation if --federate flag is passed
-  if (options.federate) {
-    const singletons = getHostAppSingletons();
-    const shared = processShared(singletons, { singleton: true, eager: true });
-    prodConfig.plugins.push(
-      new ModuleFederationPlugin({ name: 'host', shared })
-    );
-  }
-
   prodConfig.optimization = {
     mangleWasmImports: false,
     minimizer: [
@@ -75,6 +64,15 @@ const buildConfig = (stripesConfig, options = {}) => {
       }),
     ],
     splitChunks,
+  }
+
+  // build platform with Module Federation if --federate flag is passed
+  if (options.federate) {
+    prodConfig.optimization = {
+      concatenateModules: false,
+      ...prodConfig.optimization,
+    };
+    prodConfig = addHostMFConfig(prodConfig);
   }
 
   prodConfig.module.rules.push(esbuildLoaderRule(allModulePaths));
