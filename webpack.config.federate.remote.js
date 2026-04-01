@@ -4,16 +4,14 @@
 // "icons" and "sound" directories, with subfolders are copied to the output folder for a production build.
 
 const path = require('path');
-const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyPlugin = require("copy-webpack-plugin");
 const StripesTranslationsPlugin = require('./webpack/stripes-translations-plugin');
-const { container } = webpack;
-const { processExternals, processShared } = require('./webpack/utils');
+const { processExternals } = require('./webpack/utils');
 const { getStripesModulesPaths } = require('./webpack/module-paths');
 const esbuildLoaderRule = require('./webpack/esbuild-loader-rule');
 const typescriptLoaderRule = require('./webpack/typescript-loader-rule')
-const { getHostAppSingletons } = require('./consts');
+const { addRemoteMFConfig } = require('./module-federation-config');
 
 const buildConfig = (metadata, options) => {
   const { port, name, displayName, main } = metadata;
@@ -28,16 +26,6 @@ const buildConfig = (metadata, options) => {
   // other paths are plural and I'm sticking with that convention.
   const soundsPath = path.join(process.cwd(), 'sound');
 
-  // Module federation resolves dependencies at runtime.
-  // 'shared' holds a key-value list of modules and versions that are common between
-  // the host app and the remote modules.
-  // When a remote ui-module is loaded, module federation runtime will check these
-  // dependencies and load the individual chunks accordingly.
-  // For dependencies that are configured as singletons, only a single version will be loaded from the host app.
-  // If a version is semver incompatible, a console warning will be emitted.
-  const configSingletons = getHostAppSingletons();
-  const shared = processShared(configSingletons, { singleton: true });
-
   // general webpack config.
   // Some noteworthy settings:
   //  publicPath: 'auto' setting will include a bit of runtime logic so that the
@@ -47,7 +35,7 @@ const buildConfig = (metadata, options) => {
   //    and work its way through the module. This file is also 'exposed' via the module-federation
   //    plugin as './MainEntry': mainEntry. When a remote module is loaded, the mod-fed api will
   //    load 'MainEntry' by name, which imports/requires the module.
-  const config = {
+  let config = {
     name,
     mode: options.mode || 'development',
     entry: mainEntry,
@@ -90,6 +78,12 @@ const buildConfig = (metadata, options) => {
               options: {
                 modules: {
                   localIdentName: '[local]---[hash:base64:5]',
+                  // A hash salt based on the module name prevents
+                  // classname/style collisions between modules for common
+                  // shared dependencies like any of the stripes-* libraries.
+                  // This is not required in the monolithic builds since style duplication
+                  // is less of a problem there.
+                  localIdentHashSalt: name,
                 },
                 sourceMap: true,
                 importLoaders: 1,
@@ -134,22 +128,10 @@ const buildConfig = (metadata, options) => {
     plugins: [
       new StripesTranslationsPlugin({ federate: true }),
       new MiniCssExtractPlugin({ filename: 'style.css', ignoreOrder: false }),
-      // At runtime, the host app will
-      // 1. load the remoteEntry.js script as directed by the module's location.
-      // 2. remote entry requires its own set of chunks, determining location of those chunks (publicPath: 'auto' logic).
-      // 3. The above are stored in a 'container' (webpack/mod-fed term) - a global variable by the 'name' field.
-      //    The host app 'imports' the app via container.get('MainEntry') from the loaded code.
-      new container.ModuleFederationPlugin({
-        library: { type: 'var', name },
-        name,
-        filename: 'remoteEntry.js',
-        exposes: {
-          './MainEntry': mainEntry,
-        },
-        shared
-      }),
     ]
   };
+
+  config = addRemoteMFConfig(config, { name, mainEntry });
 
   // for a build/production mode copy sounds and icons to the output folder...
   if (options.mode === 'production') {
@@ -164,9 +146,14 @@ const buildConfig = (metadata, options) => {
   } else {
     // in development mode, setup the devserver...
     config.devtool = 'inline-source-map';
+    // turning off hot reloading and overlay since we're using the dev server for hosting static files rather than actual dev work.
     config.devServer = {
+      hot: false,
       port: port,
       open: false,
+      client: {
+        overlay: false,
+      },
       headers: {
         'Access-Control-Allow-Origin': '*',
       },

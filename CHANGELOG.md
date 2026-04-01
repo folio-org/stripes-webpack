@@ -9,7 +9,8 @@
 * Adjust `StripesTranslationsPlugin` for working at the module level and including translations from `stripesDeps`. Refs STRIPES-861.
 * Implement module federation functionality for building and serving remote modules. Refs STRIPES-861.
 * Generate an asset manifest for the build. Refs STRWEB-144.
-* Commit `yarn.lock` to avoid future supply chain attacks. Refs STRWEB-149.
+* Include a hash salt based on module name for mod-fed ui-module builds. Refs STRWEB-147.
+* Include `yarn.lock` to avoid future supply chain attacks. Refs STRWEB-149.
 
 ## [6.0.0](https://github.com/folio-org/stripes-webpack/tree/v6.0.0) (2025-02-24)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v5.2.0...v6.0.0)
