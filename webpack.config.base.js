@@ -40,6 +40,10 @@ const specificReact = generateStripesAlias('react');
 // Since we are now on the webpack 5 we can make use of dependOn (https://webpack.js.org/configuration/entry-context/#dependencies)
 // in order to create a dependency between stripes config and other chunks:
 
+
+const FAVICON_PATH = './tenant-assets/folio-favicon.png';
+const favicon = fs.existsSync('./tenant-assets/folio-favicon.png') ?? FAVICON_PATH;
+
 const baseConfig = {
   entry: {
     css: ['@folio/stripes-components/lib/global.css', '@folio/stripes-components/lib/variables.css'],
@@ -59,14 +63,6 @@ const baseConfig = {
     },
     extensions: ['.js', '.json', '.ts', '.tsx'],
   },
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: fs.existsSync('index.html') ? 'index.html' : `${__dirname}/index.html`,
-    }),
-    new webpack.EnvironmentPlugin(['NODE_ENV']),
-    new RemoveEmptyScriptsPlugin(),
-    new webpack.ManifestPlugin({ entrypoints: true }),
-  ],
   module: {
     rules: [
       typescriptLoaderRule,
@@ -133,7 +129,7 @@ const baseConfig = {
 };
 
 
-const buildConfig = (modulePaths) => {
+const buildConfig = (modulePaths, stripesConfig) => {
   const transpiledCssPaths = getTranspiledCssPaths(modulePaths);
   const cssDistPathRegex = /dist[\/\\]style\.css/;
 
@@ -157,6 +153,20 @@ const buildConfig = (modulePaths) => {
       ],
     });
   }
+
+  if (!fs.existsSync(stripesConfig.branding.favicon.src)) {
+    throw new Error(`The favicon ${stripesConfig.branding.favicon.src} could not be found.`)
+  }
+
+  baseConfig.plugins = [
+    new HtmlWebpackPlugin({
+      template: fs.existsSync('index.html') ? 'index.html' : `${__dirname}/index.html`,
+      favicon: stripesConfig.branding.favicon.src,
+    }),
+    new webpack.EnvironmentPlugin(['NODE_ENV']),
+    new RemoveEmptyScriptsPlugin(),
+    new webpack.ManifestPlugin({ entrypoints: true }),
+  ];
 
   // css files not transpiled yet
   baseConfig.module.rules.push({
