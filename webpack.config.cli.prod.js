@@ -15,7 +15,7 @@ const buildConfig = (stripesConfig, options = {}) => {
   const modulePaths = getModulesPaths(stripesConfig.modules);
   const stripesModulePaths = getStripesModulesPaths();
   const allModulePaths = [...stripesModulePaths, ...modulePaths];
-  const base = buildBaseConfig(allModulePaths);
+  const base = buildBaseConfig(allModulePaths, stripesConfig);
   const prodOverrides = {
     mode: 'production',
     devtool: 'source-map',
