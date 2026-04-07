@@ -1,6 +1,6 @@
 # Change history for stripes-webpack
 
-## 6.1.0 IN PROGRESS
+## 7.0.0 IN PROGRESS
 
 * Unlock `esbuild-loader` from `~3.0.0`, bumping to `^4.2.2`. Refs STRWEB-95.
 * Prune dead code, `stripes.js` and its dep `commander`. Refs STRWEB-134.
