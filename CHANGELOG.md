@@ -12,7 +12,7 @@
 * Include a hash salt based on module name for mod-fed ui-module builds. Refs STRWEB-147.
 * Include `yarn.lock` to avoid future supply chain attacks. Refs STRWEB-149.
 * Omit `favicons-webpack-plugin`, directly forwarding the provided favicon instead. Refs STRWEB-151.
-* *BREAKING* bump `serialize-javascript` to v6 and `engines.node` to v22. Refs STRWEB-148.
+* *BREAKING* bump `serialize-javascript` to v7 and `engines.node` to v22. Refs STRWEB-148.
 
 ## [6.0.0](https://github.com/folio-org/stripes-webpack/tree/v6.0.0) (2025-02-24)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v5.2.0...v6.0.0)
