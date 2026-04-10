@@ -9,6 +9,7 @@ const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
 const { generateStripesAlias } = require('./webpack/module-paths');
 const typescriptLoaderRule = require('./webpack/typescript-loader-rule');
 const { isProduction } = require('./webpack/utils');
+const isTesting = process.env.NODE_ENV === 'test';
 const { getTranspiledCssPaths } = require('./webpack/module-paths');
 
 // React doesn't like being included multiple times as can happen when using
@@ -42,7 +43,6 @@ const specificReact = generateStripesAlias('react');
 
 
 const FAVICON_PATH = './tenant-assets/folio-favicon.png';
-const favicon = fs.existsSync('./tenant-assets/folio-favicon.png') ?? FAVICON_PATH;
 
 const baseConfig = {
   entry: {
@@ -154,14 +154,15 @@ const buildConfig = (modulePaths, stripesConfig) => {
     });
   }
 
-  if (!fs.existsSync(stripesConfig.branding.favicon.src)) {
-    throw new Error(`The favicon ${stripesConfig.branding.favicon.src} could not be found.`)
+  const faviconPath = stripesConfig?.branding?.favicon?.src || FAVICON_PATH;
+  if (!isTesting && !fs.existsSync(faviconPath)) {
+    throw new Error(`The favicon ${faviconPath} could not be found.`)
   }
 
   baseConfig.plugins = [
     new HtmlWebpackPlugin({
       template: fs.existsSync('index.html') ? 'index.html' : `${__dirname}/index.html`,
-      favicon: stripesConfig.branding.favicon.src,
+      favicon: faviconPath,
     }),
     new webpack.EnvironmentPlugin(['NODE_ENV']),
     new RemoveEmptyScriptsPlugin(),
