@@ -7,7 +7,10 @@
     "registry": "https://repository.folio.org/repository/npm-folio/"
   },
   "scripts": {
-    "test": "nyc --reporter=html --report-dir=artifacts/coverage --all mocha --opts ./test/mocha.opts './test/webpack/**/*.js'"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "nyc --reporter=html --report-dir=artifacts/coverage --all mocha --opts ./test/mocha.opts './test/vite/**/*.js'"
   },
   "engines": {
     "node": ">=22.0.0"
@@ -28,54 +31,36 @@
     "@babel/preset-react": "^7.9.0",
     "@babel/preset-typescript": "^7.7.7",
     "@babel/register": "^7.0.0",
-    "@cerner/duplicate-package-checker-webpack-plugin": "~2.1.0",
     "@csstools/postcss-global-data": "^3.0.0",
     "@csstools/postcss-relative-color-syntax": "^3.0.7",
-    "@module-federation/enhanced": "^2.0.0",
-    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.4",
-    "@svgr/webpack": "^8.1.0",
-    "add-asset-html-webpack-plugin": "^6.0.0",
+    "@vitejs/plugin-federation": "^0.4.5",
+    "@vitejs/plugin-react": "^4.2.0",
+    "@vitejs/plugin-basic-ssl": "^1.1.0",
     "autoprefixer": "^10.4.13",
-    "babel-loader": "^9.1.3",
     "buffer": "^6.0.3",
     "connect-history-api-fallback": "^1.3.0",
-    "copy-webpack-plugin": "^14.0.0",
     "core-js": "^3.6.1",
     "cors": "^2.8.5",
-    "css-loader": "^6.4.0",
-    "csv-loader": "^3.0.3",
     "debug": "^4.0.1",
-    "esbuild-loader": "^4.3.0",
     "express": "^4.14.0",
     "handlebars": "^4.7.7",
-    "handlebars-loader": "^1.7.1",
-    "html-webpack-plugin": "^5.3.2",
     "lodash": "^4.17.21",
-    "mini-css-extract-plugin": "^2.7.6",
     "node-object-hash": "^1.2.0",
-    "portfinder": "^1.0.32",
     "postcss": "^8.4.2",
     "postcss-custom-media": "^9.0.1",
     "postcss-import": "^15.0.1",
-    "postcss-loader": "^7.2.4",
     "process": "^0.11.10",
-    "react-refresh": "^0.11.0",
     "regenerator-runtime": "^0.13.3",
     "semver": "^7.1.3",
     "serialize-javascript": "^7.0.5",
-    "source-map-loader": "^4.0.0",
     "stream-browserify": "^3.0.0",
-    "style-loader": "^3.3.0",
-    "tapable": "^1.0.0",
-    "ts-loader": "^9.4.1",
     "typescript": "^5.3.3",
     "util-ex": "^0.3.15",
     "validate-npm-package-name": "^6.0.2",
-    "webpack-dev-middleware": "^5.2.1",
-    "webpack-dev-server": "^5.2.3",
-    "webpack-hot-middleware": "^2.25.1",
-    "webpack-remove-empty-scripts": "^1.0.1",
-    "webpack-virtual-modules": "^0.4.3"
+    "vite": "^5.1.0",
+    "vite-plugin-svgr": "^4.2.0",
+    "vite-plugin-handlebars": "^0.0.16",
+    "vite-plugin-csv": "^1.0.2"
   },
   "devDependencies": {
     "chai": "^4.1.2",
@@ -83,12 +68,11 @@
     "mocha-junit-reporter": "^1.17.0",
     "nyc": "^17.1.0",
     "sinon": "^7.3.2",
-    "sinon-chai": "^3.3.0",
-    "webpack": "^5.58.1"
+    "sinon-chai": "^3.3.0"
   },
   "peerDependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "webpack": "^5.58.1"
+    "vite": "^5.1.0"
   }
 }
