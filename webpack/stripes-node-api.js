@@ -1,5 +1,5 @@
-const build = require('./build');
-const serve = require('./serve');
+const build = require('../vite/build');
+const serve = require('../vite/serve');
 const transpile = require('./transpile');
 
 module.exports = {
