@@ -3,7 +3,10 @@
     "noImplicitAny": true,
     "esModuleInterop": true,
     "jsx": "react",
-    "lib": ["esnext", "dom"],
+    "lib": [
+      "esnext",
+      "dom"
+    ],
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true
@@ -16,7 +19,9 @@
     "../node_modules/@folio/**/*.ts",
     "../node_modules/@folio/**/*.tsx",
     "../../node_modules/@folio/**/*.ts",
-    "../../node_modules/@folio/**/*.tsx"
+    "../../node_modules/@folio/**/*.tsx",
+    "../../../../src/**/*.ts",
+    "../../../../src/**/*.tsx"
   ],
   "exclude": [
     "../../**/*.test.ts",

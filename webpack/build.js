@@ -5,6 +5,7 @@ const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
 const applyWebpackOverrides = require('./apply-webpack-overrides');
 const logger = require('./logger')();
 const buildConfig = require('../webpack.config.cli.prod');
+const federate = require('./federate');
 const sharedStylesConfig = require('../webpack.config.cli.shared.styles');
 const platformModulePath = path.join(path.resolve(), 'node_modules');
 
@@ -12,12 +13,38 @@ module.exports = function build(stripesConfig, options) {
   return new Promise((resolve, reject) => {
     logger.log('starting build...');
 
-    let config = buildConfig(stripesConfig);
+    const buildCallback = (err, stats) => {
+      if (err) {
+        console.error(err.stack || err);
+        if (err.details) {
+          console.error(err.details);
+        }
+        reject(err);
+      } else {
+        resolve(stats);
+      }
+    };
+
+    if (options.federate) {
+      const contextMessage = options.context.isUiModule ? 'federated remote ui-module' : 'host app for federated platform';
+      console.log(`Building ${contextMessage}.`);
+      if (options.context.isUiModule) {
+        // the federate function handles federation-specific bundling for ui-modules apart from
+        // the host app, including module-level translations and handling of shared dependencies.
+        return federate(
+          stripesConfig,
+          { ...options, build: true, mode: 'production' },
+          buildCallback);
+      }
+    }
+
+    let config;
+    config = buildConfig(stripesConfig, options);
 
     config = sharedStylesConfig(config, {});
 
     if (!options.skipStripesBuild) {
-      config.plugins.push(new StripesWebpackPlugin({ stripesConfig, createDll: options.createDll }));
+      config.plugins.push(new StripesWebpackPlugin({ stripesConfig, createDll: options.createDll, lazy: options.lazy }));
     }
 
     config.resolve.modules = ['node_modules', platformModulePath];
@@ -73,16 +100,6 @@ module.exports = function build(stripesConfig, options) {
 
     logger.log('assign final webpack config', config);
 
-    webpack(config, (err, stats) => {
-      if (err) {
-        console.error(err.stack || err);
-        if (err.details) {
-          console.error(err.details);
-        }
-        reject(err);
-      } else {
-        resolve(stats);
-      }
-    });
+    webpack(config, buildCallback);
   });
 };

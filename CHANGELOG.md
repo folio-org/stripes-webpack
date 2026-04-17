@@ -1,5 +1,16 @@
 # Change history for stripes-webpack
 
+## 6.1.0 In-Progress
+* Prune dead code, `stripes.js` and its dep `commander`. Refs STRWEB-134.
+* Provide `getDynamicModule`, returning a module via `import()`. Refs STRWEB-137.
+* Add `subscribesTo` field to module metadata. Refs STRWEB-143.
+* Adjust `StripesTranslationsPlugin` for working at the module level and including translations from `stripesDeps`. Refs STRIPES-861.
+* Implement module federation functionality for building and serving remote modules. Refs STRIPES-861.
+* Generate an asset manifest for the build. Refs STRWEB-144.
+* Include a hash salt based on module name for mod-fed ui-module builds. Refs STRWEB-147.
+* Include `yarn.lock` to avoid future supply chain attacks. Refs STRWEB-149.
+* Omit `favicons-webpack-plugin`, directly forwarding the provided favicon instead. Refs STRWEB-151.
+
 ## [6.0.1](https://github.com/folio-org/stripes-webpack/tree/v6.0.1) (2025-03-11)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v6.0.0...v6.0.1)
 

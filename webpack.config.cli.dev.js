@@ -9,7 +9,7 @@ const esbuildLoaderRule = require('./webpack/esbuild-loader-rule');
 const utils = require('./webpack/utils');
 const buildBaseConfig = require('./webpack.config.base');
 const cli = require('./webpack.config.cli');
-
+const { addHostMFConfig } = require('./module-federation-config');
 
 const useBrowserMocha = () => {
   return tryResolve('mocha/mocha-es2018.js') ? 'mocha/mocha-es2018.js' : 'mocha';
@@ -20,8 +20,8 @@ const buildConfig = (stripesConfig) => {
   const stripesModulePaths = getStripesModulesPaths();
   const allModulePaths = [...stripesModulePaths, ...modulePaths];
 
-  const base = buildBaseConfig(allModulePaths);
-  const devConfig = Object.assign({}, base, cli, {
+  const base = buildBaseConfig(allModulePaths, stripesConfig);
+  const devOverrides = {
     name: 'development',
     devtool: 'inline-source-map',
     mode: 'development',
@@ -34,7 +34,8 @@ const buildConfig = (stripesConfig) => {
       appendOnly: true,
       level: 'warn',
     },
-  });
+  };
+  let devConfig = { ...base, ...cli, ...devOverrides };
 
   // Override filename to remove the hash in development due to memory issues (STCOR-296)
   devConfig.output.filename = 'bundle.js';
@@ -56,8 +57,14 @@ const buildConfig = (stripesConfig) => {
   if (utils.isDevelopment) {
     devConfig.plugins = devConfig.plugins.concat([
       new webpack.HotModuleReplacementPlugin(),
-      new ReactRefreshWebpackPlugin()
+      new ReactRefreshWebpackPlugin(),
     ]);
+  }
+
+  // Enable module federation, setting up the host platform to share singletons (react, stripes-core, etc) with remote modules.
+  if (stripesConfig.okapi.discoveryUrl) {
+    devConfig.cache = false;
+    devConfig = addHostMFConfig(devConfig);
   }
 
   // This alias avoids a console warning for react-dom patch

@@ -9,6 +9,7 @@ const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
 const { generateStripesAlias } = require('./webpack/module-paths');
 const typescriptLoaderRule = require('./webpack/typescript-loader-rule');
 const { isProduction } = require('./webpack/utils');
+const isTesting = process.env.NODE_ENV === 'test';
 const { getTranspiledCssPaths } = require('./webpack/module-paths');
 
 // React doesn't like being included multiple times as can happen when using
@@ -40,6 +41,9 @@ const specificReact = generateStripesAlias('react');
 // Since we are now on the webpack 5 we can make use of dependOn (https://webpack.js.org/configuration/entry-context/#dependencies)
 // in order to create a dependency between stripes config and other chunks:
 
+
+const FAVICON_PATH = './tenant-assets/folio-favicon.png';
+
 const baseConfig = {
   entry: {
     css: ['@folio/stripes-components/lib/global.css', '@folio/stripes-components/lib/variables.css'],
@@ -59,13 +63,6 @@ const baseConfig = {
     },
     extensions: ['.js', '.json', '.ts', '.tsx'],
   },
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: fs.existsSync('index.html') ? 'index.html' : `${__dirname}/index.html`,
-    }),
-    new webpack.EnvironmentPlugin(['NODE_ENV']),
-    new RemoveEmptyScriptsPlugin(),
-  ],
   module: {
     rules: [
       typescriptLoaderRule,
@@ -132,7 +129,7 @@ const baseConfig = {
 };
 
 
-const buildConfig = (modulePaths) => {
+const buildConfig = (modulePaths, stripesConfig) => {
   const transpiledCssPaths = getTranspiledCssPaths(modulePaths);
   const cssDistPathRegex = /dist[\/\\]style\.css/;
 
@@ -157,12 +154,27 @@ const buildConfig = (modulePaths) => {
     });
   }
 
+  const faviconPath = stripesConfig?.branding?.favicon?.src || FAVICON_PATH;
+  if (!isTesting && !fs.existsSync(faviconPath)) {
+    throw new Error(`The favicon ${faviconPath} could not be found.`)
+  }
+
+  baseConfig.plugins = [
+    new HtmlWebpackPlugin({
+      template: fs.existsSync('index.html') ? 'index.html' : `${__dirname}/index.html`,
+      favicon: faviconPath,
+    }),
+    new webpack.EnvironmentPlugin(['NODE_ENV']),
+    new RemoveEmptyScriptsPlugin(),
+    new webpack.ManifestPlugin({ entrypoints: true }),
+  ];
+
   // css files not transpiled yet
   baseConfig.module.rules.push({
     test: /\.css$/,
     exclude: [cssDistPathRegex],
     use: [
-      { loader: isProduction ? MiniCssExtractPlugin.loader : 'style-loader'  },
+      { loader: isProduction ? MiniCssExtractPlugin.loader : 'style-loader' },
       {
         loader: 'css-loader',
         options: {
