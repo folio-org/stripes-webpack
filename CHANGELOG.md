@@ -1,5 +1,9 @@
 # Change history for stripes-webpack
 
+## IN PROGRESS
+
+* Supply Personal Data Disclosure form. Refs STRWEB-136.
+
 ## 7.0.0 IN PROGRESS
 
 * Unlock `esbuild-loader` from `~3.0.0`, bumping to `^4.2.2`. Refs STRWEB-95.
