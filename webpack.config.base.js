@@ -10,6 +10,7 @@ const { generateStripesAlias } = require('./webpack/module-paths');
 const typescriptLoaderRule = require('./webpack/typescript-loader-rule');
 const { isProduction } = require('./webpack/utils');
 const { getTranspiledCssPaths } = require('./webpack/module-paths');
+const defaultBranding = require('./default-assets/branding');
 
 // React doesn't like being included multiple times as can happen when using
 // yarn link. Here we find a more specific path to it by first looking in
@@ -51,7 +52,10 @@ const resolveFaviconPath = (stripesConfig) => {
     }
     return configured;
   }
-  return fs.existsSync(FAVICON_PATH) ? FAVICON_PATH : undefined;
+  if (fs.existsSync(FAVICON_PATH)) {
+    return FAVICON_PATH;
+  }
+  return defaultBranding.favicon.src;
 };
 
 const baseConfig = {
