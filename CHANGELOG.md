@@ -3,6 +3,7 @@
 ## IN PROGRESS
 
 * Supply Personal Data Disclosure form. Refs STRWEB-136.
+* Gracefully handle a missing favicon. Refs STRWEB-156.
 
 ## 7.0.0 IN PROGRESS
 

@@ -9,8 +9,8 @@ const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
 const { generateStripesAlias } = require('./webpack/module-paths');
 const typescriptLoaderRule = require('./webpack/typescript-loader-rule');
 const { isProduction } = require('./webpack/utils');
-const isTesting = process.env.NODE_ENV === 'test';
 const { getTranspiledCssPaths } = require('./webpack/module-paths');
+const defaultBranding = require('./default-assets/branding');
 
 // React doesn't like being included multiple times as can happen when using
 // yarn link. Here we find a more specific path to it by first looking in
@@ -43,6 +43,20 @@ const specificReact = generateStripesAlias('react');
 
 
 const FAVICON_PATH = './tenant-assets/folio-favicon.png';
+
+const resolveFaviconPath = (stripesConfig) => {
+  const configured = stripesConfig?.branding?.favicon?.src;
+  if (configured) {
+    if (!fs.existsSync(configured)) {
+      throw new Error(`The favicon ${configured} could not be found.`);
+    }
+    return configured;
+  }
+  if (fs.existsSync(FAVICON_PATH)) {
+    return FAVICON_PATH;
+  }
+  return defaultBranding.favicon.src;
+};
 
 const baseConfig = {
   entry: {
@@ -154,15 +168,10 @@ const buildConfig = (modulePaths, stripesConfig) => {
     });
   }
 
-  const faviconPath = stripesConfig?.branding?.favicon?.src || FAVICON_PATH;
-  if (!isTesting && !fs.existsSync(faviconPath)) {
-    throw new Error(`The favicon ${faviconPath} could not be found.`)
-  }
-
   baseConfig.plugins = [
     new HtmlWebpackPlugin({
       template: fs.existsSync('index.html') ? 'index.html' : `${__dirname}/index.html`,
-      favicon: faviconPath,
+      favicon: resolveFaviconPath(stripesConfig),
     }),
     new webpack.EnvironmentPlugin(['NODE_ENV']),
     new RemoveEmptyScriptsPlugin(),
