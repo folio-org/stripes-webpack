@@ -25,15 +25,21 @@ module.exports = function build(stripesConfig, options) {
       }
     };
 
-    let config;
-    if (options.context.isUiModule && options.federate) {
-      return federate(
-        stripesConfig,
-        { ...options, build: true, mode: 'production' },
-        buildCallback);
-    } else {
-      config = buildConfig(stripesConfig, options)
+    if (options.federate) {
+      const contextMessage = options.context.isUiModule ? 'federated remote ui-module' : 'host app for federated platform';
+      console.log(`Building ${contextMessage}.`);
+      if (options.context.isUiModule) {
+        // the federate function handles federation-specific bundling for ui-modules apart from
+        // the host app, including module-level translations and handling of shared dependencies.
+        return federate(
+          stripesConfig,
+          { ...options, build: true, mode: 'production' },
+          buildCallback);
+      }
     }
+
+    let config;
+    config = buildConfig(stripesConfig, options);
 
     config = sharedStylesConfig(config, {});
 
