@@ -47,10 +47,10 @@ const FAVICON_PATH = './tenant-assets/folio-favicon.png';
 const resolveFaviconPath = (stripesConfig) => {
   const configured = stripesConfig?.branding?.favicon?.src;
   if (configured) {
-    if (!fs.existsSync(configured)) {
-      throw new Error(`The favicon ${configured} could not be found.`);
+    if (fs.existsSync(configured)) {
+      return configured;
     }
-    return configured;
+    throw new Error(`The favicon ${configured} could not be found.`);
   }
   if (fs.existsSync(FAVICON_PATH)) {
     return FAVICON_PATH;
