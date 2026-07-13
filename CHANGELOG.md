@@ -5,6 +5,7 @@
 * Supply Personal Data Disclosure form. Refs STRWEB-136.
 * Gracefully handle a missing favicon. Refs STRWEB-156.
 * Exclude consumer test files from type checking. Refs STRWEB-158.
+* Mitigate missing module messaging. Refs STRWEB-112.
 
 ## 7.0.0 IN PROGRESS
 
