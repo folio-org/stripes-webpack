@@ -75,7 +75,7 @@ class StripesModuleParser {
   loadModulePackageJson(context, aliases) {
     const packageJsonFile = modulePaths.locateStripesModule(context, this.moduleName, aliases, 'package.json');
     if (!packageJsonFile) {
-      throw new StripesBuildError(`StripesModuleParser: Unable to locate ${this.moduleName}'s package.json`);
+      throw new StripesBuildError(`StripesModuleParser: Unable to locate ${this.moduleName}'s package.json. Most likely, ${this.moduleName} is listed in 'stripes.config.js' but was not installed because it is missing in 'package.json'.`);
     }
     this.modulePath = packageJsonFile.replace('package.json', '');
     // eslint-disable-next-line global-require,import/no-dynamic-require
