@@ -61,6 +61,7 @@ const buildConfig = (stripesConfig, options = {}) => {
     minimizer: [
       new EsbuildPlugin({
         css: true,
+        minify: Boolean(options.minify)
       }),
     ],
     splitChunks,
