@@ -5,22 +5,24 @@
 const DuplicatePackageCheckerPlugin = require('@cerner/duplicate-package-checker-webpack-plugin');
 
 // Module names that must not have duplicates
-const duplicatesNotAllowed = [
+const duplicatesNotAllowed = new Set([
   'react',
   'react-dom',
   'react-intl',
   'react-router',
   'react-router-dom',
   'rxjs',
-  'stripes',
-  'stripes-core',
-  'stripes-ui',
-  'stripes-components',
-  'stripes-connect',
-  'stripes-final-form',
-  'stripes-form',
-  'stripes-smart-components',
-];
+  '@folio/stripes',
+  '@folio/stripes-components',
+  '@folio/stripes-connect',
+  '@folio/stripes-core',
+  '@folio/stripes-final-form',
+  '@folio/stripes-form',
+  '@folio/stripes-smart-components',
+  '@folio/stripes-types',
+  '@folio/stripes-ui',
+  '@folio/stripes-util',
+]);
 
 module.exports = class StripesDuplicatePlugin {
   constructor(options) {
@@ -33,10 +35,9 @@ module.exports = class StripesDuplicatePlugin {
       new DuplicatePackageCheckerPlugin().apply(compiler);
     }
 
-
     // This will error when duplicates of specific modules are found
     new DuplicatePackageCheckerPlugin({
-      exclude: instance => !duplicatesNotAllowed.includes(instance.name),
+      exclude: instance => !duplicatesNotAllowed.has(instance.name),
       verbose: true,
       emitError: true,
     }).apply(compiler);
