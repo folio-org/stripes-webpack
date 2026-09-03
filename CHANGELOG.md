@@ -7,6 +7,7 @@
 * Exclude consumer test files from type checking. Refs STRWEB-158.
 * Mitigate missing module messaging. Refs STRWEB-112.
 * Upgrade `@module-federation/enhanced` from ^2.0.0 to ^2.8.1 removing `axios`. Refs STRWEB-159.
+* Forward `options.minify` through to EsbuildPlugin. Refs STRWEB-161.
 * Use scoped package-names when checking for duplicates. Refs STRWEB-64.
 
 ## 7.0.0 IN PROGRESS
