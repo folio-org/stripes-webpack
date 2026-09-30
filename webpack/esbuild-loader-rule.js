@@ -1,6 +1,6 @@
 const path = require('path');
 
-const babelOptions = require('./babel-options');
+// const babelOptions = require('./babel-options');
 const {
   getNonTranspiledModules,
   getTranspiledModules,
@@ -80,33 +80,14 @@ module.exports = (modulePaths) => {
   return {
     test: /\.js$/,
     include: shouldModuleBeIncluded,
-    oneOf: [
+    use: [
       {
-        // handle all bigtest files and interactor files via babel
-        // due to a decorator format issue.
-        // https://issues.folio.org/browse/STRWEB-78
-        test: filePath => !filePath.match(bigTestRegex),
-        use: [
-          {
-            loader: 'esbuild-loader',
-            options: {
-              loader: 'tsx',
-              jsx: 'automatic',
-            },
-          },
-        ],
+        loader: 'esbuild-loader',
+        options: {
+          loader: 'tsx',
+          jsx: 'automatic',
+        },
       },
-      {
-        use: [
-          {
-            loader: 'babel-loader',
-            options: {
-              cacheDirectory: true,
-              ...babelOptions,
-            },
-          },
-        ],
-      },
-   ],
+    ],
   };
 };
