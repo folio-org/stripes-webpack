@@ -1,6 +1,5 @@
 const path = require('path');
 
-// const babelOptions = require('./babel-options');
 const {
   getNonTranspiledModules,
   getTranspiledModules,
