@@ -1,6 +1,10 @@
-const path = require('path');
-const logger = require('./logger')();
-const StripesBuildError = require('./stripes-build-error');
+import { createRequire } from 'node:module';
+import path from 'path';
+import getLogger from './logger.js';
+const logger = getLogger();
+import StripesBuildError from './stripes-build-error.js';
+
+const require = createRequire(import.meta.url);
 
 function tryResolve(modulePath, options) {
   try {
@@ -16,7 +20,7 @@ function generateStripesAlias(moduleName) {
   let alias;
   const workspaceModule = path.join(path.resolve(), '..', 'node_modules', moduleName);
   const platformModule = path.join(path.resolve(), 'node_modules', moduleName);
-  const coreModule = path.join(__dirname, '..', 'node_modules', moduleName);
+  const coreModule = path.join(import.meta.dirname, '..', 'node_modules', moduleName);
 
   if (tryResolve(workspaceModule)) {
     alias = workspaceModule;
@@ -254,7 +258,7 @@ function getSharedStyles(filename) {
   return path.resolve(generateStripesAlias('@folio/stripes-components'), `${filename}.css`);
 }
 
-module.exports = {
+export {
   tryResolve,
   generateStripesAlias,
   getSharedStyles,

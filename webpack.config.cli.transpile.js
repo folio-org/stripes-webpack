@@ -1,9 +1,9 @@
 // Top level default Webpack configuration used for transpiling individual modules
 // before publishing
-const path = require('path');
-const webpack = require('webpack');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const { EsbuildPlugin } = require('esbuild-loader');
+import path from 'path';
+import webpack from 'webpack';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import { EsbuildPlugin } from 'esbuild-loader';
 
 const config = {
   mode: 'production',
@@ -55,7 +55,7 @@ const config = {
             loader: 'postcss-loader',
             options: {
               postcssOptions: {
-                config: path.resolve(__dirname, 'postcss.config.js'),
+                config: path.resolve(import.meta.dirname, 'postcss.config.js'),
               },
               sourceMap: true,
             },
@@ -96,4 +96,4 @@ config.plugins = [
   new webpack.EnvironmentPlugin(['NODE_ENV']),
 ];
 
-module.exports = config;
+export default config;

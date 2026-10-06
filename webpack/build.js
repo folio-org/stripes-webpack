@@ -1,15 +1,19 @@
-const webpack = require('webpack');
-const path = require('path');
-const StripesWebpackPlugin = require('./stripes-webpack-plugin');
-const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
-const applyWebpackOverrides = require('./apply-webpack-overrides');
-const logger = require('./logger')();
-const buildConfig = require('../webpack.config.cli.prod');
-const federate = require('./federate');
-const sharedStylesConfig = require('../webpack.config.cli.shared.styles');
+import { createRequire } from 'node:module';
+import webpack from 'webpack';
+import path from 'path';
+import StripesWebpackPlugin from './stripes-webpack-plugin.js';
+import AddAssetHtmlPlugin from 'add-asset-html-webpack-plugin';
+import applyWebpackOverrides from './apply-webpack-overrides.js';
+import getLogger from './logger.js';
+const logger = getLogger();
+import buildConfig from '../webpack.config.cli.prod.js';
+import federate from './federate.js';
+import sharedStylesConfig from '../webpack.config.cli.shared.styles.js';
+
+const require = createRequire(import.meta.url);
 const platformModulePath = path.join(path.resolve(), 'node_modules');
 
-module.exports = function build(stripesConfig, options) {
+export default function build(stripesConfig, options) {
   return new Promise((resolve, reject) => {
     logger.log('starting build...');
 

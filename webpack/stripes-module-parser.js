@@ -1,11 +1,15 @@
-const path = require('path');
-const _ = require('lodash');
-const semver = require('semver');
-const validateNpmPackageName = require('validate-npm-package-name');
+import { createRequire } from 'node:module';
+import path from 'path';
+import _ from 'lodash';
+import semver from 'semver';
+import validateNpmPackageName from 'validate-npm-package-name';
 
-const modulePaths = require('./module-paths');
-const StripesBuildError = require('./stripes-build-error');
-const logger = require('./logger')('stripesModuleParser');
+import * as modulePaths from './module-paths.js';
+import StripesBuildError from './stripes-build-error.js';
+import getLogger from './logger.js';
+
+const require = createRequire(import.meta.url);
+const logger = getLogger('stripesModuleParser');
 
 // These config keys do not get exported with type-specific config
 const TOP_LEVEL_ONLY = ['permissions', 'icons', 'permissionSets', 'actsAs', 'type', 'hasSettings'];
@@ -322,7 +326,7 @@ function parseAllModules(enabledModules, context, aliases, lazy = false) {
   };
 }
 
-module.exports = {
+export {
   StripesModuleParser,
   parseAllModules,
 };

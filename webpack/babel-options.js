@@ -1,6 +1,6 @@
-const utils = require('./utils');
+import * as utils from './utils.js';
 
-module.exports = {
+export default {
   presets: [
     ['@babel/preset-env', { targets: '> 0.25%, not dead' }],
     ['@babel/preset-flow', { all: true }],

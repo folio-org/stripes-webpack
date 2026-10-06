@@ -1,25 +1,26 @@
-const webpack = require('webpack');
-const path = require('path');
-const express = require('express');
-const cors = require('cors');
-const webpackDevMiddleware = require('webpack-dev-middleware');
-const webpackHotMiddleware = require('webpack-hot-middleware');
-const connectHistoryApiFallback = require('connect-history-api-fallback');
-const StripesWebpackPlugin = require('./stripes-webpack-plugin');
-const applyWebpackOverrides = require('./apply-webpack-overrides');
-const logger = require('./logger')();
-const buildConfig = require('../webpack.config.cli.dev');
-const sharedStylesConfig = require('../webpack.config.cli.shared.styles');
-const registryServer = require('./registryServer');
-const federate = require('./federate');
-const { defaultDiscoveryUrl } = require('../consts');
+import webpack from 'webpack';
+import path from 'path';
+import express from 'express';
+import cors from 'cors';
+import webpackDevMiddleware from 'webpack-dev-middleware';
+import webpackHotMiddleware from 'webpack-hot-middleware';
+import connectHistoryApiFallback from 'connect-history-api-fallback';
+import StripesWebpackPlugin from './stripes-webpack-plugin.js';
+import applyWebpackOverrides from './apply-webpack-overrides.js';
+import getLogger from './logger.js';
+const logger = getLogger();
+import buildConfig from '../webpack.config.cli.dev.js';
+import sharedStylesConfig from '../webpack.config.cli.shared.styles.js';
+import registryServer from './registryServer.js';
+import federate from './federate.js';
+import { defaultDiscoveryUrl } from '../consts.js';
 
 const cwd = path.resolve();
 const platformModulePath = path.join(cwd, 'node_modules');
-const coreModulePath = path.join(__dirname, '..', 'node_modules');
-const serverRoot = path.join(__dirname, '..');
+const coreModulePath = path.join(import.meta.dirname, '..', 'node_modules');
+const serverRoot = path.join(import.meta.dirname, '..');
 
-module.exports = function serve(stripesConfig, options) {
+export default function serve(stripesConfig, options) {
   // serving a locally federated module
   if (options.federate && options.context.isUiModule) {
     // override default port 3000 option, as locally federated modules will be on >= 3002...

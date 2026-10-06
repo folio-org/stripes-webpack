@@ -1,7 +1,7 @@
-const path = require('node:path');
-const { ModuleFederationPlugin } = require('@module-federation/enhanced/webpack');
-const { processShared } = require('./webpack/utils.js');
-const { getHostAppSingletons } = require('./consts.js');
+import path from 'node:path';
+import { ModuleFederationPlugin } from '@module-federation/enhanced/webpack';
+import { processShared } from './webpack/utils.js';
+import { getHostAppSingletons } from './consts.js';
 
 // Module federation resolves dependencies at runtime.
 // 'shared' holds a key-value list of modules and versions that are common between
@@ -35,7 +35,7 @@ function addHostMFConfig(config) {
         }
       },
       name: 'host',
-      runtimePlugins: [path.resolve(__dirname, 'webpack', './stripes-injected-mf-runtime-plugin')],
+      runtimePlugins: [path.resolve(import.meta.dirname, 'webpack', './stripes-injected-mf-runtime-plugin')],
       shared,
       shareStrategy: 'loaded-first',
     }),
@@ -69,7 +69,7 @@ function addRemoteMFConfig(config, options) {
       // inject them via another plugin.
       // Without this, the remotes would all have to be rebuilt to pick up changes
       // to runtime plugins. With this, we only have to rebuild the host app.
-      runtimePlugins: [path.resolve(__dirname, 'webpack', './remote-runtime-plugin')],
+      runtimePlugins: [path.resolve(import.meta.dirname, 'webpack', './remote-runtime-plugin')],
       shared,
       shareStrategy: 'loaded-first',
     }));
@@ -77,7 +77,7 @@ function addRemoteMFConfig(config, options) {
   return config;
 }
 
-module.exports = {
+export {
   addHostMFConfig,
   addRemoteMFConfig,
 };

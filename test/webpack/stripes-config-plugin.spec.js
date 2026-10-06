@@ -1,12 +1,18 @@
-const expect = require('chai').expect;
+import { jest } from '@jest/globals';
+import { expect } from 'chai';
+import sinon from 'sinon';
 
-const VirtualModulesPlugin = require('webpack-virtual-modules');
-const StripesConfigPlugin = require('../../webpack/stripes-config-plugin');
-const StripesTranslationsPlugin = require('../../webpack/stripes-translations-plugin');
-const StripesBrandingPlugin = require('../../webpack/stripes-branding-plugin');
-const StripesErrorLoggingPlugin = require('../../webpack/stripes-error-logging-plugin');
-const stripesModuleParser = require('../../webpack/stripes-module-parser');
-const stripesSerialize = require('../../webpack/stripes-serialize');
+import VirtualModulesPlugin from 'webpack-virtual-modules';
+
+// The plugin imports these as ES namespaces, which cannot be stubbed; mock the modules.
+const parseAllModules = jest.fn();
+const serializeWithRequire = jest.fn();
+jest.unstable_mockModule('../../webpack/stripes-module-parser.js', () => ({ parseAllModules }));
+jest.unstable_mockModule('../../webpack/stripes-serialize.js', () => ({ serializeWithRequire }));
+const { default: StripesConfigPlugin } = await import('../../webpack/stripes-config-plugin.js');
+const { default: StripesTranslationsPlugin } = await import('../../webpack/stripes-translations-plugin.js');
+const { default: StripesBrandingPlugin } = await import('../../webpack/stripes-branding-plugin.js');
+const { default: StripesErrorLoggingPlugin } = await import('../../webpack/stripes-error-logging-plugin.js');
 
 const compilerStub = {
   apply: () => { },
@@ -73,9 +79,12 @@ describe('The stripes-config-plugin', function () {
   });
 
   describe('apply method', function () {
+    let sut;
+
     beforeEach(function () {
-      this.sandbox.stub(stripesModuleParser, 'parseAllModules').returns({ app: ['something'] });
-      this.sut = new StripesConfigPlugin(mockConfig);
+      parseAllModules.mockReset();
+      parseAllModules.mockReturnValue({ app: ['something'] });
+      sut = new StripesConfigPlugin(mockConfig);
     });
 
     afterEach(function () {
@@ -83,26 +92,30 @@ describe('The stripes-config-plugin', function () {
     });
 
     it('applies a virtual module', function () {
-      this.sandbox.spy(VirtualModulesPlugin.prototype, 'apply');
-      this.sut.apply(compilerStub);
+      sinon.spy(VirtualModulesPlugin.prototype, 'apply');
+      sut.apply(compilerStub);
 
       expect(VirtualModulesPlugin.prototype.apply).to.have.been.calledOnce;
       expect(VirtualModulesPlugin.prototype.apply).to.be.calledWith(compilerStub);
     });
 
     it('registers the "after-plugins" hook', function () {
-      this.sandbox.spy(compilerStub.hooks.afterPlugins, 'tap');
-      this.sut.apply(compilerStub);
+      sinon.spy(compilerStub.hooks.afterPlugins, 'tap');
+      sut.apply(compilerStub);
       expect(compilerStub.hooks.afterPlugins.tap).to.have.been.calledWith('StripesConfigPlugin');
     });
   });
 
   describe('afterPlugins method', function () {
+    let sut;
+
     beforeEach(function () {
-      this.sandbox.stub(stripesModuleParser, 'parseAllModules').returns({ config: 'something', metadata: 'something', lazyImports: {} });
-      this.sandbox.stub(VirtualModulesPlugin.prototype, 'writeModule').returns({});
-      this.sandbox.stub(stripesSerialize, 'serializeWithRequire').returns({});
-      this.sut = new StripesConfigPlugin(mockConfig);
+      parseAllModules.mockReset();
+      parseAllModules.mockReturnValue({ config: 'something', metadata: 'something', lazyImports: {} });
+      sinon.stub(VirtualModulesPlugin.prototype, 'writeModule').returns({});
+      serializeWithRequire.mockReset();
+      serializeWithRequire.mockReturnValue({});
+      sut = new StripesConfigPlugin(mockConfig);
 
       compilerStub.plugins = [];
 
@@ -118,7 +131,7 @@ describe('The stripes-config-plugin', function () {
       loggingPlugin.errorLogging = JSON.stringify({ loggingService: { apiKey: 'top-secret' } });
       compilerStub.options.plugins.push(loggingPlugin);
 
-      this.sut.apply(compilerStub);
+      sut.apply(compilerStub);
     });
 
     afterEach(function () {
@@ -126,13 +139,13 @@ describe('The stripes-config-plugin', function () {
     });
 
     it('calls virtualModule.writeModule()', function () {
-      this.sut.afterPlugins(compilerStub);
-      expect(this.sut.virtualModule.writeModule).to.have.been.calledOnce;
+      sut.afterPlugins(compilerStub);
+      expect(sut.virtualModule.writeModule).to.have.been.calledOnce;
     });
 
     it('writes serialized config to virtual module', function () {
-      this.sut.afterPlugins(compilerStub);
-      const writeModuleArgs = this.sut.virtualModule.writeModule.getCall(0).args;
+      sut.afterPlugins(compilerStub);
+      const writeModuleArgs = sut.virtualModule.writeModule.getCall(0).args;
       expect(writeModuleArgs[0]).to.be.a('string').that.equals('node_modules/stripes-config.js');
 
       // TODO: More thorough analysis of the generated virtual module
@@ -141,22 +154,24 @@ describe('The stripes-config-plugin', function () {
   });
 
   describe('processWarnings method', function () {
+    let sut;
+
     beforeEach(function () {
       compilerStub.warnings = [];
-      this.sut = new StripesConfigPlugin(mockConfig);
+      sut = new StripesConfigPlugin(mockConfig);
     });
 
     it('assigns warnings to the Webpack compilation', function () {
-      this.sut.warnings = ['uh-oh', 'something happened'];
-      this.sut.processWarnings(compilerStub, () => { });
+      sut.warnings = ['uh-oh', 'something happened'];
+      sut.processWarnings(compilerStub, () => { });
       expect(compilerStub.warnings).to.be.an('array').with.length(1);
       expect(compilerStub.warnings[0]).to.match(/uh-oh/);
       expect(compilerStub.warnings[0]).to.match(/something happened/);
     });
 
     it('does not assign warnings when not present', function () {
-      this.sut.warnings = [];
-      this.sut.processWarnings(compilerStub, () => { });
+      sut.warnings = [];
+      sut.processWarnings(compilerStub, () => { });
       expect(compilerStub.warnings).to.be.an('array').with.length(0);
     });
   });

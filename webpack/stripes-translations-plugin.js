@@ -1,10 +1,11 @@
-const path = require('path');
-const fs = require('fs');
-const _ = require('lodash');
-const webpack = require('webpack');
-const modulePaths = require('./module-paths');
-const logger = require('./logger')('stripesTranslationsPlugin');
-const StripesConfigPlugin = require('./stripes-config-plugin');
+import path from 'path';
+import fs from 'fs';
+import _ from 'lodash';
+import webpack from 'webpack';
+import * as modulePaths from './module-paths.js';
+import getLogger from './logger.js';
+const logger = getLogger('stripesTranslationsPlugin');
+import StripesConfigPlugin from './stripes-config-plugin.js';
 
 function prefixKeys(obj, prefix) {
   const res = {};
@@ -14,7 +15,7 @@ function prefixKeys(obj, prefix) {
   return res;
 }
 
-module.exports = class StripesTranslationPlugin {
+export default class StripesTranslationPlugin {
   constructor(options) {
     this.federate = options?.federate || false;
 

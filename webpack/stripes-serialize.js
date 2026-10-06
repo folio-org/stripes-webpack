@@ -1,4 +1,4 @@
-const path = require('path');
+import path from 'path';
 
 // Serialize an object
 // In the process, it wraps "src" properties with requires for loading files
@@ -28,6 +28,6 @@ function serializeWithRequire(theObject) {
   return theString.replace(/"(require\([^)]+\))"/g, (match, $1) => $1);
 }
 
-module.exports = {
+export {
   serializeWithRequire,
 };

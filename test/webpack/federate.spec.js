@@ -1,13 +1,11 @@
-const expect = require('chai').expect;
-const sinon = require('sinon');
-const path = require('path');
-// Ensure global test setup (sinon-chai) is applied when mocha is invoked for this single spec
-require('./test-setup.spec');
+import { expect } from 'chai';
+import sinon from 'sinon';
+import path from 'path';
+import { jest } from '@jest/globals';
 
-describe('The federate function', function () {
+describe('The federate function', () => {
   let fetchStub;
   let webpackStub;
-  let WebpackDevServerModule;
   let WebpackDevServerStub;
   let tryResolveStub;
   let buildConfigStub;
@@ -17,90 +15,37 @@ describe('The federate function', function () {
   let compilerShutdownFn;
   let federate;
 
-  beforeEach(function () {
-    // Stub global fetch (used for registry POST/DELETE)
+  beforeEach(async () => {
+    jest.resetModules();
     fetchStub = sinon.stub(global, 'fetch').resolves();
-
-    // Stub webpack (returns a compiler stub)
-    webpackModule = require('webpack');
 
     const compilerStub = {
       hooks: {
         shutdown: {
           tapPromise: sinon.stub().callsFake((name, fn) => {
-            // capture shutdown function for later simulation
             compilerShutdownFn = fn;
-          })
-        }
-      }
+          }),
+        },
+      },
     };
-
-    // replace webpack module export with a stub function that returns our compiler
-    webpackStub = sinon.stub().callsFake((cfg) => compilerStub);
-    try {
-      require.cache[require.resolve('webpack')].exports = webpackStub;
-    } catch (e) {
-      // ignore if cannot patch
-    }
-
-    // Stub WebpackDevServer constructor
-    WebpackDevServerModule = require('webpack-dev-server');
-
-    WebpackDevServerStub = sinon.stub().callsFake((devServerCfg, compiler) => ({
-      start: sinon.stub().resolves()
-    }));
-
-    // replace the module export on the real webpack-dev-server module (for when federate requires it)
-    // Some versions export a class; we attach our stub to the module export
-    Object.keys(WebpackDevServerModule).forEach(k => {
-      // noop - ensure module is loaded
-    });
-    // patching the module's export directly (works for common test environment)
-    try {
-      // In many installs webpack-dev-server exports a function/class; overwrite it safely
-      require.cache[require.resolve('webpack-dev-server')].exports = WebpackDevServerStub;
-    } catch (e) {
-      // ignore if cannot patch
-    }
-
-    // Stub module-paths.tryResolve
-    const modulePaths = require('../../webpack/module-paths');
-    tryResolveStub = sinon.stub(modulePaths, 'tryResolve').returns(path.join(__dirname, 'fixtures', 'package.json'));
-
-    // Stub the build config factory by injecting a fake module into the require cache
+    webpackStub = sinon.stub().returns(compilerStub);
+    WebpackDevServerStub = sinon.stub().callsFake(() => ({ start: sinon.stub().resolves() }));
+    tryResolveStub = sinon.stub().returns(path.join(import.meta.dirname, 'fixtures', 'package.json'));
     buildConfigStub = sinon.stub().returns({ devServer: {} });
-    try {
-      const resolved = require.resolve('../../webpack.config.federate.remote');
-      require.cache[resolved] = { id: resolved, filename: resolved, loaded: true, exports: buildConfigStub };
-    } catch (e) {
-      // ignore if cannot inject
-    }
 
-    // Stub console and process.exit
+    jest.unstable_mockModule('webpack', () => ({ default: webpackStub }));
+    jest.unstable_mockModule('webpack-dev-server', () => ({ default: WebpackDevServerStub }));
+    jest.unstable_mockModule('../../webpack/module-paths.js', () => ({ tryResolve: tryResolveStub }));
+    jest.unstable_mockModule('../../webpack.config.federate.remote.js', () => ({ default: buildConfigStub }));
+
     consoleLogStub = sinon.stub(console, 'log');
     consoleErrorStub = sinon.stub(console, 'error');
     processExitStub = sinon.stub(process, 'exit');
 
-    // Now require the federate module under test after stubs are in place
-    delete require.cache[require.resolve('../../webpack/federate')];
-    federate = require('../../webpack/federate');
+    federate = (await import('../../webpack/federate.js')).default;
   });
 
-  afterEach(function () {
-    // restore any sinon stubs we created in this file
-    sinon.restore();
-
-    // Clean up any patched module export
-    try {
-      // restore webpack-dev-server to original export by reloading module
-      delete require.cache[require.resolve('webpack-dev-server')];
-      require('webpack-dev-server');
-    } catch (e) {
-      // ignore
-    }
-  });
-
-  it('starts federation successfully', async function () {
+  it('starts federation successfully', async () => {
     const stripesConfig = { okapi: { discoveryUrl: 'http://localhost:3001/registry' } };
 
     await federate(stripesConfig, { port: 3003 });
@@ -119,7 +64,7 @@ describe('The federate function', function () {
     expect(consoleLogStub).to.have.been.calledWith('Starting remote server on port 3003');
   });
 
-  it('uses default port when not provided', async function () {
+  it('uses default port when not provided', async () => {
     const stripesConfig = { okapi: { discoveryUrl: 'http://localhost:3001/registry' } };
 
     await federate(stripesConfig);
@@ -127,9 +72,8 @@ describe('The federate function', function () {
     expect(consoleLogStub).to.have.been.calledWith('Starting remote server on port 3002');
   });
 
-  it('exits when package.json not found', async function () {
+  it('exits when package.json not found', async () => {
     // make tryResolve return falsy
-    const modulePaths = require('../../webpack/module-paths');
     tryResolveStub.returns(false);
 
     // Make process.exit throw so the function stops executing and we can assert the behaviour
@@ -147,7 +91,7 @@ describe('The federate function', function () {
     expect(processExitStub).to.have.been.called;
   });
 
-  it('exits when registry post fails', async function () {
+  it('exits when registry post fails', async () => {
     fetchStub.rejects(new Error('Network error'));
 
     await federate({ okapi: { discoveryUrl: 'http://localhost:3001/registry' } });
@@ -156,7 +100,7 @@ describe('The federate function', function () {
     expect(processExitStub).to.have.been.called;
   });
 
-  it('handles shutdown hook (DELETE is called)', async function () {
+  it('handles shutdown hook (DELETE is called)', async () => {
     const stripesConfig = { okapi: { discoveryUrl: 'http://localhost:3001/registry' } };
 
     await federate(stripesConfig, { port: 3004 });

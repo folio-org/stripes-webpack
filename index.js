@@ -1,4 +1,5 @@
-const babelOptions = require('./webpack/babel-options');
-module.exports = {
+import babelOptions from './webpack/babel-options.js';
+
+export {
   babelOptions,
 };

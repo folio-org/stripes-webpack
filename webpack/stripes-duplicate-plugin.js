@@ -2,7 +2,7 @@
 //   Error on specific packages that we never want duplicates of, notably react
 //   Warn on any duplicates that are not yet explicitly ignored
 
-const DuplicatePackageCheckerPlugin = require('@cerner/duplicate-package-checker-webpack-plugin');
+import DuplicatePackageCheckerPlugin from '@cerner/duplicate-package-checker-webpack-plugin';
 
 // Module names that must not have duplicates
 const duplicatesNotAllowed = new Set([
@@ -24,7 +24,7 @@ const duplicatesNotAllowed = new Set([
   '@folio/stripes-util',
 ]);
 
-module.exports = class StripesDuplicatePlugin {
+export default class StripesDuplicatePlugin {
   constructor(options) {
     this.config = options.config || {};
   }

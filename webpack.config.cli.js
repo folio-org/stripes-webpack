@@ -1,11 +1,11 @@
 // Base Webpack configuration for building Stripes at the command line,
 // including Stripes configuration.
 
-const path = require('path');
+import path from 'path';
 
-module.exports = {
+export default {
   output: {
-    path: path.join(__dirname, 'dist'),
+    path: path.join(import.meta.dirname, 'dist'),
     filename: 'bundle.[name][contenthash].js',
     chunkFilename: 'chunk.[name][chunkhash].js',
     publicPath: '/',

@@ -1,9 +1,10 @@
-const logger = require('./logger')();
+import getLogger from './logger.js';
+const logger = getLogger();
 
 // Applies overrides to the webpack configuration
 // Supports a function or an array of functions
 
-module.exports = function applyWebpackOverrides(overrides, originalConfig) {
+export default function applyWebpackOverrides(overrides, originalConfig) {
   logger.log('applying webpack overrides...');
   let config = originalConfig;
 

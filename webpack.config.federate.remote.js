@@ -3,15 +3,15 @@
 // "icons", "translations", "sound" folders are statically hosted in the devServer config.
 // "icons" and "sound" directories, with subfolders are copied to the output folder for a production build.
 
-const path = require('path');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CopyPlugin = require("copy-webpack-plugin");
-const StripesTranslationsPlugin = require('./webpack/stripes-translations-plugin');
-const { processExternals } = require('./webpack/utils');
-const { getStripesModulesPaths } = require('./webpack/module-paths');
-const esbuildLoaderRule = require('./webpack/esbuild-loader-rule');
-const typescriptLoaderRule = require('./webpack/typescript-loader-rule')
-const { addRemoteMFConfig } = require('./module-federation-config');
+import path from 'path';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import CopyPlugin from 'copy-webpack-plugin';
+import StripesTranslationsPlugin from './webpack/stripes-translations-plugin.js';
+import { processExternals } from './webpack/utils.js';
+import { getStripesModulesPaths } from './webpack/module-paths.js';
+import esbuildLoaderRule from './webpack/esbuild-loader-rule.js';
+import typescriptLoaderRule from './webpack/typescript-loader-rule.js';
+import { addRemoteMFConfig } from './module-federation-config.js';
 
 const buildConfig = (metadata, options) => {
   const { port, name, displayName, main } = metadata;
@@ -93,7 +93,7 @@ const buildConfig = (metadata, options) => {
               loader: 'postcss-loader',
               options: {
                 postcssOptions: {
-                  config: path.resolve(__dirname, 'postcss.config.js'),
+                  config: path.resolve(import.meta.dirname, 'postcss.config.js'),
                 },
                 sourceMap: true,
               },
@@ -182,4 +182,4 @@ const buildConfig = (metadata, options) => {
   return config;
 }
 
-module.exports = buildConfig;
+export default buildConfig;

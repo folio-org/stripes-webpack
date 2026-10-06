@@ -1,7 +1,7 @@
-const expect = require('chai').expect;
+import { expect } from 'chai';
 
-const defaultBranding = require('../../default-assets/branding');
-const { serializeWithRequire } = require('../../webpack/stripes-serialize');
+import defaultBranding from '../../default-assets/branding.js';
+import { serializeWithRequire } from '../../webpack/stripes-serialize.js';
 
 // Sample data for test
 const tenantBranding = {
