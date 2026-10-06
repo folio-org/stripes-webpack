@@ -1,11 +1,24 @@
-const expect = require('chai').expect;
-const fs = require('fs');
-const webpack = require('webpack');
+import { expect } from 'chai';
+import fs from 'fs';
+import sinon from 'sinon';
+import webpack from 'webpack';
+import { jest } from '@jest/globals';
 
-const StripesConfigPlugin = require('../../webpack/stripes-config-plugin');
+import * as actualModulePaths from '../../webpack/module-paths.js';
 
-const modulePaths = require('../../webpack/module-paths');
-const StripesTranslationsPlugin = require('../../webpack/stripes-translations-plugin');
+// ESM namespaces can't be stubbed, so replace module-paths with a mutable wrapper
+const modulePaths = { locateStripesModule: actualModulePaths.locateStripesModule };
+jest.unstable_mockModule('../../webpack/module-paths.js', () => ({
+  ...actualModulePaths,
+  locateStripesModule: (...a) => modulePaths.locateStripesModule(...a),
+}));
+const { default: StripesConfigPlugin } = await import('../../webpack/stripes-config-plugin.js');
+const { default: StripesTranslationsPlugin } = await import('../../webpack/stripes-translations-plugin.js');
+
+let stripesConfig;
+let stripesFederateConfig;
+let compilationStub;
+let sut;
 
 // Stub the parts of the webpack compiler that the StripesTranslationsPlugin interacts with
 const compilerStub = {
@@ -41,9 +54,9 @@ const compilerStub = {
   }
 };
 
-describe('The stripes-translations-plugin', function () {
-  beforeEach(function () {
-    this.stripesConfig = {
+describe('The stripes-translations-plugin', () => {
+  beforeEach(() => {
+    stripesConfig = {
       config: {},
       modules: {
         '@folio/users': {},
@@ -53,28 +66,28 @@ describe('The stripes-translations-plugin', function () {
       },
     };
 
-    this.stripesFederateConfig = { ...this.stripesConfig, federate: true };
+    stripesFederateConfig = { ...stripesConfig, federate: true };
   });
 
-  describe('constructor', function () {
-    it('includes stripes-core with modules for translation', function () {
-      const sut = new StripesTranslationsPlugin(this.stripesConfig);
+  describe('constructor', () => {
+    it('includes stripes-core with modules for translation', () => {
+      const sut = new StripesTranslationsPlugin(stripesConfig);
       expect(sut.modules).to.be.an('object').with.property('@folio/stripes-core');
-      expect(sut.modules).to.deep.include(this.stripesConfig.modules);
+      expect(sut.modules).to.deep.include(stripesConfig.modules);
     });
 
-    it('assigns language filter', function () {
-      this.stripesConfig.config.languages = ['en'];
-      const sut = new StripesTranslationsPlugin(this.stripesConfig);
+    it('assigns language filter', () => {
+      stripesConfig.config.languages = ['en'];
+      const sut = new StripesTranslationsPlugin(stripesConfig);
       expect(sut.languageFilter).to.be.an('array').and.include('en');
     });
   });
 
-  describe('apply method', function () {
-    beforeEach(function () {
-      this.sandbox.stub(modulePaths, 'locateStripesModule').callsFake((context, mod) => `path/to/${mod}/package.json`);
-      this.sandbox.stub(fs, 'existsSync').returns(true);
-      this.sandbox.stub(fs, 'readdirSync').returns([
+  describe('apply method', () => {
+    beforeEach(() => {
+      modulePaths.locateStripesModule = (context, mod) => `path/to/${mod}/package.json`;
+      sinon.stub(fs, 'existsSync').returns(true);
+      sinon.stub(fs, 'readdirSync').returns([
         {
           isFile: () => true,
           name: 'en.json',
@@ -88,11 +101,11 @@ describe('The stripes-translations-plugin', function () {
           name: 'fr.json',
         },
       ]);
-      this.sandbox.spy(webpack.ContextReplacementPlugin.prototype, 'apply');
-      this.sandbox.spy(compilerStub.hooks.emit, 'tapAsync');
-      this.sandbox.spy(compilerStub.hooks.thisCompilation, 'tap');
-      this.sandbox.stub(StripesTranslationsPlugin, 'loadFile').returns({ key1: 'Value 1', key2: 'Value 2', name: 'testPackage', stripes: { stripesDeps: ['stripes-federate-dependency'] } });
-      this.compilationStub = {
+      sinon.spy(webpack.ContextReplacementPlugin.prototype, 'apply');
+      sinon.spy(compilerStub.hooks.emit, 'tapAsync');
+      sinon.spy(compilerStub.hooks.thisCompilation, 'tap');
+      sinon.stub(StripesTranslationsPlugin, 'loadFile').returns({ key1: 'Value 1', key2: 'Value 2', name: 'testPackage', stripes: { stripesDeps: ['stripes-federate-dependency'] } });
+      compilationStub = {
         assets: {},
         hooks: {
           processAssets: {
@@ -100,7 +113,7 @@ describe('The stripes-translations-plugin', function () {
           },
         },
       };
-      this.sandbox.spy(this.compilationStub.hooks.processAssets, 'tap');
+      sinon.spy(compilationStub.hooks.processAssets, 'tap');
 
       StripesConfigPlugin.getPluginHooks(compilerStub).beforeWrite.tap(
         { name: 'StripesConfigPlugin', context: true },
@@ -117,49 +130,49 @@ describe('The stripes-translations-plugin', function () {
       StripesConfigPlugin.getPluginHooks(compilerStub).beforeWrite.call({});
     });
 
-    it('registers the "emit" hook', function () {
-      this.sut = new StripesTranslationsPlugin(this.stripesConfig);
-      this.sut.apply(compilerStub);
+    it('registers the "emit" hook', () => {
+      sut = new StripesTranslationsPlugin(stripesConfig);
+      sut.apply(compilerStub);
       StripesConfigPlugin.getPluginHooks(compilerStub).beforeWrite.call({});
 
       expect(compilerStub.hooks.thisCompilation.tap).to.be.calledWith('StripesTranslationsPlugin');
     });
 
-    it('includes modules from nominated dependencies', function () {
-      this.sut = new StripesTranslationsPlugin(this.stripesConfig);
-      this.sut.apply(compilerStub);
+    it('includes modules from nominated dependencies', () => {
+      sut = new StripesTranslationsPlugin(stripesConfig);
+      sut.apply(compilerStub);
       StripesConfigPlugin.getPluginHooks(compilerStub).beforeWrite.call({});
 
-      expect(this.sut.modules).to.be.an('object').with.property('stripes-dependency');
+      expect(sut.modules).to.be.an('object').with.property('stripes-dependency');
     });
 
-    it('includes certain modules and stripes-deps in "federate" mpode', function () {
+    it('includes certain modules and stripes-deps in "federate" mpode', () => {
       // federate mode is per-module, so the plugin executes outside of StripesConfigPlugin, with its own hook.
-      this.sut = new StripesTranslationsPlugin(this.stripesFederateConfig);
-      this.sut.apply({ ...compilerStub, context: __dirname });
+      sut = new StripesTranslationsPlugin(stripesFederateConfig);
+      sut.apply({ ...compilerStub, context: import.meta.dirname });
 
-      expect(this.sut.modules).to.be.an('object').with.property('testPackage');
-      expect(this.sut.modules).to.be.an('object').with.property('stripes-federate-dependency');
+      expect(sut.modules).to.be.an('object').with.property('testPackage');
+      expect(sut.modules).to.be.an('object').with.property('stripes-federate-dependency');
     });
 
-    it('generates an emit function with all translations', function () {
-      this.sut = new StripesTranslationsPlugin(this.stripesConfig);
-      this.sut.apply(compilerStub);
+    it('generates an emit function with all translations', () => {
+      sut = new StripesTranslationsPlugin(stripesConfig);
+      sut.apply(compilerStub);
       StripesConfigPlugin.getPluginHooks(compilerStub).beforeWrite.call({});
 
       // Get the callback passed to 'thisCompilation' hook
       const pluginArgs = compilerStub.hooks.thisCompilation.tap.getCall(0).args;
       const compilerCallback = pluginArgs[1];
 
-      compilerCallback(this.compilationStub);
+      compilerCallback(compilationStub);
 
-      const compilationArgs = this.compilationStub.hooks.processAssets.tap.getCall(0).args;
+      const compilationArgs = compilationStub.hooks.processAssets.tap.getCall(0).args;
       const compilationCallback = compilationArgs[1];
 
       // Call it and observe the modification to compilation.asset
       compilationCallback();
 
-      const emitFiles = Object.keys(this.compilationStub.assets);
+      const emitFiles = Object.keys(compilationStub.assets);
 
       expect(emitFiles).to.have.length(3);
       expect(emitFiles).to.match(/translations\/en-\d+\.json/);
@@ -167,23 +180,23 @@ describe('The stripes-translations-plugin', function () {
       expect(emitFiles).to.match(/translations\/fr-\d+\.json/);
     });
 
-    it('generates an emit function with all translations (federate mode)', function () {
-      this.sut = new StripesTranslationsPlugin(this.stripesFederateConfig);
-      this.sut.apply({ ...compilerStub, context: __dirname });
+    it('generates an emit function with all translations (federate mode)', () => {
+      sut = new StripesTranslationsPlugin(stripesFederateConfig);
+      sut.apply({ ...compilerStub, context: import.meta.dirname });
 
       // Get the callback passed to 'thisCompilation' hook
       const pluginArgs = compilerStub.hooks.thisCompilation.tap.getCall(0).args;
       const compilerCallback = pluginArgs[1];
 
-      compilerCallback(this.compilationStub);
+      compilerCallback(compilationStub);
 
-      const compilationArgs = this.compilationStub.hooks.processAssets.tap.getCall(0).args;
+      const compilationArgs = compilationStub.hooks.processAssets.tap.getCall(0).args;
       const compilationCallback = compilationArgs[1];
 
       // Call it and observe the modification to compilation.asset
       compilationCallback();
 
-      const emitFiles = Object.keys(this.compilationStub.assets);
+      const emitFiles = Object.keys(compilationStub.assets);
 
       expect(emitFiles).to.have.length(3);
       expect(emitFiles).to.match(/translations\/en-\d+\.json/);
@@ -191,42 +204,42 @@ describe('The stripes-translations-plugin', function () {
       expect(emitFiles).to.match(/translations\/fr-\d+\.json/);
     });
 
-    it('applies ContextReplacementPlugins when language filters are set', function () {
-      this.sut = new StripesTranslationsPlugin(this.stripesConfig);
-      this.sut.languageFilter = ['en'];
-      this.sut.apply(compilerStub);
+    it('applies ContextReplacementPlugins when language filters are set', () => {
+      sut = new StripesTranslationsPlugin(stripesConfig);
+      sut.languageFilter = ['en'];
+      sut.apply(compilerStub);
 
       expect(webpack.ContextReplacementPlugin.prototype.apply).to.have.been.calledTwice;
       expect(webpack.ContextReplacementPlugin.prototype.apply).to.be.calledWith(compilerStub);
     });
   });
 
-  describe('gatherAllTranslations method', function () {
-    beforeEach(function () {
-      this.sandbox.stub(modulePaths, 'locateStripesModule').callsFake((context, mod) => `path/to/${mod}/package.json`);
-      this.sut = new StripesTranslationsPlugin(this.stripesConfig);
-      this.sandbox.stub(this.sut, 'loadTranslationsDirectory').returns({});
-      this.sandbox.stub(this.sut, 'loadTranslationsPackageJson').returns({});
+  describe('gatherAllTranslations method', () => {
+    beforeEach(() => {
+      modulePaths.locateStripesModule = (context, mod) => `path/to/${mod}/package.json`;
+      sut = new StripesTranslationsPlugin(stripesConfig);
+      sinon.stub(sut, 'loadTranslationsDirectory').returns({});
+      sinon.stub(sut, 'loadTranslationsPackageJson').returns({});
     });
 
-    it('uses the translation directory when it exists', function () {
-      this.sandbox.stub(fs, 'existsSync').returns(true); // translation dir exists
-      this.sut.gatherAllTranslations();
-      expect(this.sut.loadTranslationsDirectory).to.have.been.called;
-      expect(this.sut.loadTranslationsPackageJson).not.to.have.been.called;
+    it('uses the translation directory when it exists', () => {
+      sinon.stub(fs, 'existsSync').returns(true); // translation dir exists
+      sut.gatherAllTranslations();
+      expect(sut.loadTranslationsDirectory).to.have.been.called;
+      expect(sut.loadTranslationsPackageJson).not.to.have.been.called;
     });
 
-    it('uses package.json when translations directory does not exist', function () {
-      this.sandbox.stub(fs, 'existsSync').returns(false); // translation dir does not exist
-      this.sut.gatherAllTranslations();
-      expect(this.sut.loadTranslationsDirectory).not.to.have.been.called;
-      expect(this.sut.loadTranslationsPackageJson).to.have.been.called;
+    it('uses package.json when translations directory does not exist', () => {
+      sinon.stub(fs, 'existsSync').returns(false); // translation dir does not exist
+      sut.gatherAllTranslations();
+      expect(sut.loadTranslationsDirectory).not.to.have.been.called;
+      expect(sut.loadTranslationsPackageJson).to.have.been.called;
     });
   });
 
-  describe('loadTranslationsDirectory method', function () {
-    beforeEach(function () {
-      this.sandbox.stub(fs, 'readdirSync').returns([
+  describe('loadTranslationsDirectory method', () => {
+    beforeEach(() => {
+      sinon.stub(fs, 'readdirSync').returns([
         {
           isFile: () => true,
           name: 'en.json',
@@ -240,27 +253,27 @@ describe('The stripes-translations-plugin', function () {
           name: 'fr.json',
         },
       ]);
-      this.sandbox.stub(StripesTranslationsPlugin, 'loadFile').returns({ key1: 'Value 1', key2: 'Value 2' });
-      this.sut = new StripesTranslationsPlugin(this.stripesConfig);
+      sinon.stub(StripesTranslationsPlugin, 'loadFile').returns({ key1: 'Value 1', key2: 'Value 2' });
+      sut = new StripesTranslationsPlugin(stripesConfig);
     });
 
-    it('loads all translations from the translation directory', function () {
-      const result = this.sut.loadTranslationsDirectory('@folio/my-app', 'path/to/translations');
+    it('loads all translations from the translation directory', () => {
+      const result = sut.loadTranslationsDirectory('@folio/my-app', 'path/to/translations');
       expect(StripesTranslationsPlugin.loadFile).to.have.callCount(3);
       expect(result).to.be.an('object').with.all.keys('en', 'fr', 'es');
     });
 
-    it('loads only filtered translations from the translation directory', function () {
-      this.sut.languageFilter = ['en'];
-      const result = this.sut.loadTranslationsDirectory('@folio/my-app', 'path/to/translations');
+    it('loads only filtered translations from the translation directory', () => {
+      sut.languageFilter = ['en'];
+      const result = sut.loadTranslationsDirectory('@folio/my-app', 'path/to/translations');
       expect(StripesTranslationsPlugin.loadFile).to.have.been.calledOnce;
       expect(result).to.be.an('object').with.all.keys('en').and.not.any.keys('fr', 'es');
     });
   });
 
-  describe('loadTranslationsPackageJson method', function () {
-    beforeEach(function () {
-      this.sandbox.stub(StripesTranslationsPlugin, 'loadFile').returns({
+  describe('loadTranslationsPackageJson method', () => {
+    beforeEach(() => {
+      sinon.stub(StripesTranslationsPlugin, 'loadFile').returns({
         stripes: {
           translations: {
             en: { key1: 'Value 1', key2: 'Value 2' },
@@ -269,68 +282,68 @@ describe('The stripes-translations-plugin', function () {
           },
         },
       });
-      this.sut = new StripesTranslationsPlugin(this.stripesConfig);
+      sut = new StripesTranslationsPlugin(stripesConfig);
     });
 
-    it('loads all translations from package.json', function () {
-      const result = this.sut.loadTranslationsPackageJson('@folio/my-app', 'path/to/package.json');
+    it('loads all translations from package.json', () => {
+      const result = sut.loadTranslationsPackageJson('@folio/my-app', 'path/to/package.json');
       expect(result).to.be.an('object').with.all.keys('en', 'fr', 'es');
     });
 
-    it('loads only filtered translations from package.json', function () {
-      this.sut.languageFilter = ['en'];
-      const result = this.sut.loadTranslationsPackageJson('@folio/my-app', 'path/to/translations');
+    it('loads only filtered translations from package.json', () => {
+      sut.languageFilter = ['en'];
+      const result = sut.loadTranslationsPackageJson('@folio/my-app', 'path/to/translations');
       expect(result).to.be.an('object').with.all.keys('en').and.not.any.keys('fr', 'es');
     });
   });
 
-  describe('getModuleName method', function () {
-    it('applies "ui-" prefix to module keys', function () {
+  describe('getModuleName method', () => {
+    it('applies "ui-" prefix to module keys', () => {
       const result = StripesTranslationsPlugin.getModuleName('@folio/my-app');
       expect(result).to.be.a('string').to.equal('ui-my-app');
     });
 
-    it('does not apply "ui-" prefix to stripes-core keys', function () {
+    it('does not apply "ui-" prefix to stripes-core keys', () => {
       const result = StripesTranslationsPlugin.getModuleName('@folio/stripes-core');
       expect(result).to.be.a('string').to.equal('stripes-core');
     });
   });
 
-  describe('prefixModuleKeys method', function () {
-    it('applies "ui-" prefix to module keys', function () {
+  describe('prefixModuleKeys method', () => {
+    it('applies "ui-" prefix to module keys', () => {
       const translations = { key1: 'Value 1', key2: 'Value 2', key3: 'Value 3' };
       const result = StripesTranslationsPlugin.prefixModuleKeys('@folio/my-app', translations);
       expect(result).to.be.an('object').with.all.keys('ui-my-app.key1', 'ui-my-app.key2', 'ui-my-app.key3');
     });
 
-    it('does not apply "ui-" prefix to stripes-core keys', function () {
+    it('does not apply "ui-" prefix to stripes-core keys', () => {
       const translations = { key1: 'Value 1', key2: 'Value 2', key3: 'Value 3' };
       const result = StripesTranslationsPlugin.prefixModuleKeys('@folio/stripes-core', translations);
       expect(result).to.be.an('object').with.all.keys('stripes-core.key1', 'stripes-core.key2', 'stripes-core.key3');
     });
   });
 
-  describe('generateFileNames method', function () {
-    beforeEach(function () {
-      this.sut = new StripesTranslationsPlugin(this.stripesConfig);
+  describe('generateFileNames method', () => {
+    beforeEach(() => {
+      sut = new StripesTranslationsPlugin(stripesConfig);
     });
 
-    it('returns paths for emit hook and browser fetch', function () {
+    it('returns paths for emit hook and browser fetch', () => {
       const translations = {
         en: { key1: 'Value 1', key2: 'Value 2' },
       };
-      this.sut.publicPath = '/';
-      const result = this.sut.generateFileNames(translations);
+      sut.publicPath = '/';
+      const result = sut.generateFileNames(translations);
       expect(result).to.be.an('object').with.property('en').with.property('browserPath').match(/^\/translations\/en-\d+\.json/);
       expect(result).to.be.an('object').with.property('en').with.property('emitPath').match(/^translations\/en-\d+\.json/);
     });
 
-    it('applies publicPath', function () {
+    it('applies publicPath', () => {
       const translations = {
         en: { key1: 'Value 1', key2: 'Value 2' },
       };
-      this.sut.publicPath = '/my-public-path/';
-      const result = this.sut.generateFileNames(translations);
+      sut.publicPath = '/my-public-path/';
+      const result = sut.generateFileNames(translations);
       expect(result).to.be.an('object').with.property('en').with.property('browserPath').match(/^\/my-public-path\/translations\/en-\d+\.json/);
       expect(result).to.be.an('object').with.property('en').with.property('emitPath').match(/^translations\/en-\d+\.json/);
     });

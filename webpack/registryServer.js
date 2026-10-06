@@ -1,5 +1,5 @@
-const express = require('express');
-const cors = require('cors');
+import express from 'express';
+import cors from 'cors';
 
 // Registry data
 const registry = {
@@ -57,4 +57,4 @@ const registryServer = {
   }
 };
 
-module.exports = registryServer;
+export default registryServer;

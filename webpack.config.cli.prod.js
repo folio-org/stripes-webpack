@@ -1,15 +1,15 @@
 // Top level Webpack configuration for building static files for
 // production deployment from the command line
 
-const webpack = require('webpack');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const { EsbuildPlugin } = require('esbuild-loader');
-const buildBaseConfig = require('./webpack.config.base');
+import webpack from 'webpack';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import { EsbuildPlugin } from 'esbuild-loader';
+import buildBaseConfig from './webpack.config.base.js';
 
-const cli = require('./webpack.config.cli');
-const esbuildLoaderRule = require('./webpack/esbuild-loader-rule');
-const { getModulesPaths, getStripesModulesPaths, getTranspiledModules } = require('./webpack/module-paths');
-const { addHostMFConfig } = require('./module-federation-config');
+import cli from './webpack.config.cli.js';
+import esbuildLoaderRule from './webpack/esbuild-loader-rule.js';
+import { getModulesPaths, getStripesModulesPaths, getTranspiledModules } from './webpack/module-paths.js';
+import { addHostMFConfig } from './module-federation-config.js';
 
 const buildConfig = (stripesConfig, options = {}) => {
   const modulePaths = getModulesPaths(stripesConfig.modules);
@@ -85,4 +85,4 @@ const buildConfig = (stripesConfig, options = {}) => {
   return prodConfig;
 };
 
-module.exports = buildConfig;
+export default buildConfig;

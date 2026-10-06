@@ -1,11 +1,12 @@
-const expect = require('chai').expect;
+import { expect } from 'chai';
+import sinon from 'sinon';
 
-const StripesWebpackPlugin = require('../../webpack/stripes-webpack-plugin');
-const StripesConfigPlugin = require('../../webpack/stripes-config-plugin');
-const StripesTranslationsPlugin = require('../../webpack/stripes-translations-plugin');
-const StripesBrandingPlugin = require('../../webpack/stripes-branding-plugin');
-const StripesErrorLoggingPlugin = require('../../webpack/stripes-error-logging-plugin');
-const StripesDuplicatesPlugin = require('../../webpack/stripes-duplicate-plugin');
+import StripesWebpackPlugin from '../../webpack/stripes-webpack-plugin.js';
+import StripesConfigPlugin from '../../webpack/stripes-config-plugin.js';
+import StripesTranslationsPlugin from '../../webpack/stripes-translations-plugin.js';
+import StripesBrandingPlugin from '../../webpack/stripes-branding-plugin.js';
+import StripesErrorLoggingPlugin from '../../webpack/stripes-error-logging-plugin.js';
+import StripesDuplicatesPlugin from '../../webpack/stripes-duplicate-plugin.js';
 
 const compilerStub = {
   apply: () => {},
@@ -41,13 +42,15 @@ const mockConfig = {
 
 describe('The stripes-webpack-plugin', function () {
   describe('apply method', function () {
+    let sut;
+
     beforeEach(function () {
-      this.sandbox.stub(StripesConfigPlugin.prototype, 'apply').callsFake(() => {});
-      this.sandbox.stub(StripesBrandingPlugin.prototype, 'apply').callsFake(() => {});
-      this.sandbox.stub(StripesErrorLoggingPlugin.prototype, 'apply').callsFake(() => {});
-      this.sandbox.stub(StripesTranslationsPlugin.prototype, 'apply').callsFake(() => {});
-      this.sandbox.stub(StripesDuplicatesPlugin.prototype, 'apply').callsFake(() => {});
-      this.sut = new StripesWebpackPlugin({ stripesConfig: mockConfig });
+      sinon.stub(StripesConfigPlugin.prototype, 'apply').callsFake(() => {});
+      sinon.stub(StripesBrandingPlugin.prototype, 'apply').callsFake(() => {});
+      sinon.stub(StripesErrorLoggingPlugin.prototype, 'apply').callsFake(() => {});
+      sinon.stub(StripesTranslationsPlugin.prototype, 'apply').callsFake(() => {});
+      sinon.stub(StripesDuplicatesPlugin.prototype, 'apply').callsFake(() => {});
+      sut = new StripesWebpackPlugin({ stripesConfig: mockConfig });
     });
 
     afterEach(function () {
@@ -55,31 +58,31 @@ describe('The stripes-webpack-plugin', function () {
     });
 
     it('applies StripesConfigPlugin', function () {
-      this.sut.apply(compilerStub);
+      sut.apply(compilerStub);
       expect(StripesConfigPlugin.prototype.apply).to.have.been.calledOnce;
       expect(StripesConfigPlugin.prototype.apply).to.be.calledWith(compilerStub);
     });
 
     it('applies StripesBrandingPlugin', function () {
-      this.sut.apply(compilerStub);
+      sut.apply(compilerStub);
       expect(StripesBrandingPlugin.prototype.apply).to.have.been.calledOnce;
       expect(StripesBrandingPlugin.prototype.apply).to.be.calledWith(compilerStub);
     });
 
     it('applies StripesErrorLoggingPlugin', function () {
-      this.sut.apply(compilerStub);
+      sut.apply(compilerStub);
       expect(StripesErrorLoggingPlugin.prototype.apply).to.have.been.calledOnce;
       expect(StripesErrorLoggingPlugin.prototype.apply).to.be.calledWith(compilerStub);
     });
 
     it('applies StripesTranslationsPlugin', function () {
-      this.sut.apply(compilerStub);
+      sut.apply(compilerStub);
       expect(StripesTranslationsPlugin.prototype.apply).to.have.been.calledOnce;
       expect(StripesTranslationsPlugin.prototype.apply).to.be.calledWith(compilerStub);
     });
 
     it('applies StripesDuplicatesPlugin', function () {
-      this.sut.apply(compilerStub);
+      sut.apply(compilerStub);
       expect(StripesDuplicatesPlugin.prototype.apply).to.have.been.calledOnce;
       expect(StripesDuplicatesPlugin.prototype.apply).to.be.calledWith(compilerStub);
     });

@@ -1,11 +1,12 @@
 // This webpack plugin generates a virtual module containing the stripes tenant branding configuration
 // The virtual module contains require()'s needed for webpack to pull images into the bundle.
 
-const defaultBranding = require('../default-assets/branding');
-const logger = require('./logger')('stripesBrandingPlugin');
-const StripesConfigPlugin = require('./stripes-config-plugin');
+import defaultBranding from '../default-assets/branding.js';
+import getLogger from './logger.js';
+const logger = getLogger('stripesBrandingPlugin');
+import StripesConfigPlugin from './stripes-config-plugin.js';
 
-module.exports = class StripesBrandingPlugin {
+export default class StripesBrandingPlugin {
   constructor(options) {
     logger.log('initializing...');
     // TODO: Validate incoming tenantBranding paths
