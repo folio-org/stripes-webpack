@@ -1,5 +1,6 @@
 // Top level Webpack configuration for running a development environment
 // from the command line via devServer.js
+import { createRequire } from 'module';
 import webpack from 'webpack';
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 
@@ -9,6 +10,8 @@ import * as utils from './webpack/utils.js';
 import buildBaseConfig from './webpack.config.base.js';
 import cli from './webpack.config.cli.js';
 import { addHostMFConfig } from './module-federation-config.js';
+
+const require = createRequire(import.meta.url);
 
 const useBrowserMocha = () => {
   return tryResolve('mocha/mocha-es2018.js') ? 'mocha/mocha-es2018.js' : 'mocha';
