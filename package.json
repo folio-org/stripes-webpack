@@ -1,6 +1,6 @@
 {
   "name": "@folio/stripes-webpack",
-  "version": "7.0.0",
+  "version": "8.0.0",
   "description": "The webpack config for stripes",
   "license": "Apache-2.0",
   "publishConfig": {

@@ -11,7 +11,8 @@
 * Use scoped package-names when checking for duplicates. Refs STRWEB-64.
 * *BREAKING* Remove babel. STRWEB-163.
 
-## 7.0.0 IN PROGRESS
+## [7.0.0](https://github.com/folio-org/stripes-webpack/tree/v7.0.0) (2026-04-15)
+[Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v6.0.0...v7.0.0)
 
 * Unlock `esbuild-loader` from `~3.0.0`, bumping to `^4.2.2`. Refs STRWEB-95.
 * Prune dead code, `stripes.js` and its dep `commander`. Refs STRWEB-134.
