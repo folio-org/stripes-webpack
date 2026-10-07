@@ -9,6 +9,7 @@
 * Upgrade `@module-federation/enhanced` from ^2.0.0 to ^2.8.1 removing `axios`. Refs STRWEB-159.
 * Forward `options.minify` through to EsbuildPlugin. Refs STRWEB-161.
 * Use scoped package-names when checking for duplicates. Refs STRWEB-64.
+* *BREAKING* Remove babel. STRWEB-163.
 
 ## [7.0.0](https://github.com/folio-org/stripes-webpack/tree/v7.0.0) (2026-04-15)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v6.0.0...v7.0.0)

@@ -20,7 +20,7 @@ const buildConfig = (stripesConfig) => {
   const stripesModulePaths = getStripesModulesPaths();
   const allModulePaths = [...stripesModulePaths, ...modulePaths];
 
-  const base = buildBaseConfig(allModulePaths, stripesConfig);
+  const base = buildBaseConfig(allModulePaths, { ...stripesConfig, branding: { ...require("./default-assets/branding"), ...stripesConfig.branding } });
   const devOverrides = {
     name: 'development',
     devtool: 'inline-source-map',
