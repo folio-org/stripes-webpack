@@ -1,3 +1,7 @@
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
+
 // Anything that we want *the platform to provide to modules should be here.
 // If an item is not in this list, modules will each load their own version of it.
 // This can be problematic for React Context if multiple copies of the same context are loaded.
@@ -63,7 +67,7 @@ const defaultDiscoveryUrl = 'http://localhost:3001/registry';
 
 const HOST_RUNTIME_PLUGIN_NAME = 'stripes-injected-mf-runtime-plugin';
 
-module.exports = {
+export {
   defaultDiscoveryUrl,
   singletons,
   getHostAppSingletons,

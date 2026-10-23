@@ -1,8 +1,8 @@
-const expect = require('chai').expect;
+import { expect } from 'chai';
 
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const defaultBranding = require('../../default-assets/branding');
-const StripesBrandingPlugin = require('../../webpack/stripes-branding-plugin');
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import defaultBranding from '../../default-assets/branding.js';
+import StripesBrandingPlugin from '../../webpack/stripes-branding-plugin.js';
 
 // Sample data for test
 const tenantBranding = {

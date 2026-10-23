@@ -1,6 +1,6 @@
-const { getSharedStyles } = require('./webpack/module-paths');
+import { getSharedStyles } from './webpack/module-paths.js';
 
-module.exports = (config, context) => {
+export default (config, context) => {
 
   // stripes components doesn't need these aliases since to it, the references are internal.
   if (context.moduleName !== '@folio/stripes-components') {

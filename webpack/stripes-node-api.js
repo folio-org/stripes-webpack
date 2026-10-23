@@ -1,8 +1,8 @@
-const build = require('./build');
-const serve = require('./serve');
-const transpile = require('./transpile');
+import build from './build.js';
+import serve from './serve.js';
+import transpile from './transpile.js';
 
-module.exports = {
+export {
   build,
   serve,
   transpile,

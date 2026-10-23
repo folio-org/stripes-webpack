@@ -1,9 +1,9 @@
-const path = require('path');
+import path from 'path';
 
-const {
+import {
   getNonTranspiledModules,
   getTranspiledModules,
-} = require('./module-paths');
+} from './module-paths.js';
 
 // a space delimited list of strings (typically namespaces) to use in addition
 // to "@folio" to determine if something needs Stripes-flavoured transpilation
@@ -15,7 +15,7 @@ const escapeRegExp = string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const bigTestRegex = /bigtest|interactor/i;
 const nodeModulesRegex = /node_modules/;
 
-module.exports = (modulePaths) => {
+export default (modulePaths) => {
   const modulesToTranspile = getNonTranspiledModules(modulePaths);
   const transpiledModules = getTranspiledModules(modulePaths);
   let includeRegex;

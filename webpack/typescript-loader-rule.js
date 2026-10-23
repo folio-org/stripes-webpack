@@ -1,4 +1,4 @@
-const path = require('path');
+import path from 'path';
 
 // We want to transpile files inside node_modules/@folio or outside
 // any node_modules directory. And definitely not files in
@@ -15,12 +15,12 @@ function babelLoaderTest(fileName) {
   return false;
 }
 
-module.exports = {
+export default {
   test: babelLoaderTest,
   use: [{
     loader: 'ts-loader',
     options: {
-      configFile: path.join(__dirname, 'tsconfig.json'),
+      configFile: path.join(import.meta.dirname, 'tsconfig.json'),
       allowTsInNodeModules: true,
     }
   }],

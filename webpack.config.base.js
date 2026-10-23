@@ -1,20 +1,20 @@
 // Common Webpack configuration for building Stripes
-const fs = require('fs');
-const webpack = require('webpack');
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
+import fs from 'fs';
+import webpack from 'webpack';
+import path from 'path';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import RemoveEmptyScriptsPlugin from 'webpack-remove-empty-scripts';
 
-const { generateStripesAlias } = require('./webpack/module-paths');
-const typescriptLoaderRule = require('./webpack/typescript-loader-rule');
-const { isProduction } = require('./webpack/utils');
-const { getTranspiledCssPaths } = require('./webpack/module-paths');
-const defaultBranding = require('./default-assets/branding');
+import { generateStripesAlias } from './webpack/module-paths.js';
+import typescriptLoaderRule from './webpack/typescript-loader-rule.js';
+import { isProduction } from './webpack/utils.js';
+import { getTranspiledCssPaths } from './webpack/module-paths.js';
+import defaultBranding from './default-assets/branding.js';
 
 // React doesn't like being included multiple times as can happen when using
 // yarn link. Here we find a more specific path to it by first looking in
-// stripes-core (__dirname) before falling back to the platform or simply react
+// stripes-core (import.meta.dirname) before falling back to the platform or simply react
 const specificReact = generateStripesAlias('react');
 
 // A few details about stripes-config and entry
@@ -73,7 +73,7 @@ const baseConfig = {
     alias: {
       'react': specificReact,
       // TODO: remove this after all UI modules remove reference to react-hot-loader
-      'react-hot-loader': path.resolve(__dirname, 'reactHotLoader.js'),
+      'react-hot-loader': path.resolve(import.meta.dirname, 'reactHotLoader.js'),
     },
     extensions: ['.js', '.json', '.ts', '.tsx'],
   },
@@ -170,7 +170,7 @@ const buildConfig = (modulePaths, stripesConfig) => {
 
   baseConfig.plugins = [
     new HtmlWebpackPlugin({
-      template: fs.existsSync('index.html') ? 'index.html' : `${__dirname}/index.html`,
+      template: fs.existsSync('index.html') ? 'index.html' : `${import.meta.dirname}/index.html`,
       favicon: resolveFaviconPath(stripesConfig),
     }),
     new webpack.EnvironmentPlugin(['NODE_ENV']),
@@ -197,7 +197,7 @@ const buildConfig = (modulePaths, stripesConfig) => {
         loader: 'postcss-loader',
         options: {
           postcssOptions: {
-            config: path.resolve(__dirname, 'postcss.config.js'),
+            config: path.resolve(import.meta.dirname, 'postcss.config.js'),
           },
           sourceMap: true,
         },
@@ -208,4 +208,4 @@ const buildConfig = (modulePaths, stripesConfig) => {
   return baseConfig;
 }
 
-module.exports = buildConfig;
+export default buildConfig;

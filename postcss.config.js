@@ -1,11 +1,11 @@
-const path = require('path');
-const postCssImport = require('postcss-import');
-const autoprefixer = require('autoprefixer');
-const postCssCustomMedia = require('postcss-custom-media');
-const postCssGlobalData = require('@csstools/postcss-global-data');
-const postCssRelativeColorSyntax = require('@csstools/postcss-relative-color-syntax');
-const postCssOmitImports = require('./webpack/postcss-omit-imports');
-const { generateStripesAlias, tryResolve } = require('./webpack/module-paths');
+import path from 'path';
+import postCssImport from 'postcss-import';
+import autoprefixer from 'autoprefixer';
+import postCssCustomMedia from 'postcss-custom-media';
+import postCssGlobalData from '@csstools/postcss-global-data';
+import postCssRelativeColorSyntax from '@csstools/postcss-relative-color-syntax';
+import postCssOmitImports from './webpack/postcss-omit-imports.js';
+import { generateStripesAlias, tryResolve } from './webpack/module-paths.js';
 
 const locateCssVariables = () => {
   const variables = 'lib/variables.css';
@@ -18,7 +18,7 @@ const locateCssVariables = () => {
     path.join(generateStripesAlias('@folio/stripes-components'), variables);
 };
 
-module.exports = {
+export default {
   plugins: [
     // postcssGlobalData to import custom media queries so that those can be successfully resolve
     postCssGlobalData({

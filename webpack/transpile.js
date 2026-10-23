@@ -1,14 +1,19 @@
-const path = require('path');
-const webpack = require('webpack');
-const applyWebpackOverrides = require('./apply-webpack-overrides');
-const logger = require('./logger')();
-const { tryResolve } = require('./module-paths');
-const { processExternals } = require('./utils');
+import { createRequire } from 'node:module';
+import path from 'path';
+import webpack from 'webpack';
+import transpileConfig from '../webpack.config.cli.transpile.js';
+import applyWebpackOverrides from './apply-webpack-overrides.js';
+import getLogger from './logger.js';
+const logger = getLogger();
+import { tryResolve } from './module-paths.js';
+import { processExternals } from './utils.js';
 
-module.exports = function transpile(options = {}) {
+const require = createRequire(import.meta.url);
+
+export default function transpile(options = {}) {
   return new Promise((resolve, reject) => {
     logger.log('starting build...');
-    let config = require('../webpack.config.cli.transpile');
+    let config = transpileConfig;
 
     // TODO: allow for name customization
     const moduleTranspileConfigPath = path.join(process.cwd(), 'webpack.transpile.config.js');

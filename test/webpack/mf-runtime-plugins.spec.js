@@ -1,6 +1,6 @@
-const expect = require('chai').expect;
-const StripesInjectedMFRuntimePlugin = require('../../webpack/stripes-injected-mf-runtime-plugin').default;
-const RemoteRuntimePlugin = require('../../webpack/remote-runtime-plugin').default;
+import { expect } from 'chai';
+import StripesInjectedMFRuntimePlugin from '../../webpack/stripes-injected-mf-runtime-plugin.js';
+import RemoteRuntimePlugin from '../../webpack/remote-runtime-plugin.js';
 
 const HOST_RUNTIME_PLUGIN_NAME = 'stripes-injected-mf-runtime-plugin';
 
