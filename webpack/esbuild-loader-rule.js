@@ -88,5 +88,8 @@ module.exports = (modulePaths) => {
         },
       },
     ],
+    resolve: {
+      fullySpecified: false
+    },
   };
 };
