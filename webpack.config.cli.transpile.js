@@ -1,6 +1,6 @@
 // Top level default Webpack configuration used for transpiling individual modules
 // before publishing
-import path from 'path';
+import path from 'node:path';
 import webpack from 'webpack';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import { EsbuildPlugin } from 'esbuild-loader';

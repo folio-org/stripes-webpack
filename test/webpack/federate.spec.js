@@ -1,7 +1,7 @@
 import { describe, it, beforeEach, afterEach, mock } from 'node:test';
 import { expect } from 'chai';
 import sinon from 'sinon';
-import path from 'path';
+import path from 'node:path';
 
 describe('The federate function', () => {
   let fetchStub;

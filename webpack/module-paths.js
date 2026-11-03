@@ -1,5 +1,5 @@
 import { createRequire } from 'node:module';
-import path from 'path';
+import path from 'node:path';
 import getLogger from './logger.js';
 const logger = getLogger();
 import StripesBuildError from './stripes-build-error.js';

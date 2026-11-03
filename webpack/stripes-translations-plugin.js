@@ -1,6 +1,7 @@
-import path from 'path';
-import fs from 'fs';
-import _ from 'lodash';
+import path from 'node:path';
+import fs from 'node:fs';
+import mapValues from 'lodash/mapValues.js';
+import merge from 'lodash/merge.js';
 import webpack from 'webpack';
 import * as modulePaths from './module-paths.js';
 import getLogger from './logger.js';
@@ -107,7 +108,7 @@ export default class StripesTranslationPlugin {
         const allTranslations = this.gatherAllTranslations();
 
         const fileData = this.generateFileNames(allTranslations);
-        const allFiles = _.mapValues(fileData, data => data.browserPath);
+        const allFiles = mapValues(fileData, data => data.browserPath);
 
         config.translations = allFiles;
         logger.log('stripesConfigPluginBeforeWrite', config.translations);
@@ -146,15 +147,15 @@ export default class StripesTranslationPlugin {
         const moduleName = StripesTranslationPlugin.getModuleName(mod);
         const modTranslationDir = modPackageJsonPath.replace('package.json', `translations/${moduleName}`);
         if (fs.existsSync(modTranslationDir)) {
-          _.merge(allTranslations, this.loadTranslationsDirectory(mod, modTranslationDir));
+          merge(allTranslations, this.loadTranslationsDirectory(mod, modTranslationDir));
         } else {
           const modTranslationDirFallback = modPackageJsonPath.replace('package.json', 'translations');
           if (fs.existsSync(modTranslationDirFallback)) {
             logger.log(`cannot find ${modTranslationDir} falling back to ${modTranslationDirFallback}`);
-            _.merge(allTranslations, this.loadTranslationsDirectory(mod, modTranslationDirFallback));
+            merge(allTranslations, this.loadTranslationsDirectory(mod, modTranslationDirFallback));
           } else {
             logger.log(`cannot find ${modTranslationDirFallback} falling back to ${modPackageJsonPath}`);
-            _.merge(allTranslations, this.loadTranslationsPackageJson(mod, modPackageJsonPath));
+            merge(allTranslations, this.loadTranslationsPackageJson(mod, modPackageJsonPath));
           }
         }
       } else {

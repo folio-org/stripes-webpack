@@ -1,7 +1,7 @@
 // Base Webpack configuration for building Stripes at the command line,
 // including Stripes configuration.
 
-import path from 'path';
+import path from 'node:path';
 
 export default {
   output: {

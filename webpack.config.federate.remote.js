@@ -3,7 +3,7 @@
 // "icons", "translations", "sound" folders are statically hosted in the devServer config.
 // "icons" and "sound" directories, with subfolders are copied to the output folder for a production build.
 
-import path from 'path';
+import path from 'node:path';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import CopyPlugin from 'copy-webpack-plugin';
 import StripesTranslationsPlugin from './webpack/stripes-translations-plugin.js';

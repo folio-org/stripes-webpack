@@ -1,6 +1,6 @@
 import { createRequire } from 'node:module';
 import webpack from 'webpack';
-import path from 'path';
+import path from 'node:path';
 import StripesWebpackPlugin from './stripes-webpack-plugin.js';
 import AddAssetHtmlPlugin from 'add-asset-html-webpack-plugin';
 import applyWebpackOverrides from './apply-webpack-overrides.js';

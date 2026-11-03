@@ -3,8 +3,7 @@
 import webpack from 'webpack';
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 
-import { getModulesPaths, getStripesModulesPaths } from './webpack/module-paths.js';
-import { tryResolve } from './webpack/module-paths.js';
+import { getModulesPaths, getStripesModulesPaths, tryResolve } from './webpack/module-paths.js';
 import esbuildLoaderRule from './webpack/esbuild-loader-rule.js';
 import * as utils from './webpack/utils.js';
 import buildBaseConfig from './webpack.config.base.js';

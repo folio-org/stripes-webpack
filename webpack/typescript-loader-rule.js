@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 
 // We want to transpile files inside node_modules/@folio or outside
 // any node_modules directory. And definitely not files in

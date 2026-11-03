@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 
 // Serialize an object
 // In the process, it wraps "src" properties with requires for loading files

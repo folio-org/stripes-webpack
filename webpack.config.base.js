@@ -1,15 +1,14 @@
 // Common Webpack configuration for building Stripes
-import fs from 'fs';
+import fs from 'node:fs';
 import webpack from 'webpack';
-import path from 'path';
+import path from 'node:path';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import RemoveEmptyScriptsPlugin from 'webpack-remove-empty-scripts';
 
-import { generateStripesAlias } from './webpack/module-paths.js';
+import { generateStripesAlias, getTranspiledCssPaths } from './webpack/module-paths.js';
 import typescriptLoaderRule from './webpack/typescript-loader-rule.js';
 import { isProduction } from './webpack/utils.js';
-import { getTranspiledCssPaths } from './webpack/module-paths.js';
 import defaultBranding from './default-assets/branding.js';
 
 // React doesn't like being included multiple times as can happen when using

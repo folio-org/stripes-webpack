@@ -1,9 +1,9 @@
 import { createRequire } from 'node:module';
-import path from 'path';
-import net from 'net';
+import path from 'node:path';
+import net from 'node:net';
 import webpack from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
-import lodash from 'lodash';
+import snakeCase from 'lodash/snakeCase.js';
 
 import buildConfig from '../webpack.config.federate.remote.js';
 import { tryResolve } from './module-paths.js';
@@ -12,7 +12,6 @@ const logger = getLogger();
 import { defaultDiscoveryUrl } from '../consts.js';
 
 const require = createRequire(import.meta.url);
-const { snakeCase } = lodash;
 
 // Function to check if a port is free
 function isPortFree(port) {

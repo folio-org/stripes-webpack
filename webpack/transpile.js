@@ -1,5 +1,5 @@
 import { createRequire } from 'node:module';
-import path from 'path';
+import path from 'node:path';
 import webpack from 'webpack';
 import transpileConfig from '../webpack.config.cli.transpile.js';
 import applyWebpackOverrides from './apply-webpack-overrides.js';

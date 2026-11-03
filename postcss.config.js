@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 import postCssImport from 'postcss-import';
 import autoprefixer from 'autoprefixer';
 import postCssCustomMedia from 'postcss-custom-media';
