@@ -1,18 +1,18 @@
-import { jest } from '@jest/globals';
+import { describe, it, before, after, beforeEach, afterEach, mock } from 'node:test';
 import { expect } from 'chai';
 import sinon from 'sinon';
 
 import VirtualModulesPlugin from 'webpack-virtual-modules';
 
+afterEach(() => sinon.restore());
+
 // The plugin imports these as ES namespaces, which cannot be stubbed; mock the modules.
-const parseAllModules = jest.fn();
-const serializeWithRequire = jest.fn();
-jest.unstable_mockModule('../../webpack/stripes-module-parser.js', () => ({ parseAllModules }));
-jest.unstable_mockModule('../../webpack/stripes-serialize.js', () => ({ serializeWithRequire }));
-const { default: StripesConfigPlugin } = await import('../../webpack/stripes-config-plugin.js');
-const { default: StripesTranslationsPlugin } = await import('../../webpack/stripes-translations-plugin.js');
-const { default: StripesBrandingPlugin } = await import('../../webpack/stripes-branding-plugin.js');
-const { default: StripesErrorLoggingPlugin } = await import('../../webpack/stripes-error-logging-plugin.js');
+const parseAllModules = sinon.stub();
+const serializeWithRequire = sinon.stub();
+let StripesConfigPlugin;
+let StripesTranslationsPlugin;
+let StripesBrandingPlugin;
+let StripesErrorLoggingPlugin;
 
 const compilerStub = {
   apply: () => { },
@@ -56,6 +56,17 @@ const mockConfig = {
 };
 
 describe('The stripes-config-plugin', function () {
+  before(async () => {
+    mock.module('../../webpack/stripes-module-parser.js', { namedExports: { parseAllModules } });
+    mock.module('../../webpack/stripes-serialize.js', { namedExports: { serializeWithRequire } });
+    ({ default: StripesConfigPlugin } = await import('../../webpack/stripes-config-plugin.js'));
+    ({ default: StripesTranslationsPlugin } = await import('../../webpack/stripes-translations-plugin.js'));
+    ({ default: StripesBrandingPlugin } = await import('../../webpack/stripes-branding-plugin.js'));
+    ({ default: StripesErrorLoggingPlugin } = await import('../../webpack/stripes-error-logging-plugin.js'));
+  });
+
+  after(() => mock.reset());
+
   describe('constructor', function () {
     it('throws StripesBuildError when missing modules config', function () {
       const config = {};
@@ -82,8 +93,8 @@ describe('The stripes-config-plugin', function () {
     let sut;
 
     beforeEach(function () {
-      parseAllModules.mockReset();
-      parseAllModules.mockReturnValue({ app: ['something'] });
+      parseAllModules.reset();
+      parseAllModules.returns({ app: ['something'] });
       sut = new StripesConfigPlugin(mockConfig);
     });
 
@@ -110,11 +121,11 @@ describe('The stripes-config-plugin', function () {
     let sut;
 
     beforeEach(function () {
-      parseAllModules.mockReset();
-      parseAllModules.mockReturnValue({ config: 'something', metadata: 'something', lazyImports: {} });
+      parseAllModules.reset();
+      parseAllModules.returns({ config: 'something', metadata: 'something', lazyImports: {} });
       sinon.stub(VirtualModulesPlugin.prototype, 'writeModule').returns({});
-      serializeWithRequire.mockReset();
-      serializeWithRequire.mockReturnValue({});
+      serializeWithRequire.reset();
+      serializeWithRequire.returns({});
       sut = new StripesConfigPlugin(mockConfig);
 
       compilerStub.plugins = [];

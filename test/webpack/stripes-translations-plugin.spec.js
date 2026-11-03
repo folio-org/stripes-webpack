@@ -1,19 +1,17 @@
+import { describe, it, before, after, beforeEach, mock, afterEach } from 'node:test';
 import { expect } from 'chai';
 import fs from 'fs';
 import sinon from 'sinon';
 import webpack from 'webpack';
-import { jest } from '@jest/globals';
 
 import * as actualModulePaths from '../../webpack/module-paths.js';
 
+afterEach(() => sinon.restore());
+
 // ESM namespaces can't be stubbed, so replace module-paths with a mutable wrapper
 const modulePaths = { locateStripesModule: actualModulePaths.locateStripesModule };
-jest.unstable_mockModule('../../webpack/module-paths.js', () => ({
-  ...actualModulePaths,
-  locateStripesModule: (...a) => modulePaths.locateStripesModule(...a),
-}));
-const { default: StripesConfigPlugin } = await import('../../webpack/stripes-config-plugin.js');
-const { default: StripesTranslationsPlugin } = await import('../../webpack/stripes-translations-plugin.js');
+let StripesConfigPlugin;
+let StripesTranslationsPlugin;
 
 let stripesConfig;
 let stripesFederateConfig;
@@ -55,6 +53,19 @@ const compilerStub = {
 };
 
 describe('The stripes-translations-plugin', () => {
+  before(async () => {
+    mock.module('../../webpack/module-paths.js', {
+      namedExports: {
+        ...actualModulePaths,
+        locateStripesModule: (...a) => modulePaths.locateStripesModule(...a),
+      },
+    });
+    ({ default: StripesConfigPlugin } = await import('../../webpack/stripes-config-plugin.js'));
+    ({ default: StripesTranslationsPlugin } = await import('../../webpack/stripes-translations-plugin.js'));
+  });
+
+  after(() => mock.reset());
+
   beforeEach(() => {
     stripesConfig = {
       config: {},

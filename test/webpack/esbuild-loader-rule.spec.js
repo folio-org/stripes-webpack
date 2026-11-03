@@ -1,3 +1,4 @@
+import { describe, it, beforeEach } from 'node:test';
 import { expect } from 'chai';
 import babelLoaderRule from '../../webpack/esbuild-loader-rule.js';
 

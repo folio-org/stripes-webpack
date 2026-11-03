@@ -1,3 +1,4 @@
+import { describe, it, beforeEach, afterEach } from 'node:test';
 import { expect } from 'chai';
 import StripesInjectedMFRuntimePlugin from '../../webpack/stripes-injected-mf-runtime-plugin.js';
 import RemoteRuntimePlugin from '../../webpack/remote-runtime-plugin.js';

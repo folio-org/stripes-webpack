@@ -1,8 +1,10 @@
+import { describe, it, before, after, beforeEach, afterEach, mock } from 'node:test';
 import { expect } from 'chai';
 import sinon from 'sinon';
-import { jest } from '@jest/globals';
 
 import * as actualModulePaths from '../../webpack/module-paths.js';
+
+afterEach(() => sinon.restore());
 
 // ESM namespaces can't be stubbed, so replace module-paths with a mutable wrapper
 const modulePaths = {
@@ -10,12 +12,8 @@ const modulePaths = {
   tryResolve: actualModulePaths.tryResolve,
 };
 const resetPaths = () => Object.assign(modulePaths, actualModulePaths);
-jest.unstable_mockModule('../../webpack/module-paths.js', () => ({
-  ...actualModulePaths,
-  locateStripesModule: (...a) => modulePaths.locateStripesModule(...a),
-  tryResolve: (...a) => modulePaths.tryResolve(...a),
-}));
-const { StripesModuleParser, parseAllModules } = await import('../../webpack/stripes-module-parser.js');
+let StripesModuleParser;
+let parseAllModules;
 
 let sut;
 let packageJson;
@@ -80,6 +78,17 @@ function getMockPackageJson(actsAs = 'app') {
 }
 
 describe('The stripes-module-parser', () => {
+  before(async () => {
+    mock.module('../../webpack/module-paths.js', {
+      namedExports: {
+        ...actualModulePaths,
+        locateStripesModule: (...a) => modulePaths.locateStripesModule(...a),
+        tryResolve: (...a) => modulePaths.tryResolve(...a),
+      },
+    });
+    ({ StripesModuleParser, parseAllModules } = await import('../../webpack/stripes-module-parser.js'));
+  });
+
   describe('loadPackageJson method', () => {
     it('throws StripesBuildError when package.json is missing', () => {
       modulePaths.locateStripesModule = () => false;
@@ -296,7 +305,13 @@ describe('parseAllModules function', () => {
 });
 
 describe('integration', () => {
-  const result = parseAllModules({ '@folio/app1': {}, '@folio/app2': {} }, import.meta.dirname, aliases);
+  after(() => mock.reset());
+
+  let result;
+  before(() => {
+    result = parseAllModules({ '@folio/app1': {}, '@folio/app2': {} }, import.meta.dirname, aliases);
+  });
+
   it('sees the right number of apps', () => {
     expect(result.config.app).to.be.an('array').with.lengthOf(2);
   });

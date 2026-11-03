@@ -1,3 +1,4 @@
+import { describe, it, beforeEach, afterEach } from 'node:test';
 import { expect } from 'chai';
 import sinon from 'sinon';
 
@@ -7,6 +8,8 @@ import StripesTranslationsPlugin from '../../webpack/stripes-translations-plugin
 import StripesBrandingPlugin from '../../webpack/stripes-branding-plugin.js';
 import StripesErrorLoggingPlugin from '../../webpack/stripes-error-logging-plugin.js';
 import StripesDuplicatesPlugin from '../../webpack/stripes-duplicate-plugin.js';
+
+afterEach(() => sinon.restore());
 
 const compilerStub = {
   apply: () => {},

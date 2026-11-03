@@ -1,7 +1,7 @@
+import { describe, it, beforeEach, afterEach, mock } from 'node:test';
 import { expect } from 'chai';
 import sinon from 'sinon';
 import path from 'path';
-import { jest } from '@jest/globals';
 
 describe('The federate function', () => {
   let fetchStub;
@@ -14,9 +14,14 @@ describe('The federate function', () => {
   let processExitStub;
   let compilerShutdownFn;
   let federate;
+  let importCount = 0;
+
+  afterEach(() => {
+    mock.reset();
+    sinon.restore();
+  });
 
   beforeEach(async () => {
-    jest.resetModules();
     fetchStub = sinon.stub(global, 'fetch').resolves();
 
     const compilerStub = {
@@ -33,16 +38,16 @@ describe('The federate function', () => {
     tryResolveStub = sinon.stub().returns(path.join(import.meta.dirname, 'fixtures', 'package.json'));
     buildConfigStub = sinon.stub().returns({ devServer: {} });
 
-    jest.unstable_mockModule('webpack', () => ({ default: webpackStub }));
-    jest.unstable_mockModule('webpack-dev-server', () => ({ default: WebpackDevServerStub }));
-    jest.unstable_mockModule('../../webpack/module-paths.js', () => ({ tryResolve: tryResolveStub }));
-    jest.unstable_mockModule('../../webpack.config.federate.remote.js', () => ({ default: buildConfigStub }));
+    mock.module('webpack', { defaultExport: webpackStub });
+    mock.module('webpack-dev-server', { defaultExport: WebpackDevServerStub });
+    mock.module('../../webpack/module-paths.js', { namedExports: { tryResolve: tryResolveStub } });
+    mock.module('../../webpack.config.federate.remote.js', { defaultExport: buildConfigStub });
 
     consoleLogStub = sinon.stub(console, 'log');
     consoleErrorStub = sinon.stub(console, 'error');
     processExitStub = sinon.stub(process, 'exit');
 
-    federate = (await import('../../webpack/federate.js')).default;
+    federate = (await import(`../../webpack/federate.js?n=${++importCount}`)).default;
   });
 
   it('starts federation successfully', async () => {

@@ -51,7 +51,7 @@ const registryServer = {
     });
 
     const port = new URL(url).port || 3001;
-    app.listen(port, () => {
+    return app.listen(port, () => {
       console.log('Starting registry server at http://localhost:3001');
     });
   }
