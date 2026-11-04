@@ -88,5 +88,8 @@ export default (modulePaths) => {
         },
       },
     ],
+    resolve: {
+      fullySpecified: false
+    },
   };
 };
