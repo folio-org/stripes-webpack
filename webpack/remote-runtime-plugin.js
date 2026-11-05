@@ -4,7 +4,7 @@
 // This plugin sets a lifecycle method Before initialization of the remote's ModuleFederation instance
 // to pass the host's runtime plugins to the remote container.
 // The name of the plugin needs to match here, so we import it from a constant.
-import { HOST_RUNTIME_PLUGIN_NAME } from "../consts.js";
+export const HOST_RUNTIME_PLUGIN_NAME = 'stripes-injected-mf-runtime-plugin';
 
 const RemoteRuntimePlugin = () => ({
   name: 'remote-runtime-plugin',
