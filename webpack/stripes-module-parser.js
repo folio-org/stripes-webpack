@@ -1,11 +1,19 @@
-const path = require('path');
-const _ = require('lodash');
-const semver = require('semver');
-const validateNpmPackageName = require('validate-npm-package-name');
+import { createRequire } from 'node:module';
+import path from 'node:path';
+import forOwn from 'lodash/forOwn.js';
+import isObject from 'lodash/isObject.js';
+import map from 'lodash/map.js';
+import omit from 'lodash/omit.js';
+import reduce from 'lodash/reduce.js';
+import semver from 'semver';
+import validateNpmPackageName from 'validate-npm-package-name';
 
-const modulePaths = require('./module-paths');
-const StripesBuildError = require('./stripes-build-error');
-const logger = require('./logger')('stripesModuleParser');
+import * as modulePaths from './module-paths.js';
+import StripesBuildError from './stripes-build-error.js';
+import getLogger from './logger.js';
+
+const require = createRequire(import.meta.url);
+const logger = getLogger('stripesModuleParser');
 
 // These config keys do not get exported with type-specific config
 const TOP_LEVEL_ONLY = ['permissions', 'icons', 'permissionSets', 'actsAs', 'type', 'hasSettings'];
@@ -25,7 +33,7 @@ function buildIconFilePaths(name, root, module, warnings) {
     // bw: `${name}-bw.png`, example
   };
 
-  return _.reduce(iconVariants, (iconPaths, file, key) => {
+  return reduce(iconVariants, (iconPaths, file, key) => {
     const iconFilePath = path.join(root, iconDir, file);
     const isFound = modulePaths.tryResolve(iconFilePath);
     if (!isFound) {
@@ -85,7 +93,7 @@ class StripesModuleParser {
   // Wrapper to source data and transform into collections (config and metadata)
   parseModule() {
     const stripes = this.packageJson.stripes;
-    if (!_.isObject(stripes)) {
+    if (!isObject(stripes)) {
       throw new StripesBuildError(`Included module ${this.moduleName} does not have a "stripes" key in package.json`);
     }
 
@@ -149,7 +157,7 @@ class StripesModuleParser {
       throw new StripesBuildError(`${moduleName} is not a valid NPM package name according to https://www.npmjs.com/package/validate-npm-package-name`);
     }
 
-    const stripesConfig = _.omit({
+    const stripesConfig = omit({
       ...stripes,
       ...this.overrideConfig,
       ...{
@@ -203,7 +211,7 @@ class StripesModuleParser {
       if (isApp) this.warnings.push(`Module ${this.moduleName} has no icons defined in stripes.icons`);
       return {};
     }
-    return _.reduce(icons, (iconMetadata, icon) => {
+    return reduce(icons, (iconMetadata, icon) => {
       iconMetadata[icon.name] = iconPropsFromConfig(icon);
       // The icon's name will be used in the event fileName is not specified
       Object.assign(iconMetadata[icon.name], this.buildIconFilePaths(icon.fileName || icon.name));
@@ -220,7 +228,7 @@ class StripesModuleParser {
     if (!entries || !Array.isArray(entries)) {
       return [];
     }
-    return _.map(entries, (entry) => {
+    return map(entries, (entry) => {
       if (!icons[entry.iconName]) {
         this.warnings.push(`Module ${this.moduleName} defines welcome page entry icon "${entry.iconName}" with no matching stripes.icons definition`);
       }
@@ -245,7 +253,7 @@ function parseAllModules(enabledModules, context, aliases, lazy = false) {
   const icons = {};
   let warnings = [];
 
-  _.forOwn(enabledModules, (overrideConfig, moduleName) => {
+  forOwn(enabledModules, (overrideConfig, moduleName) => {
     const moduleParser = new StripesModuleParser(moduleName, overrideConfig, context, aliases, lazy);
     const parsedModule = moduleParser.parseModule();
 
@@ -322,7 +330,7 @@ function parseAllModules(enabledModules, context, aliases, lazy = false) {
   };
 }
 
-module.exports = {
+export {
   StripesModuleParser,
   parseAllModules,
 };

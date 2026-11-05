@@ -18,4 +18,4 @@ const plugin = (options = { contains: '' }) => {
 };
 plugin.postcss = true;
 
-module.exports = plugin;
+export default plugin;

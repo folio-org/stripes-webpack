@@ -1,15 +1,18 @@
 // Top level Webpack configuration for running a development environment
 // from the command line via devServer.js
-const webpack = require('webpack');
-const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+import { createRequire } from 'node:module';
+import webpack from 'webpack';
+import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 
-const { getModulesPaths, getStripesModulesPaths } = require('./webpack/module-paths');
-const { tryResolve } = require('./webpack/module-paths');
-const esbuildLoaderRule = require('./webpack/esbuild-loader-rule');
-const utils = require('./webpack/utils');
-const buildBaseConfig = require('./webpack.config.base');
-const cli = require('./webpack.config.cli');
-const { addHostMFConfig } = require('./module-federation-config');
+import { getModulesPaths, getStripesModulesPaths, tryResolve } from './webpack/module-paths.js';
+import esbuildLoaderRule from './webpack/esbuild-loader-rule.js';
+import * as utils from './webpack/utils.js';
+import buildBaseConfig from './webpack.config.base.js';
+import cli from './webpack.config.cli.js';
+import defaultBranding from './default-assets/branding.js';
+import { addHostMFConfig } from './module-federation-config.js';
+
+const require = createRequire(import.meta.url);
 
 const useBrowserMocha = () => {
   return tryResolve('mocha/mocha-es2018.js') ? 'mocha/mocha-es2018.js' : 'mocha';
@@ -20,7 +23,7 @@ const buildConfig = (stripesConfig) => {
   const stripesModulePaths = getStripesModulesPaths();
   const allModulePaths = [...stripesModulePaths, ...modulePaths];
 
-  const base = buildBaseConfig(allModulePaths, { ...stripesConfig, branding: { ...require("./default-assets/branding"), ...stripesConfig.branding } });
+  const base = buildBaseConfig(allModulePaths, { ...stripesConfig, branding: { ...defaultBranding, ...stripesConfig.branding } });
   const devOverrides = {
     name: 'development',
     devtool: 'inline-source-map',
@@ -84,4 +87,4 @@ const buildConfig = (stripesConfig) => {
   return devConfig;
 }
 
-module.exports = buildConfig;
+export default buildConfig;

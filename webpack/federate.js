@@ -1,13 +1,17 @@
-const path = require('path');
-const net = require('net');
-const webpack = require('webpack');
-const WebpackDevServer = require('webpack-dev-server');
-const { snakeCase } = require('lodash');
+import { createRequire } from 'node:module';
+import path from 'node:path';
+import net from 'node:net';
+import webpack from 'webpack';
+import WebpackDevServer from 'webpack-dev-server';
+import snakeCase from 'lodash/snakeCase.js';
 
-const buildConfig = require('../webpack.config.federate.remote');
-const { tryResolve } = require('./module-paths');
-const logger = require('./logger')();
-const { defaultDiscoveryUrl } = require('../consts');
+import buildConfig from '../webpack.config.federate.remote.js';
+import { tryResolve } from './module-paths.js';
+import getLogger from './logger.js';
+const logger = getLogger();
+import { defaultDiscoveryUrl } from '../consts.js';
+
+const require = createRequire(import.meta.url);
 
 // Function to check if a port is free
 function isPortFree(port) {
@@ -32,7 +36,7 @@ async function findFreePort(startPort) {
   return port;
 }
 
-module.exports = async function federate(stripesConfig, options = {}, callback = () => { }) {
+export default async function federate(stripesConfig, options = {}, callback = () => { }) {
   logger.log('starting federation...');
   const { discoveryUrl: configDiscoveryUrl } = stripesConfig.okapi;
   const discoveryUrl = configDiscoveryUrl || defaultDiscoveryUrl;

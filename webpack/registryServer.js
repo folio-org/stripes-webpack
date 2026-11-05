@@ -1,5 +1,5 @@
-const express = require('express');
-const cors = require('cors');
+import express from 'express';
+import cors from 'cors';
 
 // Registry data
 const registry = {
@@ -51,10 +51,10 @@ const registryServer = {
     });
 
     const port = new URL(url).port || 3001;
-    app.listen(port, () => {
+    return app.listen(port, () => {
       console.log('Starting registry server at http://localhost:3001');
     });
   }
 };
 
-module.exports = registryServer;
+export default registryServer;

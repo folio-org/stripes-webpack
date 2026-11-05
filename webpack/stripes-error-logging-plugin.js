@@ -1,10 +1,11 @@
 // This webpack plugin generates a virtual module containing the
 // error-logging configuration.
 
-const logger = require('./logger')('stripesErrorLoggingPlugin');
-const StripesConfigPlugin = require('./stripes-config-plugin');
+import getLogger from './logger.js';
+const logger = getLogger('stripesErrorLoggingPlugin');
+import StripesConfigPlugin from './stripes-config-plugin.js';
 
-module.exports = class StripesErrorLoggingPlugin {
+export default class StripesErrorLoggingPlugin {
   constructor(options) {
     logger.log('initializing...');
 

@@ -11,6 +11,7 @@
 * Use scoped package-names when checking for duplicates. Refs STRWEB-64.
 * *BREAKING* Remove babel. STRWEB-163.
 * Allow ESM modules to resolve imports without file extensions. Refs STRWEB-165.
+* *BREAKING* Convert from CommonJS to pure ESM (`"type": "module"`, `exports` map). Consumers must `import` this package (or use Node 22 `require(esm)`). Tests move from mocha to Jest. Refs STRWEB-164.
 
 ## [7.0.0](https://github.com/folio-org/stripes-webpack/tree/v7.0.0) (2026-04-15)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v6.0.0...v7.0.0)

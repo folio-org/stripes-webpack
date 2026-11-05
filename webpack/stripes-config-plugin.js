@@ -6,25 +6,27 @@
 // the module name, DO NOT import this module.
 // Instead, use the ModulesContext directly or via the withModules/withModule HOCs.
 
-const _ = require('lodash');
-const VirtualModulesPlugin = require('webpack-virtual-modules');
-const serialize = require('serialize-javascript');
-const { SyncHook } = require('tapable');
-const stripesModuleParser = require('./stripes-module-parser');
-const StripesBuildError = require('./stripes-build-error');
-const stripesSerialize = require('./stripes-serialize');
-const logger = require('./logger')('stripesConfigPlugin');
+import isObject from 'lodash/isObject.js';
+import omit from 'lodash/omit.js';
+import VirtualModulesPlugin from 'webpack-virtual-modules';
+import serialize from 'serialize-javascript';
+import { SyncHook } from 'tapable';
+import * as stripesModuleParser from './stripes-module-parser.js';
+import StripesBuildError from './stripes-build-error.js';
+import * as stripesSerialize from './stripes-serialize.js';
+import getLogger from './logger.js';
+const logger = getLogger('stripesConfigPlugin');
 
 const stripesConfigPluginHooksMap = new WeakMap();
 
-module.exports = class StripesConfigPlugin {
+export default class StripesConfigPlugin {
   // options is actually stripes.config.js
   constructor(options, lazy) {
     logger.log('initializing...');
-    if (!_.isObject(options.modules)) {
+    if (!isObject(options.modules)) {
       throw new StripesBuildError('stripes-config-plugin was not provided a "modules" object for enabling stripes modules');
     }
-    this.options = _.omit(options, 'branding', 'errorLogging');
+    this.options = omit(options, 'branding', 'errorLogging');
     this.lazy = lazy;
   }
 

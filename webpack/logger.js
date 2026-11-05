@@ -1,7 +1,7 @@
-const debug = require('debug');
+import debug from 'debug';
 
 // Wrapper for debug to ensure consistent use of namespace
-module.exports = function getLogger(name) {
+export default function getLogger(name) {
   const namespace = name ? `stripes-core:${name}` : 'stripes-core';
   const logger = debug(namespace);
 

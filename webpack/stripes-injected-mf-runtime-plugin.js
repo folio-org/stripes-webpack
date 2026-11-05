@@ -2,7 +2,7 @@
 // This file can be used to attach lifecycle hooks to the module federation runtime logic.
 // See https://module-federation.io/guide/runtime/runtime-hooks.html for possible entries.
 import satisfies from 'semver/functions/satisfies.js';
-import { HOST_RUNTIME_PLUGIN_NAME } from '../consts.js';
+import { HOST_RUNTIME_PLUGIN_NAME } from './remote-runtime-plugin.js';
 
 const StripesInjectedMFRuntimePlugin = () => ({
   name: HOST_RUNTIME_PLUGIN_NAME,

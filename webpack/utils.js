@@ -40,7 +40,7 @@ const processShared = (shared, options = {}) => {
   }, {});
 };
 
-module.exports = {
+export {
   processExternals,
   isDevelopment,
   isProduction,
