@@ -2,6 +2,7 @@
 // from the command line via devServer.js
 const webpack = require('webpack');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const path = require('node:path');
 
 const { getModulesPaths, getStripesModulesPaths } = require('./webpack/module-paths');
 const { tryResolve } = require('./webpack/module-paths');
