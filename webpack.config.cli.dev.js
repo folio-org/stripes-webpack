@@ -2,6 +2,7 @@
 // from the command line via devServer.js
 const webpack = require('webpack');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const path = require('node:path');
 
 const { getModulesPaths, getStripesModulesPaths } = require('./webpack/module-paths');
 const { tryResolve } = require('./webpack/module-paths');
@@ -12,7 +13,9 @@ const cli = require('./webpack.config.cli');
 const { addHostMFConfig } = require('./module-federation-config');
 
 const useBrowserMocha = () => {
-  return tryResolve('mocha/mocha-es2018.js') ? 'mocha/mocha-es2018.js' : 'mocha';
+  if (tryResolve('mocha/mocha-es2018.js')) return 'mocha/mocha-es2018.js'; // mocha <= 10
+  if (tryResolve('mocha')) return path.resolve(__dirname, 'webpack/mocha-browser-shim.js'); // mocha >= 11
+  return 'mocha';
 };
 
 const buildConfig = (stripesConfig) => {
