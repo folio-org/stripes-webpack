@@ -12,6 +12,7 @@
 * *BREAKING* Remove babel. STRWEB-163.
 * Allow ESM modules to resolve imports without file extensions. Refs STRWEB-165.
 * Support mocha >= v10. Refs STCLI-301.
+* Bump the minimum node version to 22.12, where `require(esm)` is available. Refs STRWEB-127.
 
 ## [7.0.0](https://github.com/folio-org/stripes-webpack/tree/v7.0.0) (2026-04-15)
 [Full Changelog](https://github.com/folio-org/stripes-webpack/compare/v6.0.0...v7.0.0)
